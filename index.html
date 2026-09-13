@@ -9,50 +9,62 @@
 <title>Next Point Padel</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-:root{--blue:#174f91;--blue-dark:#123f73;--pink:#e94b87;--text:#555;--muted:#888;--line:#e5e5e5;--bg:#f7f7f7}
+:root{--blue:#174f91;--pink:#e94b87;--text:#555;--muted:#888;--line:#e7e7e7}
 *{box-sizing:border-box}
-html,body{margin:0;min-height:100%;font-family:"Open Sans","Helvetica Neue",Arial,sans-serif;color:var(--text);background:#fff;font-size:14px;line-height:1.5}
+html,body{margin:0;min-height:100%;font-family:"Open Sans","Helvetica Neue",Arial,sans-serif;color:var(--text);background:#fff;font-size:13px;line-height:1.5}
 body{min-height:100vh;display:flex;flex-direction:column}
-.topbar{height:58px;border-bottom:1px solid #ededed;background:#fff;display:flex;align-items:center;justify-content:center;position:relative;z-index:2}
-.topbar-inner{width:min(1170px,calc(100% - 40px));height:100%;display:flex;align-items:center;justify-content:space-between}
-.brand-mini{font-size:15px;font-weight:700;letter-spacing:.2px;color:#555;text-decoration:none}
-.top-nav{display:flex;align-items:center;gap:28px;font-size:13px}
+a{color:inherit}
+.topbar{width:100%;height:44px;border-bottom:1px solid var(--line);background:#fff}
+.topbar-inner{width:min(1120px,calc(100% - 40px));height:44px;margin:0 auto;display:flex;align-items:center;justify-content:space-between}
+.languages{display:flex;align-items:center;gap:13px;color:#999;font-size:11px;text-transform:none}
+.languages span{cursor:pointer}.languages span:first-child{color:#555;font-weight:600}
+.top-nav{display:flex;align-items:center;gap:22px;font-size:12px}
 .top-nav a{color:#666;text-decoration:none;cursor:pointer}.top-nav a:hover{color:var(--pink)}
-.languages{display:flex;gap:12px;color:#999;font-size:12px}.languages span{cursor:pointer}.languages span:first-child{color:#555;font-weight:600}
+.contactbar{width:100%;border-bottom:1px solid #f0f0f0;background:#fff}
+.contactbar-inner{width:min(1120px,calc(100% - 40px));min-height:38px;margin:0 auto;display:flex;align-items:center;justify-content:flex-end;gap:18px;color:#888;font-size:11px}
+.contactbar a{text-decoration:none;color:#777}.contactbar a:hover{color:var(--pink)}
 .page{flex:1;width:100%;background:#fff}
-.content{width:min(1170px,calc(100% - 40px));margin:0 auto;text-align:center;padding:42px 20px 0}
-.club-logo{width:180px;height:auto;max-height:120px;object-fit:contain;margin:0 auto 22px;display:block}
-.club-name{margin:0;color:#444;font-size:25px;line-height:1.25;font-weight:500;text-transform:uppercase;letter-spacing:.1px}
-.title-login{margin:8px 0 28px;color:#777;font-size:17px;line-height:1.4;font-weight:400}
-.login-area{width:100%;max-width:430px;margin:0 auto;text-align:left}
-.field{display:block;width:100%;height:44px;margin:0 0 13px;padding:0 14px;border:1px solid #d8d8d8;border-radius:2px;background:#fff;color:#444;font-family:inherit;font-size:14px;outline:none;transition:border-color .15s,box-shadow .15s}
-.field::placeholder{color:#aaa}.field:focus{border-color:#aaa;box-shadow:0 0 0 1px rgba(0,0,0,.03)}
-.remember{display:flex;align-items:center;gap:8px;margin:5px 0 13px;color:#777;font-size:13px;cursor:pointer}.remember input{width:15px;height:15px;margin:0;accent-color:var(--blue)}
-.link{display:block;margin:0 0 20px;text-align:center;color:#777;font-size:13px;text-decoration:none;cursor:pointer}.link:hover{text-decoration:underline;color:var(--pink)}
-.buttons{display:flex;justify-content:center;gap:10px;margin:0 0 15px}.btn{height:43px;min-width:145px;padding:0 24px;border:1px solid var(--blue);border-radius:2px;background:var(--blue);color:#fff;font-family:inherit;font-size:13px;font-weight:600;letter-spacing:.2px;cursor:pointer;transition:background .15s,border-color .15s}.btn:hover{background:var(--blue-dark);border-color:var(--blue-dark)}
-.btn-reset{display:none}
-#status{min-height:20px;margin:4px 0 18px;text-align:center;color:#777;font-size:13px}
-.footer{width:min(1170px,calc(100% - 40px));margin:0 auto;padding:34px 20px 24px;border-top:1px solid #ededed;text-align:center;color:#888;font-size:12px;line-height:1.8}
-.contacts{margin-bottom:12px;color:#777;font-size:13px}.contacts a{color:#777;text-decoration:none}.contacts a:hover{color:var(--pink)}
-.footer-links{color:#888}.footer-links span{margin:0 3px}.copyright{margin-top:12px;color:#aaa}
+.content{width:min(1120px,calc(100% - 40px));margin:0 auto;text-align:center;padding:34px 20px 18px}
+.club-logo{width:150px;height:150px;object-fit:contain;display:block;margin:0 auto 17px}
+.club-name{margin:0;color:#444;font-size:22px;line-height:1.3;font-weight:500;text-transform:uppercase;letter-spacing:0}
+.title-login{margin:5px 0 25px;color:#777;font-size:15px;line-height:1.4;font-weight:400}
+.login-area{width:100%;max-width:365px;margin:0 auto;text-align:left}
+.field{display:block;width:100%;height:40px;margin:0 0 10px;padding:0 12px;border:1px solid #d9d9d9;border-radius:2px;background:#fff;color:#444;font-family:inherit;font-size:13px;outline:none}
+.field::placeholder{color:#aaa}.field:focus{border-color:#aaa;box-shadow:none}
+.remember{display:flex;align-items:center;gap:7px;margin:4px 0 11px;color:#777;font-size:12px;cursor:pointer}.remember input{width:14px;height:14px;margin:0;accent-color:var(--blue)}
+.link{display:block;margin:0 0 15px;text-align:center;color:#777;font-size:12px;text-decoration:none;cursor:pointer}.link:hover{text-decoration:underline;color:var(--pink)}
+.buttons{display:flex;justify-content:center;gap:8px;margin:0 0 13px}
+.btn{height:39px;min-width:125px;padding:0 22px;border:1px solid var(--blue);border-radius:2px;background:var(--blue);color:#fff;font-family:inherit;font-size:12px;font-weight:600;letter-spacing:.1px;cursor:pointer}
+.btn:hover{background:#123f73;border-color:#123f73}
+.register-note{margin:2px 0 13px;text-align:center;color:#777;font-size:12px}
+.register-note a{color:#777;text-decoration:none;cursor:pointer}.register-note a:hover{color:var(--pink);text-decoration:underline}
+#status{min-height:18px;margin:2px 0 5px;text-align:center;color:#777;font-size:12px}
+.footer{width:min(1120px,calc(100% - 40px));margin:0 auto;padding:22px 20px 18px;border-top:1px solid var(--line);text-align:center;color:#888;font-size:11px;line-height:1.8}
+.footer-links{color:#888}.footer-links span{margin:0 3px}.copyright{margin-top:8px;color:#aaa}
 @media(max-width:700px){
-.topbar{height:auto;min-height:54px}.topbar-inner{width:100%;padding:0 18px}.brand-mini{font-size:13px}.top-nav{gap:15px;font-size:12px}.languages{display:none}
-.content{width:100%;padding:32px 20px 0}.club-logo{width:155px;margin-bottom:18px}.club-name{font-size:21px}.title-login{font-size:16px;margin-bottom:24px}.login-area{max-width:430px}.buttons{gap:8px}.btn{min-width:0;flex:1}
-.footer{width:100%;padding:28px 20px 20px}
+.topbar{height:auto;min-height:44px}.topbar-inner{width:100%;padding:0 15px}.languages{gap:9px}.top-nav{gap:14px}
+.contactbar-inner{width:100%;padding:7px 15px;justify-content:center;flex-wrap:wrap;gap:5px 14px}
+.content{width:100%;padding:28px 18px 15px}.club-logo{width:125px;height:125px;margin-bottom:15px}.club-name{font-size:19px}.title-login{font-size:15px;margin-bottom:22px}.login-area{max-width:365px}.buttons{gap:7px}.btn{min-width:0;flex:1}
+.footer{width:100%;padding:20px 15px 16px}
 }
 </style>
 </head>
 <body>
 <header class="topbar">
   <div class="topbar-inner">
-    <a class="brand-mini" href="index.html">NEXT POINT PADEL</a>
+    <div class="languages" aria-label="Lingua"><span>Italiano</span><span>English</span><span>English-US</span><span>Français</span><span>Deutsch</span><span>Spanish</span></div>
     <nav class="top-nav" aria-label="Navigazione accesso">
       <a href="index.html">Accesso</a>
       <a href="#" id="topRegister">Registrati</a>
-      <div class="languages" aria-label="Lingua"><span>IT</span><span>EN</span></div>
     </nav>
   </div>
 </header>
+<div class="contactbar">
+  <div class="contactbar-inner">
+    <a href="mailto:info@nextpointpadel.it">info@nextpointpadel.it</a>
+    <a href="tel:+39333444556">+39 333444556</a>
+  </div>
+</div>
 <main class="page">
   <section class="content">
     <img src="logo.jpg" class="club-logo" alt="Next Point Padel">
@@ -67,13 +79,12 @@ body{min-height:100vh;display:flex;flex-direction:column}
         <button class="btn" id="loginBtn">ACCEDI</button>
         <button class="btn" id="registerBtn">REGISTRATI</button>
       </div>
-      <button class="btn btn-reset" onclick="resetPassword()">RESET PASSWORD</button>
+      <div class="register-note">Non sei iscritto? <a href="#" id="registerNoteLink">Registrati</a></div>
       <div id="status"></div>
     </div>
   </section>
 </main>
 <footer class="footer">
-  <div class="contacts">✉ <a href="mailto:info@nextpointpadel.it">info@nextpointpadel.it</a> &nbsp; · &nbsp; 📞 <a href="tel:+39333444556">+39 333444556</a></div>
   <div class="footer-links">Cookie policy <span>|</span> Privacy policy <span>|</span> Condizioni d'uso <span>|</span> Regolamento del Club</div>
   <div class="copyright">Copyright © 2026<br>NEXT POINT PADEL</div>
 </footer>
