@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Centro Sportivo Footballite - Wansport Style</title>
+<style>
+*{box-sizing:border-box}html,body{margin:0;min-height:100%;font-family:Arial,Helvetica,sans-serif;color:#555;background:#fff}body{min-height:100vh;display:flex;flex-direction:column}.top{height:56px;border-bottom:1px solid #e6e6e6;background:#fff;display:flex;align-items:center;justify-content:space-between;padding:0 34px;font-size:13px}.languages{display:flex;gap:18px;color:#777}.languages span:first-child{color:#111;font-weight:600}.top-actions{display:flex;gap:28px}.top-actions a{color:#555;text-decoration:none;font-weight:600}.top-actions a:hover{color:#1676d2}.page{flex:1;display:flex;justify-content:center;padding:46px 20px 30px}.content{width:100%;max-width:1120px;display:grid;grid-template-columns:1fr 420px 1fr;align-items:start;gap:45px}.side{min-height:520px}.center{text-align:center}.logo{width:190px;height:190px;object-fit:contain;margin:5px auto 18px;display:block}.title{font-size:24px;line-height:1.25;font-weight:600;color:#333;margin:0 auto 30px;max-width:430px}.subtitle{font-size:18px;color:#444;margin-bottom:22px}.form{text-align:left;width:100%;max-width:360px;margin:auto}.field{width:100%;height:44px;border:1px solid #d8d8d8;border-radius:3px;padding:0 13px;font-size:14px;margin-bottom:12px;outline:none}.field:focus{border-color:#1683d8}.remember{display:flex;align-items:center;gap:8px;font-size:13px;margin:6px 0 18px;color:#666}.remember input{margin:0}.forgot{text-align:right;margin:-8px 0 18px}.forgot a,.register-link a{color:#1676d2;text-decoration:none;cursor:pointer}.buttons{display:flex;gap:10px}.btn{height:44px;border:0;border-radius:3px;cursor:pointer;font-size:13px;font-weight:700;flex:1}.btn-primary{background:#1676d2;color:#fff}.btn-secondary{background:#fff;color:#1676d2;border:1px solid #1676d2}.btn:hover{opacity:.9}.register-link{text-align:center;font-size:13px;margin-top:20px}.contact{text-align:center;color:#777;font-size:13px;line-height:1.8;margin-top:36px}.footer{border-top:1px solid #e7e7e7;padding:22px 20px;text-align:center;color:#888;font-size:11px;line-height:1.8}.footer a{color:#777;text-decoration:none}.modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);align-items:center;justify-content:center;padding:20px}.modal.open{display:flex}.modal-box{width:100%;max-width:420px;background:#fff;border-radius:4px;box-shadow:0 10px 35px rgba(0,0,0,.25);padding:28px}.modal-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px}.modal-head h2{margin:0;font-size:19px;color:#333;font-weight:600}.close{border:0;background:none;font-size:25px;color:#777;cursor:pointer}.modal-box p{font-size:13px;line-height:1.6;color:#666}.modal-box .btn{width:100%;margin-top:5px}.status{text-align:center;font-size:13px;margin-top:12px;min-height:18px}@media(max-width:850px){.content{grid-template-columns:1fr;max-width:520px}.side{display:none}.page{padding-top:30px}.top{padding:0 16px}.languages{gap:10px}.top-actions{gap:16px}.logo{width:150px;height:150px}.title{font-size:21px}}@media(max-width:480px){.top{height:auto;min-height:54px;padding:10px 14px;flex-wrap:wrap;gap:10px}.languages{font-size:11px}.top-actions{font-size:11px}.page{padding:24px 16px}.form{max-width:100%}}
+</style>
+</head>
+<body>
+<header class="top">
+<div class="languages"><span>Italiano</span><span>English</span><span>Français</span><span>Deutsch</span><span>Español</span></div>
+<nav class="top-actions"><a href="#" id="accessLink">Accesso</a><a href="#" id="registerLink">Registrati</a></nav>
+</header>
+<main class="page">
+<div class="content">
+<div class="side"></div>
+<section class="center">
+<img class="logo" src="https://cdn-eu.wansport.com/footballite.wansport.com/66b8a1c00da8/azienda/thumb/fcfe0121a75bdd9021a20f1dc4b69b374a9515ee.jpg" alt="Logo Centro Sportivo Footballite">
+<h1 class="title">CENTRO SPORTIVO FOOTBALLITE DI NUCCIO BUSTO</h1>
+<div class="subtitle">Accesso utenti</div>
+<form class="form" id="loginForm">
+<input class="field" id="email" type="text" placeholder="Email o cellulare" autocomplete="username">
+<input class="field" id="password" type="password" placeholder="Password" autocomplete="current-password">
+<label class="remember"><input type="checkbox" id="remember">Resta connesso</label>
+<div class="forgot"><a id="forgotLink">Hai dimenticato la password?</a></div>
+<div class="buttons"><button class="btn btn-primary" type="submit">ACCEDI</button><button class="btn btn-secondary" type="button" id="registerBtn">REGISTRATI</button></div>
+<div class="register-link">Non sei registrato? <a id="registerText">Registrati</a></div>
+<div class="status" id="status"></div>
+</form>
+<div class="contact">S.P. Adelfia - Valenzano Zona P.I.P. - Adelfia (BA) - 70010<br>footballite@gmail.com<br>+39 3929248118</div>
+</section>
+<div class="side"></div>
+</div>
+</main>
+<footer class="footer">Cookie policy &nbsp;|&nbsp; Privacy policy &nbsp;|&nbsp; Termini d'uso<br>Copyright © 2026 Wansport.com ® All Rights Reserved</footer>
+<div class="modal" id="resetModal"><div class="modal-box"><div class="modal-head"><h2>Password reset</h2><button class="close" id="closeModal">×</button></div><p>Inserisci l'email o il cellulare utilizzato per la registrazione.</p><input class="field" id="resetEmail" type="text" placeholder="Email o cellulare"><button class="btn btn-primary" id="resetBtn">INVIA</button><div class="status" id="resetStatus"></div></div></div>
+<script>
+const status=document.getElementById('status');
+const modal=document.getElementById('resetModal');
+function resetPassword(){modal.classList.add('open');document.getElementById('resetEmail').focus()}
+document.getElementById('forgotLink').addEventListener('click',resetPassword);
+document.getElementById('closeModal').addEventListener('click',()=>modal.classList.remove('open'));
+modal.addEventListener('click',e=>{if(e.target===modal)modal.classList.remove('open')});
+document.getElementById('loginForm').addEventListener('submit',e=>{e.preventDefault();status.textContent='Accesso pronto.'});
+document.getElementById('registerBtn').addEventListener('click',()=>status.textContent='Registrazione pronta.');
+document.getElementById('registerLink').addEventListener('click',e=>{e.preventDefault();document.getElementById('registerBtn').click()});
+document.getElementById('registerText').addEventListener('click',()=>document.getElementById('registerBtn').click());
+document.getElementById('resetBtn').addEventListener('click',()=>{const v=document.getElementById('resetEmail').value.trim();document.getElementById('resetStatus').textContent=v?'Richiesta inviata.':'Inserisci email o cellulare.'});
+</script>
+</body>
+</html>
