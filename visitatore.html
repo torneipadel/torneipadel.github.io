@@ -44,12 +44,34 @@
 <script src="visitatore-public-v2.js?v=2"></script>
 <script src="visitatore-news-preview-v1.js?v=1"></script>
 <script src="visitatore-eventi-v1.js?v=1"></script>
-<style id="np-index-dimensions">
-/* Questo blocco viene dopo gli script: sovrascrive il layout dinamico e rende effettive le stesse dimensioni esterne di index.html. */
-body{padding:24px!important;}
-.np-page{width:min(600px,100%)!important;margin:0 auto!important;}
-@media(max-width:520px){body{padding:16px!important}.np-page{width:100%!important;margin:0 auto!important;}}
+<script src="sponsor-public-v2.js?v=8"></script>
+<style id="np-index-layout">
+/* Layout dimensionale coerente con index.html: stesso guscio, stessa larghezza, stesso vetro. */
+html,body{margin:0!important;min-height:100%!important}
+body{display:flex!important;align-items:flex-start!important;justify-content:center!important;padding:24px!important;background:linear-gradient(rgba(7,18,25,.28),rgba(7,18,25,.42)),url("2pages.jpg") center/cover fixed no-repeat!important}
+body:before,body:after{display:none!important}
+.np-page{width:min(600px,100%)!important;max-width:600px!important;margin:0 auto!important;padding:34px 34px 30px!important;border:1px solid rgba(255,255,255,.24)!important;border-radius:28px!important;background:rgba(255,255,255,.12)!important;box-shadow:0 20px 55px rgba(0,0,0,.28),inset 0 1px 0 rgba(255,255,255,.16)!important;backdrop-filter:blur(18px) saturate(125%)!important;-webkit-backdrop-filter:blur(18px) saturate(125%)!important}
+.np-top{position:relative!important;top:auto!important;margin-bottom:24px!important}
+.np-topbar{padding:7px 10px!important;border:1px solid rgba(255,255,255,.22)!important;border-radius:14px!important;background:rgba(255,255,255,.08)!important;box-shadow:none!important}
+.np-login{padding:9px 11px!important;border-radius:12px!important;font-size:10px!important}
+.np-hero{grid-template-columns:1fr!important;min-height:0!important;gap:14px!important;margin-bottom:20px!important}
+.np-hero-copy,.np-hero-poster,.np-panel{border-radius:22px!important}
+.np-hero-copy{padding:28px 24px!important;min-height:0!important}
+.np-hero h1{font-size:clamp(34px,8vw,48px)!important;line-height:.98!important}
+.np-hero-copy p{font-size:13px!important;line-height:1.55!important}
+.np-hero-poster{min-height:220px!important}
+.np-grid,.np-news-grid,.np-calendar,.np-archive-list{grid-template-columns:1fr!important}
+.np-tour-feature{grid-template-columns:1fr!important;min-height:0!important}
+.np-tour-media{min-height:220px!important}
+.np-tour-info{padding:24px!important}
+.np-user{grid-template-columns:1fr!important;padding:18px!important}
+.np-section{margin:24px 0!important}
+.np-section-head{margin-bottom:12px!important}
+.np-section-head h2{font-size:22px!important}
+.np-panel{padding:18px!important}
+.np-card-media{height:180px!important}
+.np-footer{padding:25px 0 4px!important}
+@media(max-width:520px){body{padding:16px!important}.np-page{width:100%!important;max-width:none!important;padding:28px 22px 24px!important;border-radius:25px!important}.np-topbar{padding:7px 8px!important}.np-logo{width:120px!important}.np-login{padding:9px 10px!important}.np-hero-copy{padding:24px 20px!important}.np-hero h1{font-size:40px!important}.np-hero-poster{min-height:190px!important}.np-tour-info{padding:20px!important}.np-panel{padding:16px!important;border-radius:20px!important}}
 </style>
-  <script src="sponsor-public-v2.js?v=8"></script>
 </body>
 </html>
