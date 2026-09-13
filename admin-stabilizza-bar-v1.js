@@ -9,7 +9,7 @@ window.logoutAdmin=async function(){
   try{localStorage.removeItem('padel_admin_state')}catch(e){}
   const area=document.getElementById('areaAdmin');
   const login=document.getElementById('boxLoginAdmin');
-  if(area)area.style.display='none';
-  if(login)login.style.display='block';
+  if(area)area.classList.add('hidden');
+  if(login)login.classList.remove('hidden');
 };
 })();
