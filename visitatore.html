@@ -2,44 +2,43 @@
 <html lang="it">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Roberto Bove Padel</title>
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Next Point Padel</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<style>
-:root{--bg-image:url('https://torneirobertobove.github.io/sfondo2.jpg');--glass:rgba(255,255,255,.15);--border:rgba(255,255,255,.25);--blue:#004a99;--gold:#ffeb3b}
-*{box-sizing:border-box}body{margin:0;background-image:var(--bg-image);background-size:cover;background-position:center;background-attachment:fixed;font-family:"Open Sans","Helvetica Neue",Arial,sans-serif;color:white;min-height:100vh}.container{width:95%;max-width:900px;margin:auto;padding:15px}.card{background:var(--glass);backdrop-filter:blur(10px);border:1px solid var(--border);border-radius:20px;padding:20px;margin-bottom:18px;box-shadow:0 8px 32px rgba(0,0,0,.35)}header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}.logo{width:120px}.menu-btn{background:none;border:0;color:white;font-size:32px;cursor:pointer}.login-btn{background:white;color:var(--blue);padding:10px 15px;border-radius:12px;font-weight:bold;text-decoration:none}.back-btn{background:rgba(255,255,255,.9);color:var(--blue);border:0;padding:8px 14px;border-radius:10px;cursor:pointer;font-weight:bold}h1,h2,h3{text-align:center}.sezione-titolo{color:var(--gold);text-align:center}.menu{position:fixed;top:0;left:-300px;width:280px;height:100vh;background:#111827;padding:25px;z-index:1000;transition:.3s;overflow-y:auto}.menu.aperto{left:0}.menu a{display:block;color:white;text-decoration:none;padding:14px 5px;border-bottom:1px solid rgba(255,255,255,.15)}.chiudi{font-size:25px;cursor:pointer;margin-bottom:20px}.news-item{background:rgba(0,0,0,.25);padding:15px;border-radius:12px;margin-bottom:12px}.news-poster{display:block;width:100%;max-width:620px;margin:0 auto;border-radius:14px;box-shadow:0 10px 30px rgba(0,0,0,.3)}.news-poster-title{margin:14px 0 4px;font-size:20px}.news-poster-text{margin:0;white-space:pre-line;line-height:1.5}.torneo-item{background:rgba(255,255,255,.12);padding:18px;border-radius:15px;margin-bottom:15px}.btn-iscriviti{width:100%;background:white;color:var(--blue);padding:12px;border:0;border-radius:10px;font-weight:bold;cursor:pointer}.btn-apri{width:100%;background:#16a34a;color:white;padding:12px;border:0;border-radius:10px;font-weight:bold;cursor:pointer;margin-top:10px}.btn-iscriviti:disabled{background:#555;color:white}
-</style>
 </head>
 <body>
-<button class="back-btn" onclick="history.back()">⬅ Indietro</button>
-<div id="menu" class="menu"><div class="chiudi" onclick="chiudiMenu()">✖</div><a href="#">⌂ Home</a><a href="#tornei">♛ Tornei</a><a href="#news">▣ News</a><a href="javascript:apriMercatino()">□ Mercatino</a><a href="#calendario">▦ Eventi</a><a href="javascript:apriContatti()">○ Contatti</a><a href="javascript:esciVisitatore()">🚪 Esci</a></div>
-<div class="container"><header><button class="menu-btn" onclick="apriMenu()">☰</button><img src="logo.jpg" class="logo" alt="Logo"><a href="index.html" class="login-btn">👤</a></header>
-<div class="card" id="boxUtente">⏳ Caricamento...</div>
-<div class="card" id="mioTorneo"><h2 class="sezione-titolo">🏆 Il mio torneo</h2><div id="contenutoMioTorneo" class="news-item">Caricamento torneo personale...</div></div>
-<div class="card" id="news"><h2 class="sezione-titolo">📰 News</h2><div id="listaNewsVisitatore"><div class="news-item">Caricamento news...</div></div></div>
-<div class="card" id="tornei"><h2 class="sezione-titolo">🏆 Tornei disponibili</h2><div id="lista-tornei"><div class="news-item">Caricamento tornei...</div></div></div>
-<div class="card" id="calendario"><h2 class="sezione-titolo">📅 Calendario eventi</h2><div class="news-item">Calendario tornei e appuntamenti in aggiornamento.</div></div>
+<button class="np-back" onclick="history.back()">← Indietro</button>
+<nav id="npMenu" class="np-menu" aria-label="Menu principale">
+  <div class="np-menu-close"><strong>NEXT POINT PADEL</strong><button class="np-icon" onclick="chiudiMenu()">×</button></div>
+  <a href="#home" onclick="chiudiMenu()">⌂ Home</a>
+  <a href="#tornei" onclick="chiudiMenu()">♛ Tornei</a>
+  <a href="#news" onclick="chiudiMenu()">▣ News</a>
+  <a href="javascript:apriMercatino()">□ Mercatino</a>
+  <a href="#eventi" onclick="chiudiMenu()">▦ Eventi</a>
+  <a href="javascript:apriContatti()">○ Contatti</a>
+  <a href="javascript:esciVisitatore()">🚪 Esci</a>
+</nav>
+<div class="np-page" id="home">
+  <header class="np-top">
+    <div class="np-topbar"><button class="np-icon" onclick="apriMenu()" aria-label="Apri menu">☰</button><img class="np-logo" src="logo.jpg" alt="Next Point Padel"></div>
+    <a class="np-login" href="index.html">👤 <span>AREA PERSONALE</span></a>
+  </header>
+  <section class="np-hero">
+    <div class="np-hero-copy"><span class="np-eyebrow">NEXT POINT PADEL · CLUB</span><h1>Vivi il gioco.<span>Vivi il momento.</span></h1><p>Il punto d'incontro per tornei, eventi, news e appuntamenti del club. Scopri cosa sta succedendo, scegli il tuo prossimo torneo e scendi in campo.</p><div class="np-hero-actions"><a class="np-btn np-primary" href="#tornei">SCOPRI I TORNEI</a><a class="np-btn np-ghost" href="#news">VEDI LE NEWS</a></div></div>
+    <div class="np-hero-poster" id="npHeroPoster"><div class="np-no-poster">🎾</div></div>
+  </section>
+  <section class="np-panel np-user" id="npUser"><div><h3>Caricamento...</h3><p>Verifica della sessione in corso.</p></div></section>
+  <section class="np-section" id="mioTorneo"><div class="np-section-head"><h2>Il mio torneo</h2><span>La tua esperienza</span></div><div id="npMyTournament"><div class="np-panel np-empty">Caricamento torneo personale...</div></div></section>
+  <section class="np-section" id="tornei"><div class="np-section-head"><h2>Scendi in campo</h2><span>Prossimi appuntamenti</span></div><div id="npTournaments"><div class="np-panel np-empty">Caricamento tornei...</div></div></section>
+  <section class="np-section" id="news"><div class="np-section-head"><h2>News & comunicazioni</h2><span>Tutto dal club</span></div><div id="npNews"><div class="np-panel np-empty">Caricamento news...</div></div></section>
+  <section class="np-section" id="eventi"><div class="np-section-head"><h2>Eventi</h2><span>Club life</span></div><div class="np-panel"><div class="np-calendar"><div class="np-event"><strong>📅 Calendario tornei</strong><span>Consulta gli appuntamenti direttamente dalle sezioni torneo.</span></div><div class="np-event"><strong>🎾 Prossimi appuntamenti</strong><span>Nuove iniziative, eventi e comunicazioni saranno pubblicati qui.</span></div></div></div></section>
+  <section class="np-section np-sponsor-slot" aria-label="Sponsor"></section>
+  <footer class="np-footer">NEXT POINT PADEL · TORNEI · EVENTI · NEWS</footer>
 </div>
-<script>
-const sb=window.sb=supabase.createClient("https://iybjvtmfaupgthqqsngd.supabase.co","sb_publishable_oLLML3_ne0I1dWKIinSRNA_K1Ao5SOl",{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});
-function apriMenu(){document.getElementById("menu")?.classList.add("aperto")}
-function chiudiMenu(){document.getElementById("menu")?.classList.remove("aperto")}
-function apriMercatino(){window.location.href="mercatino.html"}
-function apriContatti(){window.location.href="contatti.html"}
-async function esciVisitatore(){try{await sb.auth.signOut()}finally{window.location.href="index.html"}}
-function escHtml(v){return String(v??'').replace(/[&<>\"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;'}[m]))}
-async function caricaNewsVisitatore(){const box=document.getElementById("listaNewsVisitatore");if(!box)return;const {data,error}=await sb.from("tornei").select("id,nome,pubblicato,stato,configurazione");if(error){console.error("Errore caricamento news visitatore:",error);box.innerHTML='<div class="news-item">Errore caricamento news</div>';return}const news=[];(data||[]).forEach(t=>{if(!(t.pubblicato===true||String(t.stato||'').toLowerCase()==='attivo'))return;const items=Array.isArray(t.configurazione?.news)?t.configurazione.news:[];items.forEach(n=>news.push({...n,nomeTorneo:t.nome,torneoId:t.id}))});news.sort((a,b)=>new Date(b.data||0)-new Date(a.data||0));if(!news.length){box.innerHTML='<div class="news-item">Nessuna news disponibile</div>';return}box.innerHTML=news.map(n=>{const titolo=escHtml(n.titolo||n.tipo||'News');const testo=escHtml(n.testo||'');const img=n.immagine?`<img class="news-poster" src="${escHtml(n.immagine)}" alt="${titolo}" loading="lazy">`:'';const torneo=n.nomeTorneo?`<div style="font-size:12px;opacity:.75;margin-top:10px">${escHtml(n.nomeTorneo)}</div>`:'';return `<article class="news-item">${img}<h3 class="news-poster-title">${titolo}</h3>${testo?`<p class="news-poster-text">${testo}</p>`:''}${torneo}</article>`}).join("")}
-async function caricaTornei(){const box=document.getElementById("lista-tornei");if(!box)return;const {data,error}=await sb.from("tornei").select("id,nome,data,stato,pubblicato,iscrizioni_chiuse,formula,configurazione").order("data",{ascending:true});if(error){console.error("Errore caricamento tornei:",error);box.innerHTML='<div class="torneo-item">Errore caricamento tornei</div>';return}const torneiVisibili=(data||[]).filter(t=>t.pubblicato===true||t.stato==="attivo");if(!torneiVisibili.length){box.innerHTML='<div class="torneo-item">Nessun torneo disponibile</div>';return}box.innerHTML=torneiVisibili.map(t=>{const chiuso=t.iscrizioni_chiuse===true||["chiuso","concluso","archiviato"].includes(String(t.stato||"").toLowerCase());return `<div class="torneo-item"><h3>🏆 ${t.nome||"Torneo"}</h3><p>📅 ${t.data||"-"}</p><p>🎾 Formula: ${t.formula||t.configurazione?.rules?.tipoTorneo||"Padel"}</p><p>📌 ${chiuso?"Iscrizioni chiuse":"Iscrizioni aperte"}</p><button class="btn-iscriviti" ${chiuso?"disabled":""} onclick="vaiIscrizione(${Number(t.id)})">${chiuso?"ISCRIZIONI CHIUSE":"ISCRIVITI"}</button></div>`}).join("")}
-function vaiIscrizione(id){if(!id){alert("Torneo non valido");return}window.location.href="iscrizione.html?torneo="+encodeURIComponent(id)}
-async function aggiornaContatoriTornei(){const box=document.getElementById("lista-tornei");if(!box)return;const {data:tornei,error}=await sb.from("tornei").select("id,nome,posti,stato,iscrizioni_chiuse,configurazione").eq("pubblicato",true);if(error||!tornei?.length)return;const ids=tornei.map(t=>t.id);const {data:rows}=await sb.from("iscrizioni").select("torneo_id,stato").in("torneo_id",ids);const counts={};(rows||[]).forEach(r=>{if(String(r.stato||"").toLowerCase()==="rifiutato")return;counts[r.torneo_id]=(counts[r.torneo_id]||0)+1});box.querySelectorAll(".torneo-item").forEach(card=>{const title=card.querySelector("h3")?.textContent?.replace(/^🏆\s*/,"").trim();const t=tornei.find(x=>String(x.nome||"").trim()===String(title||"").trim());if(!t)return;const n=counts[t.id]||0,max=(Number(t.posti)||Number(t.configurazione?.rules?.numeroSquadre)||8)*2,rem=Math.max(0,max-n);let badge=card.querySelector(".live-capacity");if(!badge){badge=document.createElement("div");badge.className="live-capacity";badge.style.cssText="margin:8px 0;font-weight:700";const p=card.querySelector("p:last-of-type");p?.insertAdjacentElement("afterend",badge)}badge.innerHTML=n>=max?`🔴 TORNEO COMPLETO · ${n}/${max} iscritti`:`👥 ${n}/${max} iscritti · ${rem} posti disponibili${rem>0&&rem<=3?` · 🔥 ULTIMI ${rem} POSTI`:""}`;const btn=card.querySelector(".btn-iscriviti");if(btn&&n>=max){btn.disabled=true;btn.textContent="TORNEO COMPLETO"}})}
-async function mostraIlMioTorneo(){const box=document.getElementById("contenutoMioTorneo");if(!box)return;const {data}=await sb.auth.getUser();const user=data?.user;if(!user){box.innerHTML='<div class="news-item">🔐 Effettua il login per visualizzare il tuo torneo.</div>';return}const {data:iscrizioni,error}=await sb.from("iscrizioni").select(`id,torneo_id,stato,tornei(id,nome,data,formula,configurazione)`).eq("user_id",user.id);if(error){console.error("Errore iscrizioni:",error);box.innerHTML='<div class="news-item">Errore caricamento iscrizione</div>';return}if(!iscrizioni?.length){box.innerHTML='<div class="news-item">Non risulti iscritto a nessun torneo.</div>';return}const iscrizione=iscrizioni[0],torneo=iscrizione.tornei;if(!torneo){box.innerHTML='<div class="news-item">Torneo non trovato</div>';return}box.innerHTML=`<div class="news-item"><h3>🏆 ${torneo.nome||"Torneo"}</h3><p>📅 ${torneo.data||"-"}</p><p>🎾 ${torneo.formula||torneo.configurazione?.rules?.tipoTorneo||"Padel"}</p><p>📌 Stato: ${iscrizione.stato||"richiesta"}</p><button class="btn-apri" onclick="apriMioTorneo(${torneo.id})">Apri torneo</button></div>`}
-function apriMioTorneo(id){if(!id){alert("Torneo non valido");return}window.location.href="Bove.html?idTorneo="+encodeURIComponent(id)}
-async function caricaBoxUtente(){const box=document.getElementById("boxUtente");if(!box)return;try{const {data}=await sb.auth.getSession();const sessione=data.session;if(!sessione?.user){box.innerHTML='<div class="news-item">👤 Accesso non effettuato<br><br>Accedi per visualizzare iscrizioni e tornei personali.</div>';return}box.innerHTML=`<div class="news-item">👤 Utente collegato<br><br>${sessione.user.email||""}</div>`}catch(e){console.error("Errore caricamento utente:",e);box.innerHTML='<div class="news-item">Errore caricamento profilo</div>'}}
-async function avviaPagina(){console.log("Avvio visitatore");try{await caricaBoxUtente()}catch(e){console.error(e)}try{await mostraIlMioTorneo()}catch(e){console.error(e)}try{await caricaNewsVisitatore()}catch(e){console.error(e)}try{await caricaTornei()}catch(e){console.error(e)}setTimeout(aggiornaContatoriTornei,500);setInterval(aggiornaContatoriTornei,10000);console.log("Pagina visitatore caricata")}
-window.addEventListener("error",e=>console.error("Errore pagina visitatore:",e.message));window.addEventListener("unhandledrejection",e=>console.error("Errore asincrono visitatore:",e.reason));window.addEventListener("load",avviaPagina);
-</script>
-<script src="torneo-flow-public-fix-v1.js?v=1"></script>
-<script src="tornei-public-redesign-v1.js?v=1"></script>
-  <script src="sponsor-public-v2.js?v=8"></script>
+<script src="visitatore-public-v2.js?v=2"></script>
+<script src="sponsor-public-v2.js?v=8"></script>
 </body>
 </html>
