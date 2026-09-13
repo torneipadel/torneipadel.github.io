@@ -2,12 +2,12 @@
 (()=>{
 'use strict';
 const q=s=>document.querySelector(s);
-const POSTER_IMAGE_URL='locandina.jpg';
+const POSTER_IMAGE_URL='';
 const W=1080,H=1350;
 let photoPromise=null;
 let layers=[];
 let nextId=1;
-function loadPhoto(){if(photoPromise)return photoPromise;photoPromise=new Promise(resolve=>{const img=new Image();img.onload=()=>resolve(img);img.onerror=()=>resolve(null);img.src=POSTER_IMAGE_URL;});return photoPromise}
+function loadPhoto(){if(photoPromise)return photoPromise;if(!POSTER_IMAGE_URL)return Promise.resolve(null);photoPromise=new Promise(resolve=>{const img=new Image();img.onload=()=>resolve(img);img.onerror=()=>resolve(null);img.src=POSTER_IMAGE_URL;});return photoPromise}
 function esc(v){return String(v??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\"/g,'&quot;')}
 function defaults(){return{text:'',x:540,y:200,size:64,color:'#ffffff',align:'center',weight:'700'}}
 function addLayer(data={}){layers.push({...defaults(),...data,id:nextId++});renderLayerList();drawPreview()}
