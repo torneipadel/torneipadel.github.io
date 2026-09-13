@@ -4,6 +4,29 @@ function scan(){const bar=document.getElementById('adminTournamentControls');if(
 const observer=new MutationObserver(scan);observer.observe(document.body,{childList:true,subtree:true});scan();
 let tentativi=0;const wrap=setInterval(()=>{if(typeof window.renderCleanAdmin==='function'){clearInterval(wrap);const originale=window.renderCleanAdmin;if(!originale.__stabilizzato){const wrapper=function(){const r=originale.apply(this,arguments);requestAnimationFrame(()=>{window.dispatchEvent(new Event('admin:render'));scan()});return r};wrapper.__stabilizzato=true;window.renderCleanAdmin=wrapper}}tentativi++;if(tentativi>100)clearInterval(wrap)},50);
 
+function removeDuplicateSponsorBanner(){
+  const nodes=[...document.querySelectorAll('h1,h2,h3,h4,h5,h6,div,section,article')];
+  for(const node of nodes){
+    const text=String(node.textContent||'').replace(/\s+/g,' ').trim().toUpperCase();
+    if(text!=='I NOSTRI SPONSOR') continue;
+    let target=node;
+    for(let i=0;i<6&&target.parentElement;i++){
+      const parent=target.parentElement;
+      const parentText=String(parent.textContent||'').replace(/\s+/g,' ').trim().toUpperCase();
+      if(parentText.includes('I NOSTRI SPONSOR')&&parentText.includes('NESSUNO SPONSOR CONFIGURATO')){
+        target=parent;
+        if(parent.matches('section,article,.card,[id*="sponsor" i],[class*="sponsor" i]'))break;
+      }else break;
+    }
+    if(target!==document.body&&target!==document.documentElement)target.remove();
+  }
+}
+const sponsorBannerObserver=new MutationObserver(removeDuplicateSponsorBanner);
+sponsorBannerObserver.observe(document.body,{childList:true,subtree:true});
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',removeDuplicateSponsorBanner,{once:true});else removeDuplicateSponsorBanner();
+setTimeout(removeDuplicateSponsorBanner,300);
+setTimeout(removeDuplicateSponsorBanner,1000);
+
 /* ADMIN USA L'UNICA PAGINA DI LOGIN: index.html. Nessun secondo login dentro admin.html. */
 const login=document.getElementById('boxLoginAdmin');
 const area=document.getElementById('areaAdmin');
