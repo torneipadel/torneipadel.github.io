@@ -56,7 +56,7 @@
             return document.querySelector('.box') || document.querySelector('main');
         }
         if (page.endsWith('/visitatore.html') || page.endsWith('visitatore.html')) {
-            return document.querySelector('.container') || document.querySelector('main');
+            return document.querySelector('.np-sponsor-slot') || document.querySelector('main') || document.body;
         }
         return document.querySelector('main') || document.querySelector('.container') || document.body;
     }
