@@ -24,13 +24,18 @@ function isOpen(t){
   return (t.pubblicato===true||stato==='attivo') && t.iscrizioni_chiuse!==true && !['chiuso','concluso','archiviato'].includes(stato);
 }
 
+function isVisible(t){
+  const stato=String(t.stato||'').toLowerCase();
+  return t.pubblicato===true || stato==='attivo';
+}
+
 function formula(t){return t?.formula||t?.configurazione?.rules?.tipoTorneo||'Padel'}
 
 function render(tornei){
   const box=document.getElementById('npEvents');
   if(!box)return;
 
-  const sorted=(tornei||[]).filter(t=>t&&t.data).sort((a,b)=>new Date(a.data)-new Date(b.data));
+  const sorted=(tornei||[]).filter(t=>t&&t.data&&isVisible(t)).sort((a,b)=>new Date(a.data)-new Date(b.data));
   const upcoming=sorted.filter(t=>new Date(t.data)>=new Date(new Date().setHours(0,0,0,0)));
 
   if(!upcoming.length){
