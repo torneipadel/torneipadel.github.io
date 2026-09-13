@@ -1,0 +1,4 @@
+Backup marker for the public tournament redesign.
+Base branch: main
+Base commit: 947ccefe401638f55664d84a777caadb3da523ab
+Created before public tournament page restyling.
