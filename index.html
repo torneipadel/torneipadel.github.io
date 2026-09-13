@@ -9,44 +9,34 @@
 <title>Next Point Padel</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-:root{--bg-image:url('sfondo2.jpg');--blue:#004a99;--gold:#ffeb3b;--glass:rgba(255,255,255,.15);--border:rgba(255,255,255,.25);--text:#555}
+:root{--bg-image:url('2pages.jpg');--blue:#004a99;--gold:#ffeb3b;--glass:rgba(255,255,255,0.15);--border:rgba(255,255,255,0.25)}
 *{box-sizing:border-box}
-body{margin:0;min-height:100vh;display:flex;justify-content:center;align-items:center;padding:20px;background-color:#f5f5f5;background-image:var(--bg-image);background-size:cover;background-position:center;background-repeat:no-repeat;background-attachment:fixed;font-family:"Open Sans","Helvetica Neue",Helvetica,Arial,sans-serif;font-size:13px;line-height:18.57px;color:var(--text)}
-.container{width:100%;max-width:430px}
-.box{background:var(--glass);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:1px solid var(--border);border-radius:12px;padding:30px;box-shadow:0 8px 32px rgba(0,0,0,.35);text-align:center}
-.logo{width:150px;margin-bottom:10px}.club-name{font-family:"Open Sans","Helvetica Neue",Helvetica,Arial,sans-serif;font-size:28px;font-weight:700;color:#fff;margin:5px 0;text-transform:uppercase}.subtitle{font-size:13px;color:#fff;margin-bottom:20px}.contacts{font-size:13px;line-height:1.7;margin-bottom:20px;color:#fff}.contacts a{color:#fff;text-decoration:none}.title-login{font-family:"Open Sans","Helvetica Neue",Helvetica,Arial,sans-serif;font-size:22px;font-weight:600;color:#fff;margin:15px 0}
-input{width:100%;padding:13px;margin:8px 0;border-radius:5px;border:1px solid #ddd;font-size:13px;font-family:"Open Sans",Arial,sans-serif;color:#333;background:#fff}input:focus{outline:none;border-color:var(--blue)}
-.remember{display:flex;align-items:center;justify-content:flex-start;gap:8px;font-size:13px;margin:12px 0;color:#fff}.remember input{width:auto;margin:0}.link{color:#fff;font-size:13px;cursor:pointer;text-decoration:none;margin:8px 0;display:block}.link:hover{text-decoration:underline}.buttons{display:flex;gap:10px;margin-top:15px}.btn{flex:1;padding:13px;border:none;border-radius:5px;background:var(--blue);color:white;font-weight:600;cursor:pointer;font-size:13px;font-family:"Open Sans",Arial,sans-serif}.btn:hover{opacity:.9}.btn-reset{width:100%;margin-top:10px;background:#777}.footer{margin-top:20px;padding-top:15px;border-top:1px solid rgba(255,255,255,.25);font-size:13px;color:#fff;line-height:18.57px}.footer strong{font-size:14px}#status{margin-top:15px;min-height:20px;color:#fff;font-size:13px}
-@media(min-width:601px){
-.container{max-width:600px}
-.box{padding:38px 46px;border-radius:16px}
-.logo{width:170px;margin-bottom:12px}
-.club-name{font-size:32px}
-.subtitle{font-size:14px;margin-bottom:24px}
-.title-login{font-size:24px;margin:18px 0}
-input{padding:14px;font-size:14px}
-.remember,.link,.contacts,.footer,#status{font-size:14px}
-.btn{padding:14px;font-size:14px}
-.footer{margin-top:24px;padding-top:18px}
-}
+body{margin:0;background-image:var(--bg-image);background-size:cover;background-position:center;background-attachment:fixed;font-family:sans-serif;color:white;min-height:100vh;padding:90px 20px 40px}
+.box{width:350px;max-width:100%;margin:0 auto;padding:30px;border-radius:25px;background:var(--glass);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border:1px solid var(--border);box-shadow:0 8px 32px rgba(0,0,0,.4);text-align:center}
+.logo{width:140px;margin-bottom:10px}.club-name{margin-top:5px;font-size:28px;font-weight:bold}.subtitle{font-size:13px;opacity:.9;margin-bottom:20px}.title-login{font-size:22px;font-weight:600;margin:15px 0}
+input{width:100%;padding:13px;margin:8px 0;border:none;border-radius:10px;font-size:13px;font-family:sans-serif;color:#333;background:white}input:focus{outline:2px solid rgba(255,255,255,.35)}
+.remember{display:flex;align-items:center;justify-content:flex-start;gap:8px;font-size:13px;margin:12px 0;color:white}.remember input{width:auto;margin:0}
+.link{color:white;font-size:13px;cursor:pointer;text-decoration:none;margin:8px 0;display:block}.link:hover{text-decoration:underline}
+.buttons{display:flex;gap:10px;margin-top:12px}.btn{width:100%;padding:13px;border:none;border-radius:10px;cursor:pointer;font-weight:bold;background:white;color:#004a99;font-size:15px;font-family:sans-serif}.btn:hover{opacity:.85}
+#status{margin-top:15px;min-height:20px;color:var(--gold);font-size:14px}
+@media(min-width:601px){body{padding:70px 30px 50px}.box{width:600px;padding:38px 44px;border-radius:28px}.logo{width:160px;margin-bottom:14px}.club-name{font-size:32px}.subtitle{font-size:14px;margin-bottom:24px}.title-login{font-size:24px;margin:18px 0}input{padding:14px;font-size:14px}.remember,.link{font-size:14px}.btn{padding:14px;font-size:14px}}
+@media(max-width:600px){body{padding:58px 10px 25px}.box{width:100%;max-width:390px;padding:18px 14px 16px;border-radius:22px}.logo{width:105px;margin-bottom:3px}.club-name{font-size:21px;margin:3px 0 5px}.subtitle{font-size:11px;margin-bottom:8px}.title-login{font-size:21px;margin:8px 0}.remember,.link{font-size:12px}.btn{padding:10px 5px;font-size:12px}}
 </style>
 </head>
 <body>
-<div class="container"><div class="box">
-<img src="logo.jpg" class="logo">
+<div class="box">
+<img src="logo.jpg" class="logo" alt="Next Point Padel">
 <div class="club-name">NEXT POINT PADEL</div>
 <div class="subtitle">Tornei • Eventi • Competizioni di padel</div>
 <div class="title-login">Accesso utenti</div>
-<input id="email" type="email" placeholder="Email o cellulare">
-<input id="password" type="password" placeholder="Password">
+<input id="email" type="email" placeholder="Email o cellulare" autocomplete="username">
+<input id="password" type="password" placeholder="Password" autocomplete="current-password">
 <label class="remember"><input id="ricordami" type="checkbox">Resta connesso</label>
 <a class="link" onclick="resetPassword()">Hai dimenticato la password?</a>
-<div class="buttons"><button class="btn" id="loginBtn">ACCEDI</button><button class="btn" id="registerBtn">REGISTRATI</button></div>
-<button class="btn btn-reset" onclick="resetPassword()">RESET PASSWORD</button>
+<div class="buttons"><button class="btn" id="loginBtn" type="button">ACCEDI</button><button class="btn" id="registerBtn" type="button">REGISTRATI</button></div>
 <div class="link">Non sei iscritto? Registrati</div>
 <div id="status"></div>
-<div class="footer"><div class="contacts">✉ <a href="mailto:info@nextpointpadel.it">info@nextpointpadel.it</a><br>📞 +39 333444556</div><br>Cookie policy | Privacy policy | Condizioni d'uso | Regolamento del Club<br><br>Copyright © 2026<br>NEXT POINT PADEL</div>
-</div></div>
+</div>
 <script>
 const sb=supabase.createClient("https://iybjvtmfaupgthqqsngd.supabase.co","sb_publishable_oLLML3_ne0I1dWKIinSRNA_K1Ao5SOl",{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});
 const status=document.getElementById("status");
