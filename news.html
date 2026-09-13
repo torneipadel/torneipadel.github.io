@@ -51,5 +51,25 @@ async function load(){const {data,error}=await sb.from('tornei').select('id,nome
 async function init(){isAdmin=await checkAdmin();await load()}
 init();
 </script>
+<style id="np-index-layout-final">
+html,body{margin:0!important;min-height:100%!important}
+body{display:flex!important;align-items:flex-start!important;justify-content:center!important;padding:24px!important;background:linear-gradient(rgba(7,18,25,.28),rgba(7,18,25,.42)),url("2pages.jpg") center/cover fixed no-repeat!important}
+body:before,body:after{display:none!important}
+.page{box-sizing:border-box!important;width:600px!important;max-width:calc(100vw - 48px)!important;margin:0 auto!important;padding:34px 34px 30px!important;border:1px solid rgba(255,255,255,.24)!important;border-radius:28px!important;background:rgba(255,255,255,.12)!important;box-shadow:0 20px 55px rgba(0,0,0,.28),inset 0 1px 0 rgba(255,255,255,.16)!important;backdrop-filter:blur(18px) saturate(125%)!important;-webkit-backdrop-filter:blur(18px) saturate(125%)!important}
+.top{margin-bottom:24px!important}
+.heroTitle,.featured,.empty{border-radius:22px!important}
+.heroTitle{padding:28px 24px!important;margin-bottom:14px!important}
+.heroTitle h1{font-size:clamp(34px,8vw,48px)!important;line-height:.98!important}
+.heroTitle p{font-size:13px!important;line-height:1.55!important}
+.featured{margin-bottom:14px!important}
+.featuredMedia{min-height:220px!important}
+.featuredBody{padding:24px!important}
+.featuredBody h2{font-size:28px!important}
+.grid{grid-template-columns:1fr!important;gap:14px!important}
+.card{border-radius:20px!important}
+.cardBody{padding:17px 17px 19px!important}
+.filters{margin-bottom:14px!important}
+@media(max-width:520px){body{padding:16px!important}.page{width:calc(100vw - 32px)!important;max-width:none!important;padding:28px 22px 24px!important;border-radius:25px!important}.brand{font-size:17px!important}.back{padding:9px 13px!important;font-size:11px!important}.heroTitle{padding:24px 20px!important;border-radius:20px!important}.heroTitle h1{font-size:40px!important}.featuredBody{padding:20px!important}.featuredBody h2{font-size:26px!important}.featuredMedia{min-height:190px!important}.card{border-radius:19px!important}}
+</style>
 </body>
 </html>
