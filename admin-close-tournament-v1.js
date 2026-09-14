@@ -123,19 +123,64 @@ function injectButton(){
    pulsante #adminArchiveOpen, né del relativo pannello di consultazione. */
 function removeExtraArchiveButton(){}
 
+/* FIX ARCHIVIO: intercetta esclusivamente il pulsante "Archivia Torneo" già creato
+   da admin-functions.js. L'update viene eseguito senza .select().single(), così
+   l'archiviazione non dipende da una policy SELECT di Supabase. Nessun altro pulsante
+   o flusso Admin viene modificato. */
+async function archiviaTorneoFix(e){
+  if(e){e.preventDefault();e.stopImmediatePropagation();}
+  const t=getSelectedTournament();
+  if(!t){alert('Seleziona prima un torneo.');return false}
+  if(String(t.stato||'').toLowerCase()==='archiviato'){
+    alert('Il torneo è già archiviato.');
+    return true;
+  }
+  if(!confirm('Confermi la chiusura definitiva e l\'archiviazione del torneo "'+(t.nome||'Torneo')+'"?'))return false;
+  const client=getClient();
+  if(!client){alert('Connessione Supabase non disponibile.');return false}
+  try{
+    const {error}=await client.from('tornei').update({stato:'archiviato',iscrizioni_chiuse:true,pubblicato:false}).eq('id',t.id);
+    if(error)throw error;
+    if(Array.isArray(window.adminState?.tornei)){
+      const i=window.adminState.tornei.findIndex(x=>String(x.id)===String(t.id));
+      if(i>=0)window.adminState.tornei[i]={...window.adminState.tornei[i],stato:'archiviato',iscrizioni_chiuse:true,pubblicato:false};
+    }
+    try{localStorage.setItem('padel_admin_state',JSON.stringify(window.adminState||{}))}catch(e){}
+    if(typeof window.caricaTorneiSupabase==='function')await window.caricaTorneiSupabase();
+    else if(typeof window.renderCleanAdmin==='function')window.renderCleanAdmin();
+    alert('Torneo archiviato correttamente.');
+    return true;
+  }catch(err){
+    console.error('Errore archiviazione torneo:',err);
+    alert('Archiviazione non riuscita: '+(err?.message||err));
+    return false;
+  }
+}
+function installArchiveFix(){
+  const b=document.getElementById('adminArchiveTournament');
+  if(!b||b.dataset.archiveFixBound==='1')return;
+  b.dataset.archiveFixBound='1';
+  b.addEventListener('click',archiviaTorneoFix,true);
+}
+
 function boot(){
   removeExtraArchiveButton();
   if(install())injectButton();
-  setTimeout(()=>{removeExtraArchiveButton();install();injectButton()},100);
-  setTimeout(()=>{removeExtraArchiveButton();install();injectButton()},500);
+  installArchiveFix();
+  setTimeout(()=>{removeExtraArchiveButton();install();injectButton();installArchiveFix()},100);
+  setTimeout(()=>{removeExtraArchiveButton();install();injectButton();installArchiveFix()},500);
   const root=document.getElementById('appContent');
   if(root&&!window.__BOVE_ARCHIVE_BUTTON_FIX__){
     window.__BOVE_ARCHIVE_BUTTON_FIX__=true;
-    new MutationObserver(removeExtraArchiveButton).observe(root,{childList:true,subtree:true});
+    new MutationObserver(()=>{removeExtraArchiveButton();installArchiveFix()}).observe(root,{childList:true,subtree:true});
+  }
+  if(!window.__ARCHIVE_BUTTON_FIX_OBSERVER__){
+    window.__ARCHIVE_BUTTON_FIX_OBSERVER__=true;
+    new MutationObserver(()=>requestAnimationFrame(installArchiveFix)).observe(document.body,{childList:true,subtree:true});
   }
 }
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});else boot();
-window.addEventListener('admin:rendered',()=>{removeExtraArchiveButton();install();injectButton()});
+window.addEventListener('admin:rendered',()=>{removeExtraArchiveButton();install();injectButton();installArchiveFix()});
 
 /* STABILIZZAZIONE BANNER CONTROLLI TORNEO: il banner vive fuori da #appContent,
    così renderCleanAdmin() non lo distrugge e non può farlo apparire/scomparire. */
