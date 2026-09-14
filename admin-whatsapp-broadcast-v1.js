@@ -167,10 +167,9 @@ function renderPanel(){
 
   $('waBroadcastPoster').onclick=()=>{
     const existing=$('waCanonicalPoster');
-    if(existing){existing.click();return;}
-    const status=$('waPosterStatus');
+    if(existing){existing.click();return}
     const button=$('waCanonicalPoster');
-    if(button){button.click();return;}
+    if(button){button.click();return}
     alert('La locandina del torneo non è disponibile nella schermata WhatsApp.');
   };
 
@@ -182,7 +181,9 @@ function observe(){
   const root=$('appContent');
   if(!root||root.dataset.waBroadcastObserver==='1')return;
   root.dataset.waBroadcastObserver='1';
-  new MutationObserver(()=>{removeExisting();renderPanel()}).observe(root,{childList:true,subtree:true});
+  new MutationObserver(()=>{
+    if(!document.getElementById('waBroadcastPanel'))renderPanel();
+  }).observe(root,{childList:true,subtree:true});
 }
 
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',observe,{once:true});else observe();
