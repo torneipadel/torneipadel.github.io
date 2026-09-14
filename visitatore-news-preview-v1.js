@@ -36,29 +36,21 @@ async function loadPublishedNews(){
   });
   all.sort(sortNews);
   const cards=all.slice(0,3);
-  if(!cards.length){
-   box.innerHTML='<div class="np-empty">Nessuna comunicazione pubblicata al momento.</div>';
-  }else{
-   box.innerHTML=`<div class="np-news-grid">${cards.map(n=>`<article class="np-news-card">${n.immagine?`<div class="np-news-img"><img src="${esc(n.immagine)}" alt="${esc(n.titolo||'News')}" loading="lazy"></div>`:''}<div class="np-news-body"><span class="np-news-type">${esc(n.tipo||'Comunicazione')}</span><h3>${esc(n.titolo||'Senza titolo')}</h3>${n.testo?`<p>${esc(n.testo)}</p>`:''}${n.link?`<a class="np-btn np-ghost" href="${esc(n.link)}" target="_blank" rel="noopener">SCOPRI →</a>`:''}</div></article>`).join('')}</div>`;
-  }
-  let more=box.querySelector('.np-news-all');
-  if(!more){
-   more=document.createElement('div');
-   more.className='np-news-all';
-   more.innerHTML='<a class="np-btn np-primary" href="news.html">VEDI TUTTE LE NEWS →</a>';
-   more.style.cssText='display:flex;justify-content:center;margin-top:18px';
-   box.appendChild(more);
-  }
+  if(!cards.length)box.innerHTML='<div class="np-empty">Nessuna comunicazione pubblicata al momento.</div>';
+  else box.innerHTML=`<div class="np-news-grid">${cards.map(n=>`<article class="np-news-card">${n.immagine?`<div class="np-news-img"><img src="${esc(n.immagine)}" alt="${esc(n.titolo||'News')}" loading="lazy"></div>`:''}<div class="np-news-body"><span class="np-news-type">${esc(n.tipo||'Comunicazione')}</span><h3>${esc(n.titolo||'Senza titolo')}</h3>${n.testo?`<p>${esc(n.testo)}</p>`:''}${n.link?`<a class="np-btn np-ghost" href="${esc(n.link)}" target="_blank" rel="noopener">SCOPRI →</a>`:''}</div></article>`).join('')}</div>`;
+  const more=document.createElement('div');
+  more.className='np-news-all';
+  more.innerHTML='<a class="np-btn np-primary" href="news.html">VEDI TUTTE LE NEWS →</a>';
+  more.style.cssText='display:flex;justify-content:center;margin-top:18px';
+  box.appendChild(more);
  }catch(e){console.warn('News preview:',e)}
  finally{busy=false}
 }
 function watch(){
- const box=document.getElementById('npNews');
- if(!box)return;
  loadPublishedNews();
- const observer=new MutationObserver(()=>loadPublishedNews());
- observer.observe(box,{childList:true,subtree:true});
- setTimeout(()=>observer.disconnect(),5000);
+ setTimeout(loadPublishedNews,300);
+ setTimeout(loadPublishedNews,1000);
+ setTimeout(loadPublishedNews,2000);
 }
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',watch,{once:true});
 else watch();
