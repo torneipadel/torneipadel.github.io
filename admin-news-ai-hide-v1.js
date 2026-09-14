@@ -18,16 +18,19 @@ function installMenus(){
     const style=document.createElement('style');
     style.id='naiPosterModesStyle';
     style.textContent=`
-#naiPosterModes{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:14px 0 16px}
-#naiPosterModes button{width:100%;box-sizing:border-box;border:1px solid rgba(141,232,216,.28);border-radius:12px;background:rgba(2,16,24,.58);color:inherit;padding:13px 15px;font:inherit;font-size:14px;font-weight:900;text-align:left;cursor:pointer}
-#naiPosterModes button:hover{background:rgba(255,255,255,.06)}
-#naiPosterModes button.active{border-color:rgba(141,232,216,.65);background:rgba(141,232,216,.10)}
-@media(max-width:700px){#naiPosterModes{grid-template-columns:1fr}}
+#naiPosterModes{display:block;margin:12px 0 14px;max-width:520px}
+#naiPosterModes::before{content:'Crea locandina';display:block;margin:0 0 6px 2px;font-size:13px;font-weight:800;opacity:.82}
+#naiPosterModes .nai-poster-mode{display:flex;align-items:center;justify-content:space-between;width:100%;box-sizing:border-box;margin:5px 0;padding:9px 12px;border:1px solid rgba(141,232,216,.22);border-radius:10px;background:rgba(2,16,24,.42);color:inherit;font:inherit;font-size:13px;font-weight:700;text-align:left;cursor:pointer}
+#naiPosterModes .nai-poster-mode:hover{background:rgba(255,255,255,.05);border-color:rgba(141,232,216,.38)}
+#naiPosterModes .nai-poster-mode.active{border-color:rgba(141,232,216,.52);background:rgba(141,232,216,.08)}
+#naiPosterModes .nai-poster-arrow{font-size:12px;opacity:.7;transition:transform .15s ease}
+#naiPosterModes .nai-poster-mode.active .nai-poster-arrow{transform:rotate(90deg)}
+@media(max-width:700px){#naiPosterModes{max-width:none}}
 `;
     document.head.appendChild(style);
     box=document.createElement('div');
     box.id='naiPosterModes';
-    box.innerHTML=`<button type="button" data-poster-mode="automatic">✨ Locandina automatica</button><button type="button" data-poster-mode="manual">✏️ Locandina manuale</button>`;
+    box.innerHTML=`<button type="button" class="nai-poster-mode" data-poster-mode="automatic"><span>✨ Locandina automatica</span><span class="nai-poster-arrow">▸</span></button><button type="button" class="nai-poster-mode" data-poster-mode="manual"><span>✏️ Locandina manuale</span><span class="nai-poster-arrow">▸</span></button>`;
     automatic.parentNode.insertBefore(box,automatic);
     box.addEventListener('click',e=>{
       const btn=e.target.closest('[data-poster-mode]');
