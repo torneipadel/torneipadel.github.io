@@ -16,3 +16,4 @@ function enhance(){const panel=q('#naiManualPosterPanel');if(!panel||panel.datas
 function hook(){if(q('#naiManualPosterPanel'))enhance()}
 new MutationObserver(hook).observe(document.body,{childList:true,subtree:true});setTimeout(hook,300);window.addEventListener('admin:render',hook);document.addEventListener('change',e=>{if(e.target?.id==='naiImage')loadPhotoFile(e.target.files?.[0])});
 })();
+(()=>{const s=document.createElement('script');s.src='admin-news-poster-auto-data-v1.js?v=1';s.async=false;document.head.appendChild(s)})();
