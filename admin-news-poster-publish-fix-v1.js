@@ -72,5 +72,22 @@ obs.observe(document.body,{childList:true,subtree:true});
 setTimeout(bindDraft,500);
 window.addEventListener('admin:render',bindDraft);
 bindDraft();
+
+/* MODIFICA NEWS: il codice editor rinomina il pulsante Pubblica in "Aggiorna News".
+   Manteniamo esplicita la pubblicazione dell'aggiornamento, senza cambiare il comportamento. */
+function bindEditPublish(){
+ const b=q('#naiPublish');
+ if(!b)return;
+ if((b.textContent||'').trim()==='💾 Aggiorna News'){
+  b.textContent='🚀 Pubblica aggiornamento';
+  b.title='Pubblica le modifiche della News esistente';
+ }
+}
+const editObs=new MutationObserver(bindEditPublish);
+editObs.observe(document.body,{childList:true,subtree:true,characterData:true});
+setTimeout(bindEditPublish,300);
+setInterval(bindEditPublish,1000);
+window.addEventListener('admin:render',bindEditPublish);
+bindEditPublish();
 window.__NAI_POSTER_PUBLISH_FIX__=true;
 })();
