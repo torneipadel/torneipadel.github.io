@@ -7,10 +7,24 @@ function cleanAI(){
   const sub=document.querySelector('.page-head p');
   if(sub&&/creazione assistita/i.test(sub.textContent)) sub.textContent=sub.textContent.replace(/\s*·\s*creazione assistita e pubblicazione/i,'');
   document.querySelectorAll('#naiGenerate,#naiRegenerate').forEach(el=>{el.style.display='none';});
-  document.querySelectorAll('#naiSaveDraft,#naiPublish').forEach(el=>{
+  const draft=document.querySelector('#naiSaveDraft');
+  const publish=document.querySelector('#naiPublish');
+  const actions=draft?.parentElement||publish?.parentElement;
+  if(actions){
+    actions.style.setProperty('display','flex','important');
+    actions.style.setProperty('flex-direction','row','important');
+    actions.style.setProperty('align-items','center','important');
+    actions.style.setProperty('justify-content','flex-start','important');
+    actions.style.setProperty('flex-wrap','nowrap','important');
+    actions.style.setProperty('gap','8px','important');
+    actions.style.setProperty('width','auto','important');
+  }
+  [draft,publish].forEach(el=>{
+    if(!el)return;
     el.style.setProperty('display','inline-flex','important');
     el.style.setProperty('width','auto','important');
     el.style.setProperty('min-width','0','important');
+    el.style.setProperty('max-width','max-content','important');
     el.style.setProperty('flex','0 0 auto','important');
     el.style.setProperty('padding','8px 13px','important');
     el.style.setProperty('margin','0','important');
