@@ -31,6 +31,7 @@ function installArchivio(chiusi){
  section.appendChild(box);
 }
 function installSponsor(client){
+ if(location.pathname.toLowerCase().endsWith('iscrizione.html'))return;
  if(document.getElementById('publicSponsorBanner'))return;
  const target=document.querySelector('.container')||document.body;
  if(!target)return;
