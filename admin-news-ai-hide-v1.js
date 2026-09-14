@@ -7,7 +7,7 @@ function cleanAI(){
   const sub=document.querySelector('.page-head p');
   if(sub&&/creazione assistita/i.test(sub.textContent)) sub.textContent=sub.textContent.replace(/\s*·\s*creazione assistita e pubblicazione/i,'');
   document.querySelectorAll('#naiGenerate,#naiRegenerate').forEach(el=>el.remove());
-  document.querySelectorAll('#naiAutoPosterPanel,.nai-auto-wrap').forEach(el=>el.remove());
+  document.querySelectorAll('#naiAutoPosterPanel,.nai-auto-wrap').forEach(el=>{el.style.setProperty('display','none','important');});
 }
 cleanAI();
 new MutationObserver(cleanAI).observe(document.body,{childList:true,subtree:true});
