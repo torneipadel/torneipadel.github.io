@@ -36,13 +36,14 @@ function installMenus(){
     });
   }
   function showMode(mode){
+    mode=mode==='manual'?'manual':'automatic';
+    box.dataset.mode=mode;
     const auto=mode==='automatic';
     automatic.style.display=auto?'':'none';
     manual.style.display=auto?'none':'';
     box.querySelectorAll('[data-poster-mode]').forEach(b=>b.classList.toggle('active',b.dataset.posterMode===mode));
   }
   showMode(box.dataset.mode||'automatic');
-  box.dataset.mode=box.querySelector('.active')?.dataset.posterMode||'automatic';
 }
 function run(){cleanAI();installMenus()}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',run,{once:true});else run();
