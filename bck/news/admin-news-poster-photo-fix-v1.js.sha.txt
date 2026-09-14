@@ -1,0 +1,2 @@
+Current main file reference SHA before blind snapshot: cc107f66f27a614113828eee287b8211c7de9888
+Full source preserved in branch bck/news-blindato-2026-09-14.
