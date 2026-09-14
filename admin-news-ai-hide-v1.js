@@ -7,6 +7,14 @@ function cleanAI(){
   const sub=document.querySelector('.page-head p');
   if(sub&&/creazione assistita/i.test(sub.textContent)) sub.textContent=sub.textContent.replace(/\s*·\s*creazione assistita e pubblicazione/i,'');
   document.querySelectorAll('#naiGenerate,#naiRegenerate').forEach(el=>{el.style.display='none';});
+  document.querySelectorAll('#naiSaveDraft,#naiPublish').forEach(el=>{
+    el.style.setProperty('display','inline-flex','important');
+    el.style.setProperty('width','auto','important');
+    el.style.setProperty('min-width','0','important');
+    el.style.setProperty('flex','0 0 auto','important');
+    el.style.setProperty('padding','8px 13px','important');
+    el.style.setProperty('margin','0','important');
+  });
 }
 function installMenus(){
   const root=document.querySelector('#page-news')||document.querySelector('[data-page="news"]');
