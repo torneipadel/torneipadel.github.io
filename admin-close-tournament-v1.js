@@ -118,10 +118,10 @@ function injectButton(){
   }else if(r){r.remove()}
 }
 
-function removeExtraArchiveButton(){
-  const button=document.getElementById('adminArchiveOpen');
-  if(button)button.remove();
-}
+/* L'Archivio Tornei è una funzione di consultazione già presente in admin-functions.js.
+   Non deve essere rimosso da questo modulo: qui non facciamo più alcuna cancellazione del
+   pulsante #adminArchiveOpen, né del relativo pannello di consultazione. */
+function removeExtraArchiveButton(){}
 
 function boot(){
   removeExtraArchiveButton();
