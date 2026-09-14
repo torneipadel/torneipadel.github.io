@@ -48,5 +48,29 @@ document.addEventListener('click',e=>{
  e.stopImmediatePropagation();
  publishPoster();
 },true);
+
+/* SALVA BOZZA: deve restare locale e non creare record pubblici nel database. */
+function bindDraft(){
+ const b=q('#naiSaveDraft');
+ if(!b||b.dataset.localDraftFix==='1')return;
+ b.dataset.localDraftFix='1';
+ b.onclick=()=>{
+  const t=selected();
+  const key='news-ai-draft-'+String(t?.id||'');
+  const ids=['naiType','naiTitle','naiDate','naiTime','naiLocation','naiPairs','naiLevel','naiFee','naiDeadline','naiOffer','naiProduct','naiPrice','naiCta'];
+  const draft={};
+  ids.forEach(id=>{const e=q('#'+id);if(e)draft[id]=e.value});
+  try{
+   localStorage.setItem(key,JSON.stringify(draft));
+   const status=q('#naiStatus');
+   if(status)status.textContent='Bozza salvata localmente. Non è ancora pubblicata.';
+  }catch(e){console.error('Salvataggio bozza locale:',e);alert('Impossibile salvare la bozza localmente.');}
+ };
+}
+const obs=new MutationObserver(bindDraft);
+obs.observe(document.body,{childList:true,subtree:true});
+setTimeout(bindDraft,500);
+window.addEventListener('admin:render',bindDraft);
+bindDraft();
 window.__NAI_POSTER_PUBLISH_FIX__=true;
 })();
