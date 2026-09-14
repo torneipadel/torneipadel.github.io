@@ -27,6 +27,6 @@ $('naiList')?.querySelectorAll('[data-nai-del]').forEach(b=>b.onclick=async()=>{
 $('naiList')?.querySelectorAll('[data-nai-feature]').forEach(b=>b.onclick=async()=>{const next=(Array.isArray(cfg(t).news)?cfg(t).news:[]).map(n=>({...n,inEvidenza:String(n.id)===String(b.dataset.naiFeature)}));if(await saveNews(next))build()});
 $('naiList')?.querySelectorAll('[data-nai-edit]').forEach(b=>b.onclick=()=>{const n=(Array.isArray(cfg(t).news)?cfg(t).news:[]).find(x=>String(x.id)===String(b.dataset.naiEdit));if(!n)return;editingId=n.id;$('naiType').value=n.tipo||'Comunicazione';$('naiTitle').value=n.titolo||'';$('naiCta').value='Scopri di più';$('naiStatus').textContent='Modifica pronta: genera nuovamente o pubblica per aggiornare il contenuto.';previewImage=n.immagine||'';lastGenerated={title:n.titolo,text:n.testo,cta:'Scopri di più',mode:n.aiMode||'template'};$('naiGenerate').textContent='✨ Rigenera contenuto';$('naiPublish').textContent='💾 Aggiorna News'});
 }
-function hook(){const old=window.openAdminComPage;window.openAdminComPage=(page,...args)=>{if(page==='news-ai'){build();return}return old?.(page,...args)};}
-hook();
+function hook(){const old=window.openAdminComPage;window.openAdminComPage=(page,...args)=>{if(page==='news'||page==='news-ai'){build();return}return old?.(page,...args)};window.addEventListener('click',e=>{const b=e.target?.closest?.('[data-com-page="news"]');if(!b)return;e.preventDefault();e.stopImmediatePropagation();build()},true)}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',hook,{once:true});else hook();
 })();
