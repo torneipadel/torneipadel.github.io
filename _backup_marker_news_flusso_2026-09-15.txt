@@ -1,0 +1,5 @@
+Snapshot di sicurezza del flusso News e creazione locandina.
+
+Questo file marca il punto di salvataggio richiesto dall'amministratore. Il contenuto del repository al momento del salvataggio resta invariato.
+
+Data: 2026-09-15
