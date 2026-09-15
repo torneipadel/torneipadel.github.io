@@ -4,6 +4,7 @@ const q=s=>document.querySelector(s);
 const selected=()=>window.getTorneoAdminCorrente?.()||((window.adminState?.tornei||[]).find(t=>String(t.id)===String(window.adminState?.torneoSelezionato))||null);
 const fieldIds=['naiType','naiTitle','naiDate','naiTime','naiLocation','naiPairs','naiLevel','naiFee','naiDeadline','naiOffer','naiProduct','naiPrice','naiCta'];
 const draftKey=()=>`news-ai-draft-${String(selected()?.id||'')}`;
+const normalizeColor=v=>{const s=String(v??'').trim();if(/^#[0-9a-fA-F]{6}$/.test(s))return s;if(/^#[0-9a-fA-F]{3}$/.test(s))return '#'+s.slice(1).split('').map(x=>x+x).join('');return '#ffffff'};
 const readDataUrl=file=>new Promise((resolve,reject)=>{const r=new FileReader();r.onload=()=>resolve(String(r.result||''));r.onerror=()=>reject(new Error('Impossibile leggere la foto della locandina.'));r.readAsDataURL(file)});
 async function compressPhoto(file){
  if(!file)return '';
@@ -24,7 +25,7 @@ function readLayers(){
   return {
    text:box.querySelector('.nai-photo-text')?.value||'',
    x:nums.x??540,y:nums.y??200,size:nums.size??64,
-   color:box.querySelector('.nai-photo-color')?.value||'#fff',
+   color:normalizeColor(box.querySelector('.nai-photo-color')?.value||'#ffffff'),
    align:box.querySelector('.nai-photo-align')?.value||'center',
    weight:box.querySelector('.nai-photo-weight')?.value||'700'
   };
@@ -68,7 +69,7 @@ function restoreLayers(layers){
   const box=[...document.querySelectorAll('#naiManualLayers .nai-manual-layer')].at(-1);if(!box)return;
   const ta=box.querySelector('.nai-photo-text');if(ta){ta.value=l.text||'';ta.dispatchEvent(new Event('input',{bubbles:true}))}
   box.querySelectorAll('.nai-photo-num').forEach(e=>{if(e.dataset.k in l){e.value=l[e.dataset.k];e.dispatchEvent(new Event('input',{bubbles:true}))}});
-  const color=box.querySelector('.nai-photo-color');if(color&&l.color){color.value=l.color;color.dispatchEvent(new Event('input',{bubbles:true}))}
+  const color=box.querySelector('.nai-photo-color');if(color&&l.color){color.value=normalizeColor(l.color);color.dispatchEvent(new Event('input',{bubbles:true}))}
   const align=box.querySelector('.nai-photo-align');if(align&&l.align){align.value=l.align;align.dispatchEvent(new Event('change',{bubbles:true}))}
   const weight=box.querySelector('.nai-photo-weight');if(weight&&l.weight){weight.value=l.weight;weight.dispatchEvent(new Event('change',{bubbles:true}))}
  });
