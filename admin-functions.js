@@ -77,7 +77,6 @@ function inject(){
   mk('adminSaveTournament','💾 Salva Torneo',salva);
   mk('adminArchiveTournament','📦 Archivia Torneo',archivia);
   mk('adminDeleteTournament','🗑️ Elimina Torneo',elimina);
-  mk('adminArchiveOpen','📦 Archivio Tornei',()=>{const b=archivio();renderArchivio();b.style.display=b.style.display==='none'?'block':'none'});
   contatore();
 }
 window.salvaTorneoAdmin=salva;window.archiviaTorneoAdmin=archivia;window.eliminaTorneoAdmin=elimina;
