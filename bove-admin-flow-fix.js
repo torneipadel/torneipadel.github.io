@@ -139,6 +139,80 @@
     return true;
   }
 
+  async function leggiStatoRemoto(client, id) {
+    try {
+      const { data, error } = await client
+        .from('tornei')
+        .select('stato')
+        .eq('id', id)
+        .maybeSingle();
+
+      if (error) {
+        console.error('Errore lettura stato torneo:', error);
+        return null;
+      }
+
+      return data ? data.stato : null;
+    } catch (e) {
+      console.error('Errore lettura stato torneo:', e);
+      return null;
+    }
+  }
+
+  function preservaStatoTorneo(nomeFunzione) {
+    try {
+      const originale = window[nomeFunzione];
+      if (typeof originale !== 'function') return;
+      const flag = '__BOVE_STATUS_PATCHED_' + nomeFunzione + '__';
+      if (window[flag]) return;
+
+      window[nomeFunzione] = async function (...args) {
+        const client = window.supabaseClient || window.sb;
+        const s = typeof state !== 'undefined' ? state : null;
+        const id = s?.idTorneo || new URLSearchParams(location.search).get('idTorneo');
+
+        let statoOriginale = null;
+
+        if (client && id) {
+          statoOriginale = await leggiStatoRemoto(client, id);
+        }
+
+        let risultato;
+
+        try {
+          risultato = await originale.apply(this, args);
+        } finally {
+          if (client && id && statoOriginale !== null && statoOriginale !== undefined) {
+            const { error } = await client
+              .from('tornei')
+              .update({ stato: statoOriginale })
+              .eq('id', id);
+
+            if (error) {
+              console.error('Errore ripristino stato torneo:', error);
+            }
+          }
+        }
+
+        return risultato;
+      };
+
+      window[flag] = true;
+    } catch (e) {
+      console.error('Errore protezione stato torneo:', e);
+    }
+  }
+
+  /*
+   * RIPARAZIONE ANOMALIA ARCHIVIO:
+   * Bove.html contiene vecchi salvataggi che impostano sempre
+   * stato='attivo'. Prima di ciascun salvataggio leggiamo lo stato
+   * reale del torneo e, se il torneo esiste già, lo ripristiniamo
+   * dopo il salvataggio. Un nuovo torneo resta normalmente 'attivo'.
+   */
+  preservaStatoTorneo('updateAndSync');
+  preservaStatoTorneo('salvaTorneoSupabase');
+
   let saveInProgress = false;
 
   document.addEventListener('click', async function(event) {
