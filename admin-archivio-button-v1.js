@@ -80,17 +80,40 @@
     setTimeout(ensureArchiveButton, 50);
   }
 
+  function filterArchivedFromMainSelector() {
+    const selector = document.getElementById('torneoSelector');
+    if (!selector) return;
+    [...selector.options].forEach(option => {
+      if (!option.value) return;
+      const torneo = (getState().tornei || []).find(t => String(t.id) === String(option.value));
+      if (String(torneo?.stato || '').toLowerCase() === 'archiviato') {
+        option.remove();
+      }
+    });
+    if (selector.value) {
+      const current = (getState().tornei || []).find(t => String(t.id) === String(selector.value));
+      if (String(current?.stato || '').toLowerCase() === 'archiviato') selector.value = '';
+    }
+  }
+
+  function refreshArchiveUI() {
+    refreshArchiveButton();
+    setTimeout(filterArchivedFromMainSelector, 0);
+    setTimeout(filterArchivedFromMainSelector, 50);
+    setTimeout(filterArchivedFromMainSelector, 150);
+  }
+
   function hookRender() {
     if (window.__ADMIN_ARCHIVE_BUTTON_V1__) return;
     const original = window.renderCleanAdmin;
     if (typeof original !== 'function') return;
     window.renderCleanAdmin = function (...args) {
       const result = original.apply(this, args);
-      refreshArchiveButton();
+      refreshArchiveUI();
       return result;
     };
     window.__ADMIN_ARCHIVE_BUTTON_V1__ = true;
-    refreshArchiveButton();
+    refreshArchiveUI();
   }
 
   if (document.readyState === 'loading') {
