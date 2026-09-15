@@ -2,7 +2,7 @@
 'use strict';
 const $=id=>document.getElementById(id);
 const state=()=>window.adminState||{};
-const selected=()=>{const s=state();return (s.tornei||[]).find(t=>String(t.id)===String(s.torneoSelezionato))||null};
+const selected=()=>{const s=state();const t=(s.tornei||[]).find(t=>String(t.id)===String(s.torneoSelezionato))||null;return String(t?.stato||'').trim().toLowerCase()==='archiviato'?null:t};
 const esc=v=>String(v??'').replace(/[&<>\"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;'}[m]));
 const date=v=>{if(!v)return '-';const d=new Date(String(v).slice(0,10)+'T00:00:00');return Number.isNaN(d.getTime())?String(v):d.toLocaleDateString('it-IT')};
 const approved=r=>r?.stato==='approvato'||r?.approvato===true;
