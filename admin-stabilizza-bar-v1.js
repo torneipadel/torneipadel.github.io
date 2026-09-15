@@ -86,3 +86,28 @@ window.logoutAdmin=async function(){
   };
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',load,{once:true});else load();
 })();
+
+/* FIX ISOLATO ARCHIVIO: un torneo gia' archiviato non puo' essere ripubblicato.
+   Non modifica il flusso di creazione, partecipanti, coppie, tabellone o calendario. */
+(function(){
+  function protectArchivedPublish(){
+    const t=(window.adminState?.tornei||[]).find(x=>String(x.id)===String(window.adminState?.torneoSelezionato));
+    const b=document.getElementById('publish');
+    if(!b)return;
+    const archived=String(t?.stato||'').toLowerCase()==='archiviato';
+    b.disabled=archived;
+    if(archived){
+      b.innerHTML='📦 <strong>Torneo archiviato</strong><span>Non è possibile ripubblicarlo</span>';
+      b.title='Un torneo archiviato non può essere ripubblicato.';
+    }
+  }
+  const original=window.renderCleanAdmin;
+  if(typeof original==='function'&&!original.__archivePublishProtected){
+    const wrapped=function(){const r=original.apply(this,arguments);requestAnimationFrame(protectArchivedPublish);return r};
+    wrapped.__archivePublishProtected=true;
+    window.renderCleanAdmin=wrapped;
+  }
+  const observer=new MutationObserver(protectArchivedPublish);
+  observer.observe(document.body,{childList:true,subtree:true});
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',protectArchivedPublish,{once:true});else protectArchivedPublish();
+})();
