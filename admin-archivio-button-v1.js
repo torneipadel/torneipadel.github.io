@@ -65,22 +65,10 @@
     return panel;
   }
 
+  // Il bottone Archivio Tornei corretto è quello dell'implementazione originale in admin-functions.js.
+  // Questo modulo mantiene le altre funzioni (filtro archivio e cancellazione) senza creare un secondo bottone.
   function ensureArchiveButton() {
-    const bar = document.getElementById('adminTournamentControls');
-    if (!bar) return;
-    let button = document.getElementById('adminArchiveOpenV1');
-    if (!button) {
-      button = document.createElement('button');
-      button.id = 'adminArchiveOpenV1';
-      button.type = 'button';
-      button.className = 'btn action-tile';
-      button.textContent = '📦 Archivio Tornei';
-      bar.appendChild(button);
-    }
-    button.onclick = () => {
-      const panel = renderArchivePanel();
-      panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
-    };
+    return;
   }
 
   function refreshArchiveButton() {
