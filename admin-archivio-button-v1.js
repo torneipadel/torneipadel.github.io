@@ -86,9 +86,7 @@
     [...selector.options].forEach(option => {
       if (!option.value) return;
       const torneo = (getState().tornei || []).find(t => String(t.id) === String(option.value));
-      if (String(torneo?.stato || '').toLowerCase() === 'archiviato') {
-        option.remove();
-      }
+      if (String(torneo?.stato || '').toLowerCase() === 'archiviato') option.remove();
     });
     if (selector.value) {
       const current = (getState().tornei || []).find(t => String(t.id) === String(selector.value));
@@ -96,11 +94,65 @@
     }
   }
 
+  function getClient() {
+    return window.supabaseClient || window.sb || null;
+  }
+
+  async function deleteSelectedTournament() {
+    const s = getState();
+    const t = (s.tornei || []).find(x => String(x.id) === String(s.torneoSelezionato));
+    if (!t) { alert('Seleziona prima un torneo.'); return false; }
+    if (!confirm('ATTENZIONE: eliminare definitivamente il torneo "' + (t.nome || 'Torneo') + '" e tutti i dati collegati?')) return false;
+    const client = getClient();
+    if (!client) { alert('Connessione Supabase non disponibile.'); return false; }
+    try {
+      let r = await client.from('iscrizioni').delete().eq('torneo_id', t.id);
+      if (r.error) throw new Error('Eliminazione iscrizioni non riuscita: ' + r.error.message);
+      r = await client.from('iscritti').delete().eq('torneo_id', t.id);
+      if (r.error) throw new Error('Eliminazione partecipanti non riuscita: ' + r.error.message);
+      r = await client.from('tornei').delete().eq('id', t.id);
+      if (r.error) throw new Error('Eliminazione torneo non riuscita: ' + r.error.message);
+      s.tornei = (s.tornei || []).filter(x => String(x.id) !== String(t.id));
+      s.torneoSelezionato = null;
+      window.adminState = s;
+      try { localStorage.removeItem('torneoState'); localStorage.removeItem('savedTeams'); } catch (e) {}
+      try { localStorage.setItem('padel_admin_state', JSON.stringify(s)); } catch (e) {}
+      if (typeof window.caricaTorneiSupabase === 'function') await window.caricaTorneiSupabase();
+      else if (typeof window.renderCleanAdmin === 'function') window.renderCleanAdmin();
+      alert('Torneo eliminato correttamente.');
+      return true;
+    } catch (e) {
+      console.error('Errore eliminazione torneo:', e);
+      alert(e?.message || 'Eliminazione torneo non riuscita.');
+      return false;
+    }
+  }
+
+  function ensureDeleteButton() {
+    const root = document.getElementById('appContent');
+    if (!root) return;
+    const operations = [...root.querySelectorAll('.action-grid')].find(x => x.querySelector('#publish') && x.querySelector('#closeReg'));
+    if (!operations) return;
+    let button = document.getElementById('adminDeleteTournamentV1');
+    if (!button) {
+      button = document.createElement('button');
+      button.id = 'adminDeleteTournamentV1';
+      button.type = 'button';
+      button.className = 'btn action-tile danger';
+      button.innerHTML = '🗑️ <strong>Elimina torneo</strong><span>Elimina definitivamente il torneo</span>';
+      operations.appendChild(button);
+    }
+    button.onclick = deleteSelectedTournament;
+  }
+
   function refreshArchiveUI() {
     refreshArchiveButton();
     setTimeout(filterArchivedFromMainSelector, 0);
     setTimeout(filterArchivedFromMainSelector, 50);
     setTimeout(filterArchivedFromMainSelector, 150);
+    setTimeout(ensureDeleteButton, 0);
+    setTimeout(ensureDeleteButton, 50);
+    setTimeout(ensureDeleteButton, 150);
   }
 
   function hookRender() {
