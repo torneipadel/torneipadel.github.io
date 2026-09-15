@@ -66,21 +66,9 @@
   }
 
   function ensureArchiveButton() {
-    const bar = document.getElementById('adminTournamentControls');
-    if (!bar) return;
-    let button = document.getElementById('adminArchiveOpenV1');
-    if (!button) {
-      button = document.createElement('button');
-      button.id = 'adminArchiveOpenV1';
-      button.type = 'button';
-      button.className = 'btn action-tile';
-      button.textContent = '📦 Archivio Tornei';
-      bar.appendChild(button);
-    }
-    button.onclick = () => {
-      const panel = renderArchivePanel();
-      panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
-    };
+    const existing = document.getElementById('adminArchiveOpen');
+    if (existing) return existing;
+    return null;
   }
 
   function refreshArchiveButton() {
