@@ -112,3 +112,37 @@ window.logoutAdmin=async function(){
   observer.observe(document.body,{childList:true,subtree:true});
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',protectArchivedPublish,{once:true});else protectArchivedPublish();
 })();
+
+/* FIX ISOLATO: i tornei archiviati restano nell'Archivio ma NON compaiono in Gestione torneo. */
+(function(){
+  const isArchived=t=>String(t?.stato||'').trim().toLowerCase()==='archiviato';
+  const cleanSelection=()=>{
+    const s=window.adminState||{};
+    const t=(s.tornei||[]).find(x=>String(x.id)===String(s.torneoSelezionato));
+    if(isArchived(t))s.torneoSelezionato=null;
+  };
+  const filterSelector=()=>{
+    cleanSelection();
+    const select=document.getElementById('torneoSelector');
+    if(!select)return;
+    [...select.options].forEach(o=>{
+      if(!o.value)return;
+      const t=(window.adminState?.tornei||[]).find(x=>String(x.id)===String(o.value));
+      if(isArchived(t))o.remove();
+    });
+    if(!select.value)select.value='';
+  };
+  const original=window.renderCleanAdmin;
+  if(typeof original==='function'&&!original.__archivedFiltered){
+    const wrapped=function(){
+      cleanSelection();
+      const r=original.apply(this,arguments);
+      requestAnimationFrame(filterSelector);
+      return r;
+    };
+    wrapped.__archivedFiltered=true;
+    window.renderCleanAdmin=wrapped;
+  }
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',filterSelector,{once:true});
+  else requestAnimationFrame(filterSelector);
+})();
