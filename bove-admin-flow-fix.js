@@ -38,6 +38,30 @@
 
   preserveTournamentResults();
 
+  function preserveKOLegacyKeys() {
+    try {
+      if (typeof window.updateKOField !== 'function' || typeof window.state === 'undefined') return;
+      if (window.__BOVE_KO_KEYS_PATCHED__) return;
+      const original = window.updateKOField;
+      window.updateKOField = function(type, index, field, valore) {
+        const v = String(valore ?? '').trim();
+        if (type === 'S') {
+          if (!Array.isArray(state.sCamp)) state.sCamp = [];
+          if (!Array.isArray(state.sTime)) state.sTime = [];
+          state[field === 'camp' ? 'sCamp' : 'sTime'][index] = v;
+        } else if (type === 'F') {
+          if (!Array.isArray(state.fCamp)) state.fCamp = [];
+          if (!Array.isArray(state.fTime)) state.fTime = [];
+          state[field === 'camp' ? 'fCamp' : 'fTime'][index] = v;
+        }
+        return original(type, index, field, valore);
+      };
+      window.__BOVE_KO_KEYS_PATCHED__ = true;
+    } catch (e) { console.error('Errore compatibilita chiavi KO:', e); }
+  }
+
+  preserveKOLegacyKeys();
+
   function openRequestedRules() {
     try {
       const params = new URLSearchParams(window.location.search);
