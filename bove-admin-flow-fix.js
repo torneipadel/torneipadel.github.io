@@ -64,8 +64,52 @@
         if (time) s[timeKey][i] = time.value || '';
       }
     };
-    capture('tbody#S', 'sCamp', 'sTime', 2);
-    capture('tbody#finaleBox', 'fCamp', 'fTime', 1);
+    capture('tbody#S', 'sTopCamp', 'sTopTime', 2);
+    capture('tbody#finaleBox', 'fTopCamp', 'fTopTime', 1);
+
+    /* Compatibilità con i nomi storici letti da loadState(). */
+    s.sCamp = Array.isArray(s.sTopCamp) ? s.sTopCamp.slice() : [];
+    s.sTime = Array.isArray(s.sTopTime) ? s.sTopTime.slice() : [];
+    s.fCamp = Array.isArray(s.fTopCamp) ? s.fTopCamp.slice() : [''];
+    s.fTime = Array.isArray(s.fTopTime) ? s.fTopTime.slice() : [''];
+  }
+
+  function restoreKOFieldKeysAfterLoad(s) {
+    if (!s) return s;
+
+    if ((!Array.isArray(s.sTopCamp) || s.sTopCamp.every(v => !String(v || '').trim())) && Array.isArray(s.sCamp)) {
+      s.sTopCamp = s.sCamp.slice();
+    }
+    if ((!Array.isArray(s.sTopTime) || s.sTopTime.every(v => !String(v || '').trim())) && Array.isArray(s.sTime)) {
+      s.sTopTime = s.sTime.slice();
+    }
+    if ((!Array.isArray(s.fTopCamp) || s.fTopCamp.every(v => !String(v || '').trim())) && Array.isArray(s.fCamp)) {
+      s.fTopCamp = s.fCamp.slice();
+    }
+    if ((!Array.isArray(s.fTopTime) || s.fTopTime.every(v => !String(v || '').trim())) && Array.isArray(s.fTime)) {
+      s.fTopTime = s.fTime.slice();
+    }
+
+    return s;
+  }
+
+  /*
+   * loadState() recupera ancora i nomi storici sCamp/sTime/fCamp/fTime.
+   * Il motore del tabellone usa invece sTopCamp/sTopTime/fTopCamp/fTopTime.
+   * Riallineiamo i dati subito dopo il caricamento, senza sostituire
+   * o riscrivere la macchina di caricamento esistente.
+   */
+  try {
+    if (typeof window.loadState === 'function' && !window.__BOVE_KO_LOAD_PATCHED__) {
+      const originalLoadState = window.loadState;
+      window.__BOVE_KO_LOAD_PATCHED__ = true;
+      window.loadState = async function () {
+        const result = await originalLoadState.apply(this, arguments);
+        return restoreKOFieldKeysAfterLoad(result || (typeof state !== 'undefined' ? state : null));
+      };
+    }
+  } catch (e) {
+    console.error('Errore patch caricamento campi KO:', e);
   }
 
   async function salvaTorneoBove() {
