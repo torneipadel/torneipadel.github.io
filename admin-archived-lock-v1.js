@@ -8,5 +8,5 @@ function install(){const original=window.renderCleanAdmin;if(typeof original!=='
 let closing=false;
 function sync(){const t=selected();if(isArchived(t)){if(archiveOpen()){hideManagement(true);return}if(!closing){closing=true;window.adminState.torneoSelezionato=null;hideManagement(false);if(typeof window.renderCleanAdmin==='function')window.renderCleanAdmin();closing=false}return}hideManagement(false);filterSelector()}
 if(!install()){let n=0;const timer=setInterval(()=>{if(install()||++n>100)clearInterval(timer)},50)}
-const observer=new MutationObserver(sync);observer.observe(document.body,{childList:true,subtree:true,attributes:true,attributeFilter:['style','class']});sync();
+sync();setInterval(sync,250);
 })();
