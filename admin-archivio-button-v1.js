@@ -14,7 +14,7 @@
         const year = d && !Number.isNaN(d.getTime()) ? d.getFullYear() : '-';
         const date = d && !Number.isNaN(d.getTime()) ? d.toLocaleDateString('it-IT') : (rawDate || '-');
         const time = t.ora_inizio || t.ora || t.configurazione?.ora_inizio || t.configurazione?.oraInizio || '-';
-        return { year, date, name: t.nome || 'Torneo', time, id: t.id };
+        return { year, date, name: t.nome || 'Torneo', time, id: t.id, sortDate: d && !Number.isNaN(d.getTime()) ? d.getTime() : 0 };
       });
   }
 
@@ -39,22 +39,59 @@
     if (!rows.length) {
       html += '<div style="padding:18px 4px;opacity:.72">Nessun torneo archiviato.</div>';
     } else {
-      html += '<div style="overflow:auto"><table style="width:100%;border-collapse:collapse;font-size:13px"><thead><tr>' +
-        '<th style="text-align:left;padding:9px;border-bottom:1px solid rgba(255,255,255,.16)">Anno</th>' +
-        '<th style="text-align:left;padding:9px;border-bottom:1px solid rgba(255,255,255,.16)">Data</th>' +
-        '<th style="text-align:left;padding:9px;border-bottom:1px solid rgba(255,255,255,.16)">Nome Torneo</th>' +
-        '<th style="text-align:left;padding:9px;border-bottom:1px solid rgba(255,255,255,.16)">Ora</th>' +
-        '<th style="text-align:left;padding:9px;border-bottom:1px solid rgba(255,255,255,.16)">ID Torneo</th>' +
-        '<th style="text-align:left;padding:9px;border-bottom:1px solid rgba(255,255,255,.16)">Azioni</th>' +
-        '</tr></thead><tbody>';
+      const groups = new Map();
       rows.forEach(r => {
-        html += `<tr><td style="padding:9px;border-bottom:1px solid rgba(255,255,255,.08)">${esc(r.year)}</td><td style="padding:9px;border-bottom:1px solid rgba(255,255,255,.08)">${esc(r.date)}</td><td style="padding:9px;border-bottom:1px solid rgba(255,255,255,.08)">${esc(r.name)}</td><td style="padding:9px;border-bottom:1px solid rgba(255,255,255,.08)">${esc(r.time)}</td><td style="padding:9px;border-bottom:1px solid rgba(255,255,255,.08)">${esc(r.id)}</td><td style="padding:9px;border-bottom:1px solid rgba(255,255,255,.08)"><button type="button" class="btn" data-open-archived-tournament="${esc(r.id)}" style="padding:6px 10px">Apri</button></td></tr>`;
+        const key = String(r.year);
+        if (!groups.has(key)) groups.set(key, []);
+        groups.get(key).push(r);
       });
-      html += '</tbody></table></div>';
+
+      const orderedGroups = [...groups.entries()].sort((a, b) => {
+        const ay = Number(a[0]);
+        const by = Number(b[0]);
+        if (Number.isFinite(ay) && Number.isFinite(by)) return by - ay;
+        if (Number.isFinite(ay)) return -1;
+        if (Number.isFinite(by)) return 1;
+        return a[0].localeCompare(b[0]);
+      });
+
+      orderedGroups.forEach(([year, groupRows], groupIndex) => {
+        groupRows.sort((a, b) => b.sortDate - a.sortDate);
+        const groupId = 'archiveYear_' + groupIndex;
+        const isOpen = groupIndex === 0;
+
+        html += `<div style="margin-top:${groupIndex ? '12px' : '4px'};border:1px solid rgba(255,255,255,.12);border-radius:10px;overflow:hidden">`;
+        html += `<button type="button" data-archive-year-toggle="${groupId}" aria-expanded="${isOpen}" style="width:100%;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:11px 13px;border:0;background:rgba(255,255,255,.06);color:#fff;cursor:pointer;text-align:left;font-size:14px;font-weight:700"><span>📁 Anno ${esc(year)}</span><span data-archive-year-arrow="${groupId}" style="font-size:12px;opacity:.75">${isOpen ? '▲' : '▼'}</span></button>`;
+        html += `<div id="${groupId}" style="display:${isOpen ? 'block' : 'none'};padding:0 8px 8px">`;
+        html += '<div style="overflow:auto"><table style="width:100%;border-collapse:collapse;font-size:13px"><thead><tr>' +
+          '<th style="text-align:left;padding:9px;border-bottom:1px solid rgba(255,255,255,.16)">Anno</th>' +
+          '<th style="text-align:left;padding:9px;border-bottom:1px solid rgba(255,255,255,.16)">Data</th>' +
+          '<th style="text-align:left;padding:9px;border-bottom:1px solid rgba(255,255,255,.16)">Nome Torneo</th>' +
+          '<th style="text-align:left;padding:9px;border-bottom:1px solid rgba(255,255,255,.16)">Ora</th>' +
+          '<th style="text-align:left;padding:9px;border-bottom:1px solid rgba(255,255,255,.16)">ID Torneo</th>' +
+          '<th style="text-align:left;padding:9px;border-bottom:1px solid rgba(255,255,255,.16)">Azioni</th>' +
+          '</tr></thead><tbody>';
+        groupRows.forEach(r => {
+          html += `<tr><td style="padding:9px;border-bottom:1px solid rgba(255,255,255,.08)">${esc(r.year)}</td><td style="padding:9px;border-bottom:1px solid rgba(255,255,255,.08)">${esc(r.date)}</td><td style="padding:9px;border-bottom:1px solid rgba(255,255,255,.08)">${esc(r.name)}</td><td style="padding:9px;border-bottom:1px solid rgba(255,255,255,.08)">${esc(r.time)}</td><td style="padding:9px;border-bottom:1px solid rgba(255,255,255,.08)">${esc(r.id)}</td><td style="padding:9px;border-bottom:1px solid rgba(255,255,255,.08)"><button type="button" class="btn" data-open-archived-tournament="${esc(r.id)}" style="padding:6px 10px">Apri</button></td></tr>`;
+        });
+        html += '</tbody></table></div></div></div>';
+      });
     }
 
     panel.innerHTML = html;
     panel.querySelector('#closeAdminArchiveV1')?.addEventListener('click', () => { panel.style.display = 'none'; });
+    panel.querySelectorAll('[data-archive-year-toggle]').forEach(button => {
+      button.addEventListener('click', () => {
+        const id = button.getAttribute('data-archive-year-toggle');
+        const content = id ? panel.querySelector('#' + id) : null;
+        const arrow = id ? panel.querySelector('[data-archive-year-arrow="' + id + '"]') : null;
+        if (!content) return;
+        const open = content.style.display !== 'none';
+        content.style.display = open ? 'none' : 'block';
+        button.setAttribute('aria-expanded', String(!open));
+        if (arrow) arrow.textContent = open ? '▼' : '▲';
+      });
+    });
     panel.querySelectorAll('[data-open-archived-tournament]').forEach(button => {
       button.addEventListener('click', () => {
         const id = button.getAttribute('data-open-archived-tournament');
