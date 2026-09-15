@@ -19,16 +19,29 @@ function isArchived(t){
 }
 function clearArchivedSelection(){
   const t=selected();
-  if(!isArchived(t))return;
+  if(!isArchived(t))return false;
   const s=window.adminState||{};
   s.torneoSelezionato=null;
   window.adminState=s;
   try{localStorage.setItem('padel_admin_state',JSON.stringify(s))}catch(e){}
   const selector=document.getElementById('torneoSelector');
-  if(selector){
-    selector.value='';
-    selector.dispatchEvent(new Event('change',{bubbles:true}));
-  }
+  if(selector)selector.value='';
+  return true;
+}
+function installRenderGuard(){
+  const original=window.renderCleanAdmin;
+  if(typeof original!=='function'||original.__archiveRenderGuard)return;
+  const wrapped=function(){
+    clearArchivedSelection();
+    const result=original.apply(this,arguments);
+    setTimeout(()=>{
+      clearArchivedSelection();
+      hideArchivedFromSelector();
+    },0);
+    return result;
+  };
+  wrapped.__archiveRenderGuard=true;
+  window.renderCleanAdmin=wrapped;
 }
 function installGuard(name){
   const original=window[name];
@@ -78,6 +91,7 @@ function installSupabaseArchiveGuard(){
 }
 function install(){
   clearArchivedSelection();
+  installRenderGuard();
   hideArchivedFromSelector();
   installGuard('pubblicaTorneo');
   installGuard('chiudiIscrizioniTorneo');
@@ -86,6 +100,7 @@ function install(){
   if(root&&!root.__archivedSelectorObserver){
     const observer=new MutationObserver(()=>{
       clearArchivedSelection();
+      installRenderGuard();
       hideArchivedFromSelector();
       installGuard('pubblicaTorneo');
       installGuard('chiudiIscrizioniTorneo');
