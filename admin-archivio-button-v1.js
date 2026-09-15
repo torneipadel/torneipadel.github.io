@@ -209,14 +209,8 @@
 
   function hookRender() {
     if (window.__ADMIN_ARCHIVE_BUTTON_V1__) return;
-    const original = window.renderCleanAdmin;
-    if (typeof original !== 'function') return;
-    window.renderCleanAdmin = function (...args) {
-      const result = original.apply(this, args);
-      refreshArchiveUI();
-      return result;
-    };
     window.__ADMIN_ARCHIVE_BUTTON_V1__ = true;
+    window.addEventListener('admin:render', refreshArchiveUI);
     refreshArchiveUI();
   }
 
