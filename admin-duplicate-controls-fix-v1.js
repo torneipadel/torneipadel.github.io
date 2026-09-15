@@ -12,6 +12,7 @@
 function removeDuplicates(){
   document.getElementById('newTournament')?.remove();
   document.getElementById('refreshTournaments')?.remove();
+  document.getElementById('adminArchiveOpen')?.remove();
 }
 function bindParticipantsRefresh(){
   const original=window.openAdminPage;
