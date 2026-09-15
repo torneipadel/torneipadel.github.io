@@ -7,9 +7,7 @@ function hideArchivedFromSelector(){
     const id=String(option.value);
     const tournaments=window.adminState?.tornei||[];
     const torneo=tournaments.find(t=>String(t.id)===id);
-    if(torneo&&String(torneo.stato||'').trim().toLowerCase()==='archiviato'){
-      option.remove();
-    }
+    if(torneo&&String(torneo.stato||'').trim().toLowerCase()==='archiviato')option.remove();
   });
 }
 function selected(){
@@ -18,6 +16,19 @@ function selected(){
 }
 function isArchived(t){
   return !!t&&String(t.stato||'').trim().toLowerCase()==='archiviato';
+}
+function clearArchivedSelection(){
+  const t=selected();
+  if(!isArchived(t))return;
+  const s=window.adminState||{};
+  s.torneoSelezionato=null;
+  window.adminState=s;
+  try{localStorage.setItem('padel_admin_state',JSON.stringify(s))}catch(e){}
+  const selector=document.getElementById('torneoSelector');
+  if(selector){
+    selector.value='';
+    selector.dispatchEvent(new Event('change',{bubbles:true}));
+  }
 }
 function installGuard(name){
   const original=window[name];
@@ -66,6 +77,7 @@ function installSupabaseArchiveGuard(){
   });
 }
 function install(){
+  clearArchivedSelection();
   hideArchivedFromSelector();
   installGuard('pubblicaTorneo');
   installGuard('chiudiIscrizioniTorneo');
@@ -73,6 +85,7 @@ function install(){
   const root=document.getElementById('appContent');
   if(root&&!root.__archivedSelectorObserver){
     const observer=new MutationObserver(()=>{
+      clearArchivedSelection();
       hideArchivedFromSelector();
       installGuard('pubblicaTorneo');
       installGuard('chiudiIscrizioniTorneo');
