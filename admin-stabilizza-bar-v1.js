@@ -97,7 +97,8 @@ window.logoutAdmin=async function(){
     const archived=String(t?.stato||'').toLowerCase()==='archiviato';
     b.disabled=archived;
     if(archived){
-      b.innerHTML='📦 <strong>Torneo archiviato</strong><span>Non è possibile ripubblicarlo</span>';
+      const html='📦 <strong>Torneo archiviato</strong><span>Non è possibile ripubblicarlo</span>';
+      if(b.innerHTML!==html)b.innerHTML=html;
       b.title='Un torneo archiviato non può essere ripubblicato.';
     }
   }
