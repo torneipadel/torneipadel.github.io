@@ -1,5 +1,6 @@
-/* ADMIN WIZARD CALCULATION FIX V2
- * Apply only historically supported automatic defaults in the tournament wizard.
+/* ADMIN WIZARD CALCULATION FIX V3
+ * Apply historical automatic defaults only when a formula is selected.
+ * Never overwrite values manually changed by the administrator.
  * No layout, tournament engine, participants, pairs, bracket or calendar changes.
  */
 (()=>{
@@ -44,8 +45,11 @@ function applyHistoricalDefaults(){
   }
 }
 function bind(){
-  document.addEventListener('click',()=>setTimeout(applyHistoricalDefaults,0),false);
-  new MutationObserver(()=>setTimeout(applyHistoricalDefaults,0)).observe(document.body,{childList:true,subtree:true});
+  document.addEventListener('click',event=>{
+    const button=event.target?.closest?.('#adminFlowV18 .af-formula');
+    if(!button)return;
+    setTimeout(applyHistoricalDefaults,0);
+  },false);
 }
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',bind,{once:true});
 else bind();
