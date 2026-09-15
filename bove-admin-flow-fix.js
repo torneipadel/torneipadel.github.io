@@ -105,7 +105,9 @@
       window.__BOVE_KO_LOAD_PATCHED__ = true;
       window.loadState = async function () {
         const result = await originalLoadState.apply(this, arguments);
-        return restoreKOFieldKeysAfterLoad(result || (typeof state !== 'undefined' ? state : null));
+        const restored = restoreKOFieldKeysAfterLoad(result || (typeof state !== 'undefined' ? state : null));
+        if (typeof renderKO === 'function') renderKO();
+        return restored;
       };
     }
   } catch (e) {
