@@ -5,26 +5,36 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Informazioni Club - Next Point Padel</title>
 <meta name="description" content="Informazioni sul Club Next Point Padel, attività, tornei, news, mercatino e contatti.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
+:root{--blue:#073b72;--gold:#ffe76b;--glass:rgba(255,255,255,.11);--border:rgba(255,255,255,.20)}
 *{box-sizing:border-box}
-html,body{margin:0;padding:0;min-height:100%;font-family:Arial,sans-serif;background:#111;color:#fff}
-body{background:linear-gradient(rgba(0,0,0,.58),rgba(0,0,0,.72)),url('sfondo2.jpg') center/cover fixed no-repeat}
-.header{position:sticky;top:0;z-index:20;display:flex;align-items:center;justify-content:space-between;padding:14px 18px;background:rgba(0,0,0,.72);backdrop-filter:blur(8px)}
-.logo{height:42px;width:auto;display:block}
-.menu-button{width:44px;height:44px;border:1px solid rgba(255,255,255,.35);border-radius:10px;background:rgba(255,255,255,.08);color:#fff;font-size:27px;display:flex;align-items:center;justify-content:center;cursor:pointer}
-.menu-panel{position:absolute;right:16px;top:66px;width:230px;display:none;padding:8px;background:rgba(15,15,15,.96);border:1px solid rgba(255,255,255,.18);border-radius:12px;box-shadow:0 12px 30px rgba(0,0,0,.45)}
-.menu-panel.open{display:block}
-.menu-item{padding:13px 12px;border-radius:8px;cursor:pointer;font-size:15px}
-.menu-item:hover{background:rgba(255,255,255,.1)}
-.container{width:min(920px,calc(100% - 28px));margin:30px auto 50px}
-.card{background:rgba(255,255,255,.94);color:#222;border-radius:18px;padding:28px;box-shadow:0 15px 45px rgba(0,0,0,.35);margin-bottom:18px}
-h1{margin:0 0 10px;font-size:30px}h2{margin:0 0 10px;font-size:21px}p{line-height:1.6;margin:8px 0}.intro{font-size:17px;color:#444}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;margin-top:18px}.info{padding:18px;border-radius:14px;background:#f3f3f3}.info strong{display:block;margin-bottom:6px}.actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:18px}.button{display:inline-block;padding:11px 16px;border-radius:10px;background:#111;color:#fff;text-decoration:none}.button.secondary{background:#e8e8e8;color:#222}.steps{display:grid;gap:12px;margin-top:16px}.step{display:flex;gap:14px;align-items:flex-start;padding:15px;border-radius:14px;background:#f3f3f3}.number{min-width:34px;height:34px;border-radius:50%;background:#111;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:bold}.footer{text-align:center;color:rgba(255,255,255,.82);font-size:13px;padding:10px 0 30px}
-@media(max-width:650px){.card{padding:21px}.grid{grid-template-columns:1fr}h1{font-size:25px}.actions{flex-direction:column}.button{text-align:center}}
+html,body{margin:0;min-height:100%;font-family:'Open Sans',Arial,sans-serif;color:#fff}
+body{background:linear-gradient(rgba(3,12,24,.30),rgba(3,12,24,.68)),url('2pages.jpg') center/cover fixed no-repeat;min-height:100vh;padding:18px 14px 36px;overflow-x:hidden}
+body:before{content:"";position:fixed;inset:0;pointer-events:none;background:radial-gradient(circle at 50% 0%,rgba(255,255,255,.10),transparent 38%),linear-gradient(120deg,rgba(7,59,114,.12),transparent 45%,rgba(0,0,0,.20));z-index:-1}
+.menu-button{position:fixed;top:18px;right:18px;width:44px;height:44px;border:1px solid var(--border);border-radius:12px;background:rgba(255,255,255,.10);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);color:#fff;font:22px/1 'Open Sans',Arial,sans-serif;display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:1000;box-shadow:0 6px 20px rgba(0,0,0,.20)}
+.menu-button:hover{background:rgba(255,255,255,.17)}
+.menu-panel{position:fixed;top:0;right:-290px;width:280px;height:100vh;background:rgba(7,20,38,.84);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border-left:1px solid rgba(255,255,255,.20);box-shadow:-10px 0 35px rgba(0,0,0,.28);transition:right .28s ease;padding-top:78px;z-index:999}.menu-panel.open{right:0}.menu-item{padding:15px 22px;font-size:14px;line-height:1.4;font-weight:600;cursor:pointer;color:#fff}.menu-item:hover{background:rgba(255,255,255,.12)}
+.page{width:min(820px,100%);margin:0 auto}
+.hero{position:relative;isolation:isolate;text-align:center;padding:34px 24px 28px;border-radius:26px;background:linear-gradient(135deg,rgba(255,255,255,.16),rgba(255,255,255,.055));backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border:1px solid rgba(255,255,255,.23);box-shadow:0 18px 48px rgba(0,0,0,.28);overflow:hidden}
+.hero:before{content:"";position:absolute;z-index:-1;left:50%;top:-50px;width:500px;height:260px;transform:translateX(-50%);border-radius:50%;background:radial-gradient(ellipse at center,rgba(0,0,0,.55),rgba(0,0,0,.18) 52%,transparent 75%);filter:blur(12px)}
+.logo{display:block;width:auto;max-width:280px;max-height:130px;margin:0 auto 13px;object-fit:contain;filter:brightness(1.2) contrast(.92) drop-shadow(0 8px 22px rgba(0,0,0,.28))}
+.eyebrow{font-size:10px;font-weight:800;letter-spacing:2.5px;color:rgba(255,255,255,.68);text-transform:uppercase;margin-bottom:7px}h1{font-size:30px;line-height:1.15;margin:0;font-weight:800;letter-spacing:-.03em;text-shadow:0 3px 15px rgba(0,0,0,.22)}
+.hero-text{max-width:620px;margin:13px auto 0;font-size:14px;line-height:1.6;color:rgba(255,255,255,.80)}
+.quick-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;margin-top:22px}.quick{padding:13px 8px;border:1px solid rgba(255,255,255,.16);border-radius:14px;background:rgba(255,255,255,.08);color:#fff;text-decoration:none;transition:.2s}.quick:hover{transform:translateY(-2px);background:rgba(255,255,255,.14)}.quick-icon{display:block;font-size:22px;margin-bottom:6px}.quick-label{font-size:10px;font-weight:800}
+.section{margin-top:14px;padding:21px;border-radius:22px;background:linear-gradient(135deg,rgba(255,255,255,.13),rgba(255,255,255,.055));backdrop-filter:blur(15px);-webkit-backdrop-filter:blur(15px);border:1px solid rgba(255,255,255,.17);box-shadow:0 10px 32px rgba(0,0,0,.18)}
+.section-head{display:flex;align-items:center;gap:12px;margin-bottom:13px}.section-icon{width:44px;height:44px;flex:0 0 44px;border-radius:13px;background:rgba(255,255,255,.12);display:flex;align-items:center;justify-content:center;font-size:22px}.section-title{font-size:15px;font-weight:800}.section-subtitle{margin-top:3px;font-size:11px;color:rgba(255,255,255,.58);line-height:1.4}.section p{font-size:12px;line-height:1.65;color:rgba(255,255,255,.75);margin:7px 0}
+.cards{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:15px}.info-card{padding:16px;border-radius:15px;background:rgba(255,255,255,.075);border:1px solid rgba(255,255,255,.12);transition:.2s}.info-card:hover{transform:translateY(-2px);background:rgba(255,255,255,.11)}.info-card strong{display:block;font-size:12px;color:#fff;margin-bottom:5px}.info-card span{display:block;font-size:10px;line-height:1.5;color:rgba(255,255,255,.60)}
+.steps{display:grid;gap:9px;margin-top:15px}.step{display:flex;align-items:center;gap:13px;padding:13px 14px;border-radius:14px;background:rgba(255,255,255,.075);border:1px solid rgba(255,255,255,.11)}.number{width:32px;height:32px;flex:0 0 32px;border-radius:50%;background:#fff;color:var(--blue);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800}.step strong{display:block;font-size:11px}.step span{display:block;margin-top:3px;font-size:10px;line-height:1.45;color:rgba(255,255,255,.60)}
+.actions{display:flex;flex-wrap:wrap;gap:9px;margin-top:15px}.button{display:inline-flex;align-items:center;justify-content:center;padding:11px 15px;border-radius:10px;background:#fff;color:var(--blue);font:800 11px/1.2 'Open Sans',Arial,sans-serif;text-decoration:none;transition:.2s}.button:hover{transform:translateY(-1px);filter:brightness(1.04)}.button.secondary{background:rgba(255,255,255,.10);color:#fff;border:1px solid rgba(255,255,255,.17)}
+.footer{text-align:center;color:rgba(255,255,255,.55);font-size:10px;padding:18px 0 5px}
+@media(max-width:600px){body{padding:14px 11px 28px}.menu-button{top:12px;right:12px}.hero{padding:28px 17px 21px;border-radius:21px}.logo{max-width:235px;max-height:112px}.hero:before{width:370px;height:220px}.quick-grid{grid-template-columns:repeat(2,1fr);gap:8px}.quick{padding:11px 7px}.section{padding:17px;border-radius:19px}.cards{grid-template-columns:1fr}.actions{flex-direction:column}.button{text-align:center}.menu-panel{width:min(280px,86vw)}}
+@media(max-width:390px){h1{font-size:25px}.hero-text{font-size:12px}.quick-label{font-size:9px}}
 </style>
 </head>
 <body>
-<header class="header">
-<img class="logo" src="logo_bianco.png" alt="Next Point Padel">
 <div class="menu-button" onclick="toggleMenu()" aria-label="Apri menu">☰</div>
 <div class="menu-panel" id="menuPanel">
 <div class="menu-item" onclick="location.href='2Page.html'">⌂ Home</div>
@@ -36,80 +46,70 @@ h1{margin:0 0 10px;font-size:30px}h2{margin:0 0 10px;font-size:21px}p{line-heigh
 <div class="menu-item" onclick="location.href='contatti.html'">☎ Contatti</div>
 <div class="menu-item" onclick="logout()">🚪 Esci</div>
 </div>
-</header>
 
-<main class="container">
-<section class="card">
+<main class="page">
+<section class="hero">
+<img src="logo_bianco.png" class="logo" alt="Next Point Padel">
+<div class="eyebrow">NEXT POINT PADEL</div>
 <h1>Informazioni Club</h1>
-<p class="intro"><strong>Benvenuto in Next Point Padel.</strong> Questa pagina è il punto di riferimento per conoscere il club, le attività disponibili e il modo più semplice per utilizzare il sito.</p>
-<p>Qui trovi una panoramica delle principali sezioni: tornei, news e comunicazioni, mercatino, sponsor e contatti.</p>
-</section>
-
-<section class="card">
-<h2>🎾 Il Club</h2>
-<p>Next Point Padel nasce per riunire giocatori, appassionati e persone che vogliono vivere il padel attraverso partite, tornei e iniziative del club.</p>
-<p>Il sito raccoglie in un unico punto le informazioni utili per seguire le attività e rimanere aggiornati sulle novità.</p>
-</section>
-
-<section class="card">
-<h2>🏆 Tornei e competizioni</h2>
-<p>La sezione Tornei permette di consultare le competizioni pubblicate e le informazioni disponibili per ciascun evento.</p>
-<div class="grid">
-<div class="info"><strong>📅 Calendario</strong>Consulta i tornei programmati, le date e le informazioni principali.</div>
-<div class="info"><strong>👥 Iscrizioni</strong>Verifica modalità, scadenze e indicazioni specifiche di ogni torneo.</div>
-<div class="info"><strong>📊 Risultati</strong>Quando disponibili, segui incontri, classifiche e fasi finali.</div>
-<div class="info"><strong>📰 Aggiornamenti</strong>Controlla le News per comunicazioni e variazioni relative alle competizioni.</div>
-</div>
-<div class="actions">
-<a class="button" href="tornei.html">🏆 Vai ai Tornei</a>
+<p class="hero-text"><strong>Tutto quello che devi sapere sul nostro spazio digitale.</strong><br>Scopri come seguire i tornei, restare aggiornato sulle comunicazioni, conoscere gli sponsor e trovare rapidamente ciò che cerchi.</p>
+<div class="quick-grid">
+<a class="quick" href="tornei.html"><span class="quick-icon">🏆</span><span class="quick-label">TORNEI</span></a>
+<a class="quick" href="news.html"><span class="quick-icon">📰</span><span class="quick-label">NEWS</span></a>
+<a class="quick" href="mercatino.html"><span class="quick-icon">🛒</span><span class="quick-label">MERCATINO</span></a>
+<a class="quick" href="contatti.html"><span class="quick-icon">☎</span><span class="quick-label">CONTATTI</span></a>
 </div>
 </section>
 
-<section class="card">
-<h2>📰 News e comunicazioni</h2>
-<p>La sezione News è il punto in cui trovare comunicazioni, aggiornamenti, iniziative e informazioni pubblicate dal club.</p>
-<p>È utile controllarla periodicamente per non perdere avvisi importanti.</p>
-<div class="actions">
-<a class="button" href="news.html">📰 Vai alle News</a>
-</div>
+<section class="section">
+<div class="section-head"><div class="section-icon">🎾</div><div><div class="section-title">Il Club</div><div class="section-subtitle">Una community costruita intorno al padel</div></div></div>
+<p>Next Point Padel riunisce giocatori e appassionati attraverso partite, tornei e iniziative del club. Questo sito nasce per raccogliere in un unico punto le informazioni utili e rendere più semplice seguire tutte le attività.</p>
 </section>
 
-<section class="card">
-<h2>🛒 Mercatino</h2>
-<p>Il Mercatino è lo spazio dedicato agli annunci della community. Può essere utilizzato per consultare le proposte pubblicate e, quando previsto, inserire nuovi annunci.</p>
-<p>Per ogni annuncio è sempre consigliato verificare direttamente le informazioni pubblicate.</p>
-<div class="actions">
-<a class="button" href="mercatino.html">🛒 Vai al Mercatino</a>
+<section class="section">
+<div class="section-head"><div class="section-icon">🏆</div><div><div class="section-title">Tornei e competizioni</div><div class="section-subtitle">Dal calendario ai risultati</div></div></div>
+<p>Consulta le competizioni pubblicate, verifica le informazioni del torneo e segui gli aggiornamenti durante lo svolgimento.</p>
+<div class="cards">
+<div class="info-card"><strong>📅 Calendario</strong><span>Scopri date e tornei programmati.</span></div>
+<div class="info-card"><strong>👥 Iscrizioni</strong><span>Controlla modalità e scadenze.</span></div>
+<div class="info-card"><strong>📊 Risultati</strong><span>Segui incontri, classifiche e fasi finali quando disponibili.</span></div>
+<div class="info-card"><strong>📣 Aggiornamenti</strong><span>Controlla le comunicazioni relative alle competizioni.</span></div>
 </div>
+<div class="actions"><a class="button" href="tornei.html">🏆 Vai ai Tornei</a></div>
 </section>
 
-<section class="card">
-<h2>⭐ Sponsor</h2>
-<p>Gli sponsor fanno parte della realtà del club e contribuiscono alle attività e alle iniziative collegate a Next Point Padel.</p>
-<p>In questa sezione puoi conoscere le realtà che hanno scelto di accompagnare il progetto.</p>
-<div class="actions">
-<a class="button" href="sponsor-pubblico.html">⭐ Scopri gli Sponsor</a>
-</div>
+<section class="section">
+<div class="section-head"><div class="section-icon">📰</div><div><div class="section-title">News e comunicazioni</div><div class="section-subtitle">Rimani sempre aggiornato</div></div></div>
+<p>La sezione News raccoglie comunicazioni, aggiornamenti, iniziative e informazioni pubblicate dal club. È il posto giusto da controllare quando vuoi sapere cosa sta succedendo.</p>
+<div class="actions"><a class="button" href="news.html">📰 Vai alle News</a></div>
 </section>
 
-<section class="card">
-<h2>📱 Come utilizzare il sito</h2>
-<p>Se è la prima volta che utilizzi il sito, puoi orientarti così:</p>
+<section class="section">
+<div class="section-head"><div class="section-icon">🛒</div><div><div class="section-title">Mercatino</div><div class="section-subtitle">Uno spazio per la community</div></div></div>
+<p>Il Mercatino è dedicato agli annunci della community. Puoi consultare le proposte pubblicate e, quando previsto, inserire nuovi annunci.</p>
+<div class="actions"><a class="button" href="mercatino.html">🛒 Vai al Mercatino</a></div>
+</section>
+
+<section class="section">
+<div class="section-head"><div class="section-icon">⭐</div><div><div class="section-title">Sponsor</div><div class="section-subtitle">I partner che accompagnano il club</div></div></div>
+<p>Scopri le realtà che hanno scelto di accompagnare Next Point Padel e le iniziative del club.</p>
+<div class="actions"><a class="button" href="sponsor-pubblico.html">⭐ Scopri gli Sponsor</a></div>
+</section>
+
+<section class="section">
+<div class="section-head"><div class="section-icon">📱</div><div><div class="section-title">Come utilizzare il sito</div><div class="section-subtitle">Quattro passi per orientarti subito</div></div></div>
 <div class="steps">
-<div class="step"><div class="number">1</div><div><strong>Scopri i tornei</strong><br>Apri Tornei e consulta le competizioni disponibili.</div></div>
-<div class="step"><div class="number">2</div><div><strong>Controlla le informazioni</strong><br>Apri il torneo che ti interessa e verifica date, modalità e indicazioni presenti.</div></div>
-<div class="step"><div class="number">3</div><div><strong>Segui gli aggiornamenti</strong><br>Consulta News e comunicazioni per eventuali novità.</div></div>
-<div class="step"><div class="number">4</div><div><strong>Hai bisogno di aiuto?</strong><br>Per domande o richieste utilizza la pagina Contatti.</div></div>
+<div class="step"><div class="number">1</div><div><strong>Scopri i tornei</strong><span>Apri la sezione Tornei e consulta le competizioni disponibili.</span></div></div>
+<div class="step"><div class="number">2</div><div><strong>Controlla i dettagli</strong><span>Apri il torneo che ti interessa e verifica date, modalità e indicazioni.</span></div></div>
+<div class="step"><div class="number">3</div><div><strong>Segui le novità</strong><span>Consulta News e comunicazioni per eventuali aggiornamenti.</span></div></div>
+<div class="step"><div class="number">4</div><div><strong>Hai bisogno di aiuto?</strong><span>Per domande o richieste utilizza la pagina Contatti.</span></div></div>
 </div>
 </section>
 
-<section class="card">
-<h2>📍 Contatti</h2>
+<section class="section">
+<div class="section-head"><div class="section-icon">📍</div><div><div class="section-title">Contatti</div><div class="section-subtitle">Siamo qui per le tue richieste</div></div></div>
 <p>Per informazioni, richieste o comunicazioni puoi utilizzare la pagina dedicata ai contatti del club.</p>
-<div class="actions">
-<a class="button" href="contatti.html">☎ Vai ai Contatti</a>
-<a class="button secondary" href="2Page.html">⌂ Torna alla Home</a>
-</div>
+<div class="actions"><a class="button" href="contatti.html">☎ Vai ai Contatti</a><a class="button secondary" href="2Page.html">⌂ Torna alla Home</a></div>
 </section>
 </main>
 
@@ -118,16 +118,13 @@ h1{margin:0 0 10px;font-size:30px}h2{margin:0 0 10px;font-size:21px}p{line-heigh
 <script>
 function toggleMenu(){document.getElementById('menuPanel').classList.toggle('open')}
 function logout(){
-  if(window.sb&&window.sb.auth){
-    window.sb.auth.signOut().finally(()=>{window.location.href='index.html'});
-  }else{
-    window.location.href='index.html';
-  }
+  if(window.sb&&window.sb.auth){window.sb.auth.signOut().finally(()=>{window.location.href='index.html'});}
+  else{window.location.href='index.html';}
 }
 document.addEventListener('click',function(e){
   const panel=document.getElementById('menuPanel');
   const button=document.querySelector('.menu-button');
-  if(panel.classList.contains('open')&&!panel.contains(e.target)&&!button.contains(e.target)) panel.classList.remove('open');
+  if(panel.classList.contains('open')&&!panel.contains(e.target)&&!button.contains(e.target))panel.classList.remove('open');
 });
 </script>
 </body>
