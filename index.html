@@ -8,6 +8,7 @@
 <meta http-equiv="Expires" content="0">
 <title>NEXT POINT PADEL</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="lingue.js?v=1"></script>
 <style>
 *{box-sizing:border-box}
 html,body{margin:0;min-height:100%;font-family:"Open Sans",Arial,sans-serif}
@@ -22,22 +23,32 @@ input::placeholder{color:rgba(255,255,255,.68)}input:focus{border-color:rgba(255
 .link{color:#fff;text-decoration:underline;cursor:pointer;font-weight:600}
 button{width:100%;height:46px;border:1px solid rgba(255,255,255,.20);border-radius:10px;color:#073b72;font:800 13px/1.2 "Open Sans",Arial,sans-serif;letter-spacing:.4px;cursor:pointer;background:#fff;transition:.2s ease}button:hover{background:#fff;transform:translateY(-1px)}.secondary{margin-top:10px;background:rgba(0,0,0,.32);color:#fff}
 .register{margin-top:22px;padding-top:20px;border-top:1px solid rgba(255,255,255,.16);text-align:center;font-size:13px;line-height:1.5}.status{min-height:20px;margin-top:15px;text-align:center;font-size:13px;line-height:1.45;color:#fff;opacity:.95}
-@media(max-width:767px){body{padding:18px 12px;align-items:center}.glass{width:min(620px,100%);height:auto;min-height:calc(100dvh - 36px);padding:28px 22px 24px;border-radius:16px}.brand img{max-width:220px;max-height:112px}.brand h1{font-size:24px;letter-spacing:1.4px}.brand p{font-size:13px}.section-title{font-size:18px}label{font-size:14px}input[type=email],input[type=password]{height:46px;font-size:15px}.options{font-size:13px}button{height:46px;font-size:13px}.register{font-size:13px}.status{font-size:13px}}
-@media(max-width:380px){body{padding:14px 10px;align-items:center}.glass{min-height:calc(100dvh - 28px);padding:24px 18px 22px;border-radius:16px}.brand{margin-bottom:22px}.brand img{max-width:190px;max-height:98px;margin-bottom:12px}.brand h1{font-size:22px}.brand p{font-size:12px}.section-title{font-size:17px}.options{align-items:flex-start;flex-direction:column;gap:8px;margin-bottom:18px}}
+.language-selector{position:fixed;top:18px;right:18px;z-index:1000;font-size:13px}.language-button{height:38px;min-width:76px;padding:0 12px;border:1px solid rgba(255,255,255,.28);border-radius:10px;background:rgba(7,18,25,.38);color:#fff;box-shadow:0 5px 18px rgba(0,0,0,.18);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);font:700 13px/1 "Open Sans",Arial,sans-serif;letter-spacing:.2px;cursor:pointer}.language-button:hover{background:rgba(7,18,25,.52);transform:none}.language-menu{position:absolute;right:0;top:44px;width:164px;padding:6px;border:1px solid rgba(255,255,255,.22);border-radius:12px;background:rgba(10,24,32,.88);box-shadow:0 12px 30px rgba(0,0,0,.30);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);opacity:0;visibility:hidden;transform:translateY(-5px);transition:.18s ease}.language-selector.open .language-menu{opacity:1;visibility:visible;transform:translateY(0)}.language-option{display:flex;align-items:center;gap:9px;width:100%;padding:9px 10px;border:0;border-radius:8px;background:transparent;color:#fff;text-align:left;font:600 13px/1.2 "Open Sans",Arial,sans-serif;cursor:pointer}.language-option:hover,.language-option.active{background:rgba(255,255,255,.12)}
+@media(max-width:767px){body{padding:18px 12px;align-items:center}.glass{width:min(620px,100%);height:auto;min-height:calc(100dvh - 36px);padding:28px 22px 24px;border-radius:16px}.brand img{max-width:220px;max-height:112px}.brand h1{font-size:24px;letter-spacing:1.4px}.brand p{font-size:13px}.section-title{font-size:18px}label{font-size:14px}input[type=email],input[type=password]{height:46px;font-size:15px}.options{font-size:13px}button{height:46px;font-size:13px}.register{font-size:13px}.status{font-size:13px}.language-selector{top:12px;right:12px}.language-button{height:36px;min-width:72px}.language-menu{top:42px}}
+@media(max-width:380px){body{padding:14px 10px;align-items:center}.glass{min-height:calc(100dvh - 28px);padding:24px 18px 22px;border-radius:16px}.brand{margin-bottom:22px}.brand img{max-width:190px;max-height:98px;margin-bottom:12px}.brand h1{font-size:22px}.brand p{font-size:12px}.section-title{font-size:17px}.options{align-items:flex-start;flex-direction:column;gap:8px;margin-bottom:18px}.language-selector{top:10px;right:10px}.language-menu{width:154px}}
 </style>
 </head>
 <body>
+<div class="language-selector" id="languageSelector" aria-label="Lingua">
+<button type="button" class="language-button"><span class="language-current">🇮🇹 IT ▾</span></button>
+<div class="language-menu">
+<button type="button" class="language-option active" data-lang="it">🇮🇹 <span>Italiano</span></button>
+<button type="button" class="language-option" data-lang="en">🇺🇸 <span>English</span></button>
+<button type="button" class="language-option" data-lang="fr">🇫🇷 <span>Français</span></button>
+<button type="button" class="language-option" data-lang="es">🇪🇸 <span>Español</span></button>
+</div>
+</div>
 <main class="glass">
-<div class="brand"><img src="logo_bianco.png" alt="NEXT POINT PADEL"><h1>NEXT POINT PADEL</h1><p>Tornei • Eventi • Competizioni di padel</p></div>
-<h2 class="section-title">Accesso utenti</h2>
+<div class="brand"><img src="logo_bianco.png" alt="NEXT POINT PADEL"><h1>NEXT POINT PADEL</h1><p data-i18n="brandSub">Tornei • Eventi • Competizioni di padel</p></div>
+<h2 class="section-title" data-i18n="access">Accesso utenti</h2>
 <form id="loginForm" onsubmit="return false">
-<div class="field"><label for="email">Email</label><input id="email" type="email" autocomplete="email" placeholder="Inserisci la tua email"></div>
-<div class="field"><label for="password">Password</label><input id="password" type="password" autocomplete="current-password" placeholder="Inserisci la tua password"></div>
-<div class="options"><label class="remember"><input id="ricordami" type="checkbox"><span>Ricordami</span></label><span class="link" id="forgotPassword">Password dimenticata?</span></div>
-<button type="button" id="loginBtn">ACCEDI</button>
-<button type="button" class="secondary" id="registerBtn">REGISTRATI</button>
+<div class="field"><label for="email" data-i18n="emailLabel">Email</label><input id="email" type="email" autocomplete="email" placeholder="Inserisci la tua email" data-i18n-placeholder="emailPlaceholder"></div>
+<div class="field"><label for="password" data-i18n="passwordLabel">Password</label><input id="password" type="password" autocomplete="current-password" placeholder="Inserisci la tua password" data-i18n-placeholder="passwordPlaceholder"></div>
+<div class="options"><label class="remember"><input id="ricordami" type="checkbox"><span data-i18n="remember">Ricordami</span></label><span class="link" id="forgotPassword" data-i18n="forgot">Password dimenticata?</span></div>
+<button type="button" id="loginBtn" data-i18n="login">ACCEDI</button>
+<button type="button" class="secondary" id="registerBtn" data-i18n="register">REGISTRATI</button>
 </form>
-<div class="register">Non sei iscritto? <span class="link" id="registerLink">Registrati</span></div>
+<div class="register"><span data-i18n="notRegistered">Non sei iscritto?</span> <span class="link" id="registerLink" data-i18n="registerLink">Registrati</span></div>
 <div id="status" class="status"></div>
 </main>
 <script>
@@ -49,9 +60,10 @@ const loginBtn=document.getElementById("loginBtn");
 const registerBtn=document.getElementById("registerBtn");
 const registerLink=document.getElementById("registerLink");
 const forgotPassword=document.getElementById("forgotPassword");
-async function registerUser(){const email=emailInput.value.trim();const password=passwordInput.value;if(!email||!password){status.innerHTML="Inserisci email e password";return}status.innerHTML="Registrazione in corso...";const {error}=await sb.auth.signUp({email,password});if(error){status.innerHTML="Errore: "+error.message;return}status.innerHTML="Registrazione completata. Ora puoi accedere."}
-async function loginUser(){const email=emailInput.value.trim();const password=passwordInput.value;if(!email||!password){status.innerHTML="Inserisci email e password";return}status.innerHTML="Accesso in corso...";const {error}=await sb.auth.signInWithPassword({email,password});if(error){status.innerHTML=error.message;return}window.location.href="2Page.html"}
-async function resetPassword(){const email=emailInput.value.trim();if(!email){status.innerHTML="Inserisci prima la tua email";return}status.innerHTML="Invio richiesta reset password...";const {error}=await sb.auth.resetPasswordForEmail(email,{redirectTo:window.location.origin+"/reset-password.html"});if(error){status.innerHTML="Errore: "+error.message;return}status.innerHTML="Controlla la tua email per reimpostare la password"}
+function tr(key){return window.NextPointLanguage?window.NextPointLanguage.getText(key):key}
+async function registerUser(){const email=emailInput.value.trim();const password=passwordInput.value;if(!email||!password){status.innerHTML=tr("enterCredentials");return}status.innerHTML=tr("registering");const {error}=await sb.auth.signUp({email,password});if(error){status.innerHTML="Errore: "+error.message;return}status.innerHTML=tr("registered")}
+async function loginUser(){const email=emailInput.value.trim();const password=passwordInput.value;if(!email||!password){status.innerHTML=tr("enterCredentials");return}status.innerHTML=tr("accessing");const {error}=await sb.auth.signInWithPassword({email,password});if(error){status.innerHTML=error.message;return}window.location.href="2Page.html"}
+async function resetPassword(){const email=emailInput.value.trim();if(!email){status.innerHTML=tr("enterEmail");return}status.innerHTML=tr("resetSending");const {error}=await sb.auth.resetPasswordForEmail(email,{redirectTo:window.location.origin+"/reset-password.html"});if(error){status.innerHTML="Errore: "+error.message;return}status.innerHTML=tr("resetSent")}
 loginBtn.addEventListener("click",loginUser);registerBtn.addEventListener("click",registerUser);registerLink.addEventListener("click",registerUser);forgotPassword.addEventListener("click",resetPassword);document.getElementById("loginForm").addEventListener("submit",function(){loginUser()});
 sb.auth.onAuthStateChange(function(event,session){});
 </script>
