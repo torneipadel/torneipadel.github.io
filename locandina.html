@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Locandina | Next Point Padel</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+*{box-sizing:border-box}html,body{margin:0;min-height:100%;font-family:'Open Sans',Arial,sans-serif}body{display:flex;justify-content:center;align-items:flex-start;padding:24px 14px 40px;background:linear-gradient(rgba(7,18,25,.38),rgba(7,18,25,.55)),url('2pages.jpg') center/cover fixed no-repeat;color:#fff}.page{width:min(720px,100%);text-align:center}.head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:14px}.brand{font-size:13px;font-weight:800;letter-spacing:.08em}.back,.share{border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.10);color:#fff;text-decoration:none;border-radius:10px;padding:8px 11px;font-size:9px;font-weight:700;cursor:pointer}.card{padding:14px;border:1px solid rgba(255,255,255,.16);border-radius:20px;background:rgba(20,24,29,.76);backdrop-filter:blur(12px);box-shadow:0 22px 65px rgba(0,0,0,.32)}h1{font-size:19px;margin:2px 0 5px}.meta{font-size:10px;color:rgba(255,255,255,.58);margin-bottom:13px}.poster{display:block;width:auto;max-width:100%;max-height:78vh;margin:0 auto;border-radius:10px;box-shadow:0 18px 50px rgba(0,0,0,.38);object-fit:contain}.actions{display:flex;justify-content:center;gap:7px;margin-top:13px}.status{font-size:10px;color:rgba(255,255,255,.62);padding:30px}.error{color:#ffb4b4}@media(max-width:520px){body{padding:14px 9px}.head{align-items:flex-start}.brand{font-size:11px}.card{padding:10px;border-radius:16px}.poster{max-height:72vh}}
+</style>
+</head>
+<body>
+<main class="page">
+  <div class="head"><a class="back" href="visitatore.html">← VISITATORE</a><div class="brand">NEXT POINT PADEL</div><button class="share" id="shareLink" type="button">COPIA LINK</button></div>
+  <section class="card" id="app"><div class="status">Caricamento locandina…</div></section>
+</main>
+<script>
+const SUPABASE_URL='https://iybjvtmfaupgthqqsngd.supabase.co';
+const SUPABASE_KEY='sb_publishable_oLLML3_ne0I1dWKIinSRNA_K1Ao5SOl';
+const sb=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+const esc=v=>String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+const id=new URLSearchParams(location.search).get('id');
+document.getElementById('shareLink').onclick=async()=>{try{await navigator.clipboard.writeText(location.href);document.getElementById('shareLink').textContent='LINK COPIATO';setTimeout(()=>document.getElementById('shareLink').textContent='COPIA LINK',1800)}catch(e){window.prompt('Copia questo link:',location.href)}};
+async function load(){const app=document.getElementById('app');if(!id){app.innerHTML='<div class="status error">Locandina non disponibile: manca il torneo.</div>';return}try{const {data,error}=await sb.from('tornei').select('id,nome,data,configurazione,pubblicato,stato').eq('id',Number(id)).maybeSingle();if(error)throw error;if(!data){app.innerHTML='<div class="status error">Torneo non trovato.</div>';return}const news=Array.isArray(data.configurazione?.news)?data.configurazione.news:[];const item=news.find(n=>n?.immagine);const src=item?.immagine||'';if(!src){app.innerHTML=`<div class="status error">La locandina non è disponibile per <strong>${esc(data.nome||'questo torneo')}</strong>.</div>`;return}const d=data.data?new Date(data.data):null;const date=d&&!isNaN(d.getTime())?d.toLocaleDateString('it-IT',{day:'2-digit',month:'long',year:'numeric'}):'';app.innerHTML=`<h1>${esc(data.nome||'Locandina torneo')}</h1><div class="meta">${esc(date)}</div><img class="poster" src="${esc(src)}" alt="Locandina ${esc(data.nome||'torneo')}"><div class="actions"><button class="share" type="button" onclick="window.print()">STAMPA / PDF</button></div>`;document.title=(data.nome||'Locandina')+' | Next Point Padel'}catch(err){console.error('[LOCANDINA]',err);app.innerHTML='<div class="status error">Impossibile caricare la locandina.</div>'}}
+load();
+</script>
+</body>
+</html>
