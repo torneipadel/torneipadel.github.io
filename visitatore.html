@@ -21,12 +21,12 @@
   <a href="javascript:apriMercatino()">□ Mercatino</a>
   <a href="#eventi" onclick="chiudiMenu()">▦ Eventi</a>
   <a href="javascript:apriContatti()">○ Contatti</a>
+  <a href="index.html" onclick="chiudiMenu()">👤 Area personale</a>
   <a href="javascript:esciVisitatore()">🚪 Esci</a>
 </nav>
 <div class="np-page" id="home">
   <header class="np-top">
     <div class="np-topbar"><button class="np-icon" onclick="apriMenu()" aria-label="Apri menu">☰</button><img class="np-logo" src="logo_bianco.png" alt="Next Point Padel"></div>
-    <a class="np-login" href="index.html">👤 <span>AREA PERSONALE</span></a>
   </header>
   <section class="np-hero">
     <div class="np-hero-copy"><span class="np-eyebrow">NEXT POINT PADEL · CLUB</span><h1>Vivi il gioco.<span>Vivi il momento.</span></h1><p>Il punto d'incontro per tornei, eventi, news e appuntamenti del club. Scopri cosa sta succedendo, scegli il tuo prossimo torneo e scendi in campo.</p><div class="np-hero-actions"><a class="np-btn np-primary" href="#tornei">SCOPRI I TORNEI</a><a class="np-btn np-ghost" href="#news">VEDI LE NEWS</a></div></div>
@@ -50,7 +50,6 @@ body:before,body:after{display:none!important}
 .np-page{box-sizing:border-box!important;width:600px!important;max-width:calc(100vw - 48px)!important;margin:0 auto!important;padding:34px 34px 30px!important;border:1px solid rgba(255,255,255,.24)!important;border-radius:28px!important;background:rgba(255,255,255,.12)!important;box-shadow:0 20px 55px rgba(0,0,0,.28),inset 0 1px 0 rgba(255,255,255,.16)!important;backdrop-filter:blur(18px) saturate(125%)!important;-webkit-backdrop-filter:blur(18px) saturate(125%)!important}
 .np-top{position:relative!important;top:auto!important;margin-bottom:24px!important}
 .np-topbar{padding:7px 10px!important;border:1px solid rgba(255,255,255,.22)!important;border-radius:14px!important;background:rgba(255,255,255,.08)!important;box-shadow:none!important}
-.np-login{padding:9px 11px!important;border-radius:12px!important;font-size:10px!important}
 .np-hero{grid-template-columns:1fr!important;min-height:0!important;gap:14px!important;margin-bottom:20px!important}
 .np-hero-copy,.np-hero-poster,.np-panel{border-radius:22px!important}
 .np-hero-copy{padding:28px 24px!important;min-height:0!important}
@@ -68,7 +67,7 @@ body:before,body:after{display:none!important}
 .np-panel{padding:18px!important}
 .np-card-media{height:180px!important}
 .np-footer{padding:25px 0 4px!important}
-@media(max-width:520px){body{padding:16px!important}.np-page{width:calc(100vw - 32px)!important;max-width:none!important;padding:28px 22px 24px!important;border-radius:25px!important}.np-topbar{padding:7px 8px!important}.np-logo{width:155px!important}.np-login{padding:9px 10px!important}.np-hero-copy{padding:24px 20px!important}.np-hero h1{font-size:40px!important}.np-hero-poster{min-height:190px!important}.np-tour-info{padding:20px!important}.np-panel{padding:16px!important;border-radius:20px!important}}
+@media(max-width:520px){body{padding:16px!important}.np-page{width:calc(100vw - 32px)!important;max-width:none!important;padding:28px 22px 24px!important;border-radius:25px!important}.np-topbar{padding:7px 8px!important}.np-logo{width:155px!important}.np-hero-copy{padding:24px 20px!important}.np-hero h1{font-size:40px!important}.np-hero-poster{min-height:190px!important}.np-tour-info{padding:20px!important}.np-panel{padding:16px!important;border-radius:20px!important}}
 </style>
 <style id="np-index-layout-final">
 html,body{margin:0!important;min-height:100%!important}
@@ -95,13 +94,11 @@ body:before,body:after{display:none!important}
 </style>
 <style id="np-layout-controls-final">
 :root{--np-control-h:34px;--np-control-radius:10px;--np-control-font:9px;--np-control-pad:0 12px;--np-control-border:rgba(255,255,255,.18);--np-control-bg:rgba(255,255,255,.09);--np-control-primary:#fff;--np-control-primary-text:#073b72}
-.np-btn,.np-login,.np-icon,.np-cal-nav button,.np-drawer-close,.np-poster-close{font-family:'Open Sans',Arial,sans-serif!important;-webkit-font-smoothing:antialiased!important}
+.np-btn,.np-icon,.np-cal-nav button,.np-drawer-close,.np-poster-close{font-family:'Open Sans',Arial,sans-serif!important;-webkit-font-smoothing:antialiased!important}
 .np-btn{min-height:var(--np-control-h)!important;height:var(--np-control-h)!important;box-sizing:border-box!important;padding:var(--np-control-pad)!important;border:1px solid var(--np-control-border)!important;border-radius:var(--np-control-radius)!important;font-size:var(--np-control-font)!important;font-weight:800!important;letter-spacing:.45px!important;line-height:1!important;display:inline-flex!important;align-items:center!important;justify-content:center!important;white-space:nowrap!important;box-shadow:none!important}
 .np-primary{background:var(--np-control-primary)!important;color:var(--np-control-primary-text)!important;border-color:rgba(255,255,255,.72)!important;box-shadow:0 7px 18px rgba(0,0,0,.16)!important}
 .np-ghost{background:var(--np-control-bg)!important;color:#fff!important;border-color:var(--np-control-border)!important}
 .np-btn:hover{transform:translateY(-1px)!important;filter:brightness(1.04)!important}
-.np-login{min-height:var(--np-control-h)!important;height:var(--np-control-h)!important;box-sizing:border-box!important;padding:0 12px!important;border:1px solid rgba(255,255,255,.72)!important;border-radius:var(--np-control-radius)!important;background:rgba(255,255,255,.94)!important;color:#073b72!important;font-size:9px!important;font-weight:800!important;letter-spacing:.45px!important;line-height:1!important;box-shadow:0 7px 18px rgba(0,0,0,.15)!important}
-.np-login:hover{transform:translateY(-1px)!important;background:#fff!important}
 .np-icon{width:34px!important;height:34px!important;min-width:34px!important;border:1px solid rgba(255,255,255,.18)!important;border-radius:10px!important;background:rgba(255,255,255,.09)!important;color:#fff!important;font-size:17px!important;line-height:1!important;display:inline-flex!important;align-items:center!important;justify-content:center!important;box-sizing:border-box!important}
 .np-icon:hover{background:rgba(255,255,255,.15)!important;transform:translateY(-1px)!important}
 .np-hero-actions{display:flex!important;align-items:center!important;gap:7px!important;flex-wrap:wrap!important}
@@ -119,7 +116,7 @@ body:before,body:after{display:none!important}
 .np-poster-close{width:38px!important;height:38px!important;border:1px solid rgba(255,255,255,.16)!important;border-radius:10px!important;background:rgba(255,255,255,.12)!important;color:#fff!important;font-size:24px!important;line-height:1!important}
 .np-news-all .np-btn{min-width:150px!important}
 .np-menu-close .np-icon{flex:none!important}
-@media(max-width:600px){.np-login{min-width:34px!important;width:34px!important;padding:0!important;font-size:15px!important}.np-login span{display:none!important}.np-btn{min-height:32px!important;height:32px!important;padding:0 10px!important;font-size:8px!important}.np-cal-nav button{width:32px!important;height:32px!important;min-width:32px!important}.np-month-actions{grid-column:2!important}.np-drawer-actions .np-btn{min-width:76px!important}.np-news-all .np-btn{min-width:140px!important}}
+@media(max-width:600px){.np-btn{min-height:32px!important;height:32px!important;padding:0 10px!important;font-size:8px!important}.np-cal-nav button{width:32px!important;height:32px!important;min-width:32px!important}.np-month-actions{grid-column:2!important}.np-drawer-actions .np-btn{min-width:76px!important}.np-news-all .np-btn{min-width:140px!important}}
 </style>
   <script src="sponsor-public-v2.js?v=8"></script>
 </body>
