@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Informazioni Club - Next Point Padel</title>
+<meta name="description" content="Informazioni sul Club Next Point Padel, servizi, tornei, iscrizioni e contatti.">
+<style>
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;min-height:100%;font-family:Arial,sans-serif;background:#111;color:#fff}
+body{background:linear-gradient(rgba(0,0,0,.58),rgba(0,0,0,.72)),url('sfondo2.jpg') center/cover fixed no-repeat}
+.header{position:sticky;top:0;z-index:20;display:flex;align-items:center;justify-content:space-between;padding:14px 18px;background:rgba(0,0,0,.72);backdrop-filter:blur(8px)}
+.logo{height:42px;width:auto;display:block}
+.menu-button{width:44px;height:44px;border:1px solid rgba(255,255,255,.35);border-radius:10px;background:rgba(255,255,255,.08);color:#fff;font-size:27px;display:flex;align-items:center;justify-content:center;cursor:pointer}
+.menu-panel{position:absolute;right:16px;top:66px;width:230px;display:none;padding:8px;background:rgba(15,15,15,.96);border:1px solid rgba(255,255,255,.18);border-radius:12px;box-shadow:0 12px 30px rgba(0,0,0,.45)}
+.menu-panel.open{display:block}
+.menu-item{padding:13px 12px;border-radius:8px;cursor:pointer;font-size:15px}
+.menu-item:hover{background:rgba(255,255,255,.1)}
+.container{width:min(920px,calc(100% - 28px));margin:30px auto 50px}
+.card{background:rgba(255,255,255,.92);color:#222;border-radius:18px;padding:28px;box-shadow:0 15px 45px rgba(0,0,0,.35);margin-bottom:18px}
+h1{margin:0 0 8px;font-size:30px}h2{margin:0 0 10px;font-size:21px}p{line-height:1.6;margin:8px 0}.intro{font-size:17px;color:#444}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}.info{padding:18px;border-radius:14px;background:#f3f3f3}.info strong{display:block;margin-bottom:6px}.back{display:inline-block;margin-top:8px;padding:11px 16px;border-radius:10px;background:#111;color:#fff;text-decoration:none}.footer{text-align:center;color:rgba(255,255,255,.82);font-size:13px;padding:10px 0 30px}
+@media(max-width:650px){.card{padding:21px}.grid{grid-template-columns:1fr}h1{font-size:25px}}
+</style>
+</head>
+<body>
+<header class="header">
+<img class="logo" src="logo_bianco.png" alt="Next Point Padel">
+<div class="menu-button" onclick="toggleMenu()" aria-label="Apri menu">☰</div>
+<div class="menu-panel" id="menuPanel">
+<div class="menu-item" onclick="location.href='2Page.html'">⌂ Home</div>
+<div class="menu-item" onclick="location.href='tornei.html'">▣ Tornei</div>
+<div class="menu-item" onclick="location.href='news.html'">≡ News</div>
+<div class="menu-item" onclick="location.href='mercatino.html'">□ Mercatino</div>
+<div class="menu-item" onclick="location.href='sponsor-pubblico.html'">★ Sponsor</div>
+<div class="menu-item" onclick="location.href='informazioni.html'">ⓘ Informazioni Club</div>
+<div class="menu-item" onclick="location.href='contatti.html'">☎ Contatti</div>
+<div class="menu-item" onclick="logout()">🚪 Esci</div>
+</div>
+</header>
+
+<main class="container">
+<section class="card">
+<h1>Informazioni Club</h1>
+<p class="intro">Benvenuto nell'area informativa di <strong>Next Point Padel</strong>. Qui puoi trovare le principali informazioni sul club, sulle attività e sul modo di partecipare ai nostri tornei.</p>
+</section>
+
+<section class="card">
+<h2>🎾 Il Club</h2>
+<p>Next Point Padel è uno spazio dedicato a chi ama il padel, vuole giocare, partecipare a tornei e vivere le attività del club.</p>
+<p>Attraverso questo sito puoi consultare i tornei, le news, le comunicazioni e le iniziative disponibili.</p>
+</section>
+
+<section class="card">
+<h2>🏆 Tornei e competizioni</h2>
+<p>Nel sito trovi il calendario dei tornei e le relative informazioni. Quando un torneo è aperto alle iscrizioni, puoi consultare i dettagli e seguire le indicazioni riportate nella pagina dedicata.</p>
+<div class="grid">
+<div class="info"><strong>📅 Calendario</strong>Consulta i tornei programmati e le date disponibili.</div>
+<div class="info"><strong>👥 Iscrizioni</strong>Verifica modalità, scadenze e informazioni riportate per ogni torneo.</div>
+<div class="info"><strong>📊 Risultati</strong>Segui gironi, classifiche e fasi finali dei tornei pubblicati.</div>
+<div class="info"><strong>📰 Comunicazioni</strong>Controlla News e comunicazioni del club per eventuali aggiornamenti.</div>
+</div>
+</section>
+
+<section class="card">
+<h2>📋 Come partecipare</h2>
+<p>Per partecipare a un torneo, apri la pagina del torneo di tuo interesse e verifica le informazioni disponibili. Le modalità di iscrizione possono variare in base alla competizione.</p>
+<p>Per dubbi o richieste puoi utilizzare la pagina <strong>Contatti</strong>.</p>
+</section>
+
+<section class="card">
+<h2>📍 Dove siamo e contatti</h2>
+<p>Per indirizzo, recapiti e informazioni di contatto consulta la pagina dedicata:</p>
+<a class="back" href="contatti.html">☎ Vai ai Contatti</a>
+</section>
+
+<section class="card">
+<h2>ℹ️ Informazioni utili</h2>
+<p>Questa pagina raccoglie le informazioni generali del club. Le informazioni specifiche di ogni torneo, comprese date, formule, iscrizioni e regolamenti, fanno riferimento alla relativa pagina del torneo e alle comunicazioni pubblicate.</p>
+<a class="back" href="2Page.html">⌂ Torna alla Home</a>
+</section>
+</main>
+
+<div class="footer">Next Point Padel</div>
+
+<script>
+function toggleMenu(){document.getElementById('menuPanel').classList.toggle('open')}
+function logout(){
+  if(window.sb&&window.sb.auth){
+    window.sb.auth.signOut().finally(()=>{window.location.href='index.html'});
+  }else{
+    window.location.href='index.html';
+  }
+}
+document.addEventListener('click',function(e){
+  const panel=document.getElementById('menuPanel');
+  const button=document.querySelector('.menu-button');
+  if(panel.classList.contains('open')&&!panel.contains(e.target)&&!button.contains(e.target)) panel.classList.remove('open');
+});
+</script>
+</body>
+</html>
