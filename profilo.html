@@ -46,204 +46,68 @@ input:focus,textarea:focus{border-color:rgba(255,255,255,.65);box-shadow:0 0 0 2
 const sb = supabase.createClient(
 "https://iybjvtmfaupgthqqsngd.supabase.co",
 "sb_publishable_oLLML3_ne0I1dWKIinSRNA_K1Ao5SOl",
-{
-auth:{
-persistSession:true,
-autoRefreshToken:true,
-detectSessionInUrl:true
-}
-}
+{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}}
 );
 let userId=null;
 let emailUtente="";
+let ruoloUtente="user";
 function generaAlias(nome,cognome){
-if(!nome || !cognome)
-return "";
-return (
-nome.trim().charAt(0)
-+
-"."
-+
-cognome.trim()
-);
+if(!nome || !cognome)return "";
+return nome.trim().charAt(0)+"."+cognome.trim();
 }
 async function caricaProfilo(){
-const {
-data:{
-user
-}
-}
-=
-await sb.auth.getUser();
-if(!user){
-window.location.href="index.html";
-return;
-}
+const {data:{user}}=await sb.auth.getUser();
+if(!user){window.location.href="index.html";return;}
 userId=user.id;
 emailUtente=user.email;
 const emailBox=document.getElementById("emailBox");
-if(emailBox){
-emailBox.innerHTML="Email: "+emailUtente;
-}
-  const {
-data,
-error
-}
-=
-await sb
-.from("profili")
-.select("*")
-.eq(
-"user_id",
-userId
-)
-.single();
+if(emailBox)emailBox.innerHTML="Email: "+emailUtente;
+const {data,error}=await sb.from("profili").select("*").eq("user_id",userId).single();
 if(error && error.code !== "PGRST116"){
-console.error(
-"Errore caricamento profilo:",
-error
-);
+console.error("Errore caricamento profilo:",error);
 const status=document.getElementById("status");
-if(status){
-status.innerHTML="Errore caricamento profilo";
-}
+if(status)status.innerHTML="Errore caricamento profilo";
 return;
 }
 if(!data){
-console.log(
-"Profilo non presente, creo record iniziale"
-);
-const {
-error:erroreCreazione
-}
-=
-await sb
-.from("profili")
-.insert({
-user_id:userId,
-email:emailUtente,
-nome:"",
-cognome:"",
-telefono:"",
-livello:"",
-alias:"",
-note:"",
-ruolo:"user",
-updated_at:
-new Date()
-.toISOString()
-});
+console.log("Profilo non presente, creo record iniziale");
+const {error:erroreCreazione}=await sb.from("profili").insert({user_id:userId,email:emailUtente,nome:"",cognome:"",telefono:"",livello:"",alias:"",note:"",ruolo:"user",updated_at:new Date().toISOString()});
 if(erroreCreazione){
-console.error(
-"Errore creazione profilo:",
-erroreCreazione
-);
+console.error("Errore creazione profilo:",erroreCreazione);
 const status=document.getElementById("status");
-if(status){
-status.innerHTML="Errore creazione profilo";
-}
+if(status)status.innerHTML="Errore creazione profilo";
 return;
 }
+ruoloUtente="user";
 return;
 }
-document.getElementById("nome").value=
-data.nome || "";
-document.getElementById("cognome").value=
-data.cognome || "";
-document.getElementById("telefono").value=
-data.telefono || "";
-document.getElementById("livello").value=
-data.livello || "";
-document.getElementById("alias").value=
-data.alias || "";
-document.getElementById("note").value=
-data.note || "";
+ruoloUtente=data.ruolo || "user";
+document.getElementById("nome").value=data.nome || "";
+document.getElementById("cognome").value=data.cognome || "";
+document.getElementById("telefono").value=data.telefono || "";
+document.getElementById("livello").value=data.livello || "";
+document.getElementById("alias").value=data.alias || "";
+document.getElementById("note").value=data.note || "";
 }
 async function salvaProfilo(){
-const nome=
-document.getElementById("nome")
-.value
-.trim();
-const cognome=
-document.getElementById("cognome")
-.value
-.trim();
-const telefono=
-document.getElementById("telefono")
-.value
-.trim();
-const livello=
-document.getElementById("livello")
-.value
-.trim();
-let alias=
-document.getElementById("alias")
-.value
-.trim();
-const note=
-document.getElementById("note")
-.value
-.trim();
-if(!nome || !cognome){
-document.getElementById("status").innerHTML=
-"Inserisci nome e cognome";
-return;
-}
-if(!alias){
-alias=
-generaAlias(
-nome,
-cognome
-);
-document.getElementById("alias").value=
-alias;
-}
-  const {
-error
-}
-=
-await sb
-.from("profili")
-.upsert({
-user_id:userId,
-email:emailUtente,
-nome,
-cognome,
-telefono,
-livello,
-alias,
-note,
-ruolo:"user",
-updated_at:
-new Date()
-.toISOString()
-
-},
-
-{
-onConflict:
-"user_id"
-}
-
-);
+const nome=document.getElementById("nome").value.trim();
+const cognome=document.getElementById("cognome").value.trim();
+const telefono=document.getElementById("telefono").value.trim();
+const livello=document.getElementById("livello").value.trim();
+let alias=document.getElementById("alias").value.trim();
+const note=document.getElementById("note").value.trim();
+if(!nome || !cognome){document.getElementById("status").innerHTML="Inserisci nome e cognome";return;}
+if(!alias){alias=generaAlias(nome,cognome);document.getElementById("alias").value=alias;}
+const {error}=await sb.from("profili").upsert({user_id:userId,email:emailUtente,nome,cognome,telefono,livello,alias,note,ruolo:ruoloUtente,updated_at:new Date().toISOString()},{onConflict:"user_id"});
 if(error){
-console.error(
-"Errore salvataggio profilo:",
-error
-);
-document.getElementById("status").innerHTML=
-"Errore salvataggio";
+console.error("Errore salvataggio profilo:",error);
+document.getElementById("status").innerHTML="Errore salvataggio";
 return;
 }
-document.getElementById("status").innerHTML=
-"✅ Profilo salvato";
-setTimeout(()=>{
-window.location.href="2Page.html";
-},1000);
+document.getElementById("status").innerHTML="✅ Profilo salvato";
+setTimeout(()=>{window.location.href="2Page.html";},1000);
 }
-document.addEventListener("DOMContentLoaded", async () => {
-await caricaProfilo();
-});
+document.addEventListener("DOMContentLoaded",async()=>{await caricaProfilo();});
 </script>
 </body>
 </html>
