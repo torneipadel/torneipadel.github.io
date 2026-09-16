@@ -17,8 +17,8 @@
 <main class="page">
 <header class="topbar"><button class="icon" onclick="history.back()" aria-label="Torna indietro">←</button><img class="logo" src="logo_bianco.png" alt="Next Point Padel"></header>
 <section class="title"><div class="eyebrow">NEXT POINT PADEL · BACHECA INTERNA</div><h1>Mercatino</h1><p class="subtitle">Articoli sportivi, racchette e accessori messi in vendita all'interno del circolo.</p></section>
-<div class="toolbar"><div class="filters"><button class="filter active" data-filter="all">Tutti</button><button class="filter" data-filter="racchette">Racchette</button><button class="filter" data-filter="abbigliamento">Abbigliamento</button><button class="filter" data-filter="accessori">Accessori</button><button class="filter" data-filter="altro">Altro</button></div><button class="main-action" type="button" onclick="apriEditor()">＋ INSERISCI IL TUO ARTICOLO</button></div>
-<div id="editor" class="editor">
+<div class="toolbar"><div class="filters"><button class="filter active" data-filter="all">Tutti</button><button class="filter" data-filter="racchette">Racchette</button><button class="filter" data-filter="abbigliamento">Abbigliamento</button><button class="filter" data-filter="accessori">Accessori</button><button class="filter" data-filter="altro">Altro</button></div><button id="editorToggle" class="main-action" type="button" onclick="toggleEditor()">＋ INSERISCI IL TUO ARTICOLO</button></div>
+<div id="editor" class="editor" hidden>
 <h2 id="editorTitle">Inserisci il tuo articolo</h2><p class="editor-note">Puoi gestire solo gli articoli inseriti dal tuo account. Pubblicare significa renderli visibili nella bacheca quando sono disponibili.</p>
 <form id="myItemForm"><input type="hidden" id="itemId"><div class="form-grid">
 <div class="field full"><label>NOME COGNOME</label><input id="itemNomeCognome" placeholder="Nome e cognome (facoltativo)"></div>
@@ -31,13 +31,13 @@
 <div class="field full"><label>ANTEPRIMA</label><input id="itemAnteprima" placeholder="Breve descrizione che comparirà nella lista"></div>
 <div class="field full"><label>DESCRIZIONE COMPLETA *</label><textarea id="itemDescrizione" required placeholder="Descrivi il tuo articolo..."></textarea></div>
 <div class="field full"><label>FOTO</label><div class="photo-upload"><input id="itemFotoFile" class="photo-file" type="file" accept="image/png,image/jpeg,image/webp"><span id="photoName" class="photo-name">Nessuna foto selezionata</span><div class="photo-help">JPG, PNG o WEBP · massimo 5 MB</div><div id="photoPreview" class="photo-preview"><img id="photoPreviewImg" alt="Anteprima foto articolo"></div></div><input type="hidden" id="itemImmagine"></div>
-</div><div class="form-actions"><button class="save" type="submit">SALVA ARTICOLO</button><button class="cancel" type="button" onclick="chiudiEditor()">ANNULLA</button></div><div id="formStatus" class="form-status"></div></form>
+</div><div class="form-actions"><button class="save" type="submit">SALVA ARTICOLO</button><button class="cancel" type="button" onclick="chiudiEditor()">CHIUDI / ANNULLA</button></div><div id="formStatus" class="form-status"></div></form>
 </div>
 <section id="list" class="list" aria-live="polite"><div class="empty">Caricamento Mercatino...</div></section>
 <section class="mine"><h2>I MIEI ARTICOLI</h2><div id="mineList" class="mine-list"><div class="empty">Accedi per gestire i tuoi articoli.</div></div></section>
 <footer class="footer">NEXT POINT PADEL · MERCATINO INTERNO</footer>
 </main>
 <div id="detail" class="detail" role="dialog" aria-modal="true" aria-label="Dettaglio articolo"><div class="detail-box"><div class="detail-head"><button class="close" onclick="closeDetail()" aria-label="Chiudi">×</button></div><div id="detailContent"></div></div></div>
-<script src="mercatino-public-v1.js?v=5"></script>
+<script src="mercatino-public-v1.js?v=6"></script>
 </body>
 </html>
