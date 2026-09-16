@@ -14,7 +14,7 @@
   };
   function current(){return localStorage.getItem(STORAGE_KEY)||"it";}
   function getText(key){const lang=current();return (TEXT[lang]&&TEXT[lang][key])||TEXT.it[key]||key;}
-  function flagHtml(lang){const item=LANGS[lang]||LANGS.it;return '<img class="language-flag" src="https://flagcdn.com/w20/'+item.flagCode+'.png" alt="" width="20" height="15">';}
+  function flagHtml(lang){const item=LANGS[lang]||LANGS.it;return '<img class="language-flag" src="https://flagcdn.com/w20/'+item.flagCode+'.png" alt="" width="20" height="15" style="width:20px;height:15px;object-fit:cover;border-radius:2px;display:inline-block;vertical-align:-3px;flex:none">';}
   function setLanguage(lang){
     if(!LANGS[lang]) lang="it";
     localStorage.setItem(STORAGE_KEY,lang);
@@ -27,7 +27,11 @@
       const active=LANGS[lang];
       const currentLabel=selector.querySelector(".language-current");
       if(currentLabel)currentLabel.innerHTML=flagHtml(lang)+" <span>"+active.short+"</span><b>▾</b>";
-      selector.querySelectorAll("[data-lang]").forEach(item=>item.classList.toggle("active",item.dataset.lang===lang));
+      selector.querySelectorAll("[data-lang]").forEach(item=>{
+        const itemLang=item.dataset.lang;
+        item.innerHTML=flagHtml(itemLang)+" <span>"+LANGS[itemLang].name+"</span>";
+        item.classList.toggle("active",itemLang===lang);
+      });
     }
     document.dispatchEvent(new CustomEvent("nextpointlanguagechange",{detail:{language:lang}}));
   }
