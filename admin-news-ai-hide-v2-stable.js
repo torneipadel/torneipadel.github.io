@@ -120,5 +120,4 @@ function runUniversal(){
 function run(){runUniversal()}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',run,{once:true});else run();
 window.addEventListener('admin:render',run);
-const obs=new MutationObserver(()=>run());obs.observe(document.body,{childList:true,subtree:true});
 })();
