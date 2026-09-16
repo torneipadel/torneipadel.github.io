@@ -1,4 +1,4 @@
-/* NEWS STANDARD MODE — gestione chiara delle due modalità locandina + editor universale. */
+/* NEWS STANDARD MODE — gestione chiara delle due modalità locandina + contenuto universale. */
 (()=>{
 'use strict';
 function cleanAI(){
@@ -30,94 +30,19 @@ function installMenus(){
   function showMode(mode){mode=mode==='manual'?'manual':'automatic';box.dataset.mode=mode;const auto=mode==='automatic';automatic.style.display=auto?'':'none';manual.style.display=auto?'none':'';box.querySelectorAll('[data-poster-mode]').forEach(b=>b.classList.toggle('active',b.dataset.posterMode===mode));}
   showMode(box.dataset.mode||'automatic');
 }
-
-let universalEditingId=null;
-const universalEsc=v=>String(v??'').replace(/[&<>\"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;'}[m]));
-const universalSelected=()=>window.getTorneoAdminCorrente?.()||((window.adminState?.tornei||[]).find(t=>String(t.id)===String(window.adminState?.torneoSelezionato))||null);
-const universalCfg=t=>t?.configurazione&&typeof t.configurazione==='object'?{...t.configurazione}:{};
-const universalDataUrl=file=>new Promise((resolve,reject)=>{const r=new FileReader();r.onload=()=>resolve(String(r.result||''));r.onerror=()=>reject(new Error('Impossibile leggere l’immagine.'));r.readAsDataURL(file)});
-function addUniversalTypes(){
+function installUniversalContent(){
   const select=document.getElementById('naiType');
-  if(!select)return;
-  [['Vendita','🛒 Vendita'],['Offerta','🎁 Offerta'],['Altro','✍️ Contenuto libero']].forEach(([value,label])=>{
-    if(![...select.options].some(o=>o.value===value)){const o=document.createElement('option');o.value=value;o.textContent=label;select.appendChild(o)}
-  });
+  const grid=document.querySelector('.nai-grid');
+  if(!select||!grid)return;
+  [['Vendita','🛒 Vendita'],['Offerta','🎁 Offerta'],['Altro','✍️ Contenuto libero']].forEach(([value,label])=>{if(![...select.options].some(o=>o.value===value)){const o=document.createElement('option');o.value=value;o.textContent=label;select.appendChild(o)}});
+  let box=document.getElementById('naiUniversalContent');
+  if(!box){box=document.createElement('div');box.id='naiUniversalContent';box.className='full';box.innerHTML='<label>Contenuto / descrizione libera</label><textarea id="naiUniversalText" class="input" rows="7" placeholder="Scrivi qui qualsiasi contenuto: evento, vendita, promozione, comunicazione, articolo, ricordo o altro."></textarea><small class="notice">Il contenuto libero viene usato come testo della pubblicazione. Gli altri campi restano facoltativi.</small>';grid.appendChild(box);}
+  const sync=()=>{const text=document.getElementById('naiUniversalText');const topic=document.getElementById('naiTopic');if(text&&topic&&text.value.trim())topic.value=text.value.trim();};
+  if(select.dataset.universalBound!=='1'){select.dataset.universalBound='1';select.addEventListener('change',()=>{const text=document.getElementById('naiUniversalText');if(text){text.placeholder=select.value==='Altro'?'Scrivi liberamente qualsiasi contenuto tu voglia pubblicare.':'Scrivi la descrizione completa del contenuto. I campi sopra sono facoltativi.'}})}
+  ['input','change'].forEach(ev=>{if(box.dataset.bound!==ev){box.dataset.bound=ev;box.addEventListener(ev,sync)}});
+  ['click'].forEach(ev=>{if(document.documentElement.dataset.universalPublishBound!==ev){document.documentElement.dataset.universalPublishBound=ev;document.addEventListener(ev,e=>{if(e.target.closest('#naiGenerate,#naiRegenerate,#naiSaveDraft,#naiPublish'))sync()},{capture:true})}});
 }
-function installUniversalFields(){
-  const panel=document.querySelector('.nai-wrap > .nai-panel');
-  if(!panel||document.getElementById('naiUniversalContent'))return;
-  const title=document.getElementById('naiTitle');
-  if(!title)return;
-  const holder=document.createElement('div');
-  holder.id='naiUniversalContent';
-  holder.innerHTML=`<label style="display:block;font-size:12px;font-weight:700;margin:10px 0 5px">Contenuto / descrizione</label><textarea id="naiUniversalText" class="input" rows="8" placeholder="Scrivi liberamente tutto ciò che vuoi pubblicare: una comunicazione, un evento, una vendita, una promozione, un articolo, un ricordo o qualsiasi altro contenuto."></textarea><div class="notice" style="margin-top:6px">Questo campo è libero: non ci sono campi obbligatori oltre al titolo.</div>`;
-  const grid=title.closest('.nai-grid');
-  if(grid)grid.appendChild(holder);else title.parentElement?.insertAdjacentElement('afterend',holder);
-  const type=document.getElementById('naiType');
-  type?.addEventListener('change',()=>{
-    const v=type.value;
-    const text=document.getElementById('naiUniversalText');
-    if(text&&v==='Altro')text.placeholder='Scrivi qualsiasi contenuto tu voglia pubblicare, senza uno schema predefinito.';
-    else if(text)text.placeholder='Scrivi liberamente il contenuto. I campi specifici sopra possono essere usati solo quando servono.';
-  });
-}
-function findPosterImage(){
-  const imgs=[...document.querySelectorAll('#naiAutoPosterPanel img,#naiManualPosterPanel img')];
-  const data=imgs.map(x=>x.currentSrc||x.src||'').find(x=>x.startsWith('data:image/'));
-  if(data)return data;
-  for(const c of document.querySelectorAll('#naiAutoPosterPanel canvas,#naiManualPosterPanel canvas')){try{return c.toDataURL('image/png')}catch(e){}}
-  return '';
-}
-function buildUniversalText(type,free){
-  if(free.trim())return free.trim();
-  const v=id=>document.getElementById(id)?.value.trim()||'';
-  const lines=[];
-  if(type==='Torneo'){if(v('naiDate'))lines.push('📅 '+v('naiDate'));if(v('naiTime'))lines.push('⏰ '+v('naiTime'));if(v('naiLocation'))lines.push('📍 '+v('naiLocation'));if(v('naiPairs'))lines.push('👥 '+v('naiPairs')+' coppie');if(v('naiLevel'))lines.push('🎾 Livello '+v('naiLevel'));if(v('naiFee'))lines.push('💶 Quota '+v('naiFee'));if(v('naiDeadline'))lines.push('⏳ Iscrizioni entro '+v('naiDeadline'));return lines.join('\n');}
-  if(v('naiOffer'))lines.push(v('naiOffer'));if(v('naiProduct'))lines.push(v('naiProduct'));if(v('naiPrice'))lines.push('💶 '+v('naiPrice'));if(v('naiDate'))lines.push('📅 '+v('naiDate'));if(v('naiTime'))lines.push('⏰ '+v('naiTime'));if(v('naiLocation'))lines.push('📍 '+v('naiLocation'));if(v('naiDeadline'))lines.push('⏳ '+v('naiDeadline'));return lines.join('\n');
-}
-async function publishUniversal(){
-  const t=universalSelected();
-  if(!t){alert('Seleziona prima un torneo');return}
-  const sb=window.supabaseClient||window.sb;
-  if(!sb){alert('Connessione Supabase non disponibile.');return}
-  const title=document.getElementById('naiTitle')?.value.trim()||'Senza titolo';
-  const type=document.getElementById('naiType')?.value||'Comunicazione';
-  const free=document.getElementById('naiUniversalText')?.value||'';
-  const text=buildUniversalText(type,free);
-  if(!text.trim()){alert('Inserisci il contenuto della pubblicazione.');return}
-  const c=universalCfg(t),items=Array.isArray(c.news)?c.news:[];
-  let image=findPosterImage();
-  const file=document.getElementById('naiImage')?.files?.[0];
-  if(file){if(file.size>6*1024*1024){alert('Immagine troppo grande: massimo 6 MB.');return}image=await universalDataUrl(file)}
-  const old=universalEditingId?items.find(n=>String(n.id)===String(universalEditingId)):null;
-  const item={...(old||{}),id:old?.id||'news-'+Date.now(),tipo:type,titolo:title,testo:text,immagine:image||old?.immagine||'',link:'',inEvidenza:old?.inEvidenza??(items.length===0),data:old?.data||new Date().toISOString(),ordine:old?.ordine??items.length,pubblicata:true,stato:'pubblicata'};
-  const next=old?items.map(n=>String(n.id)===String(old.id)?item:n):[...items,item];
-  const {data,error}=await sb.from('tornei').update({configurazione:{...c,news:next}}).eq('id',t.id).select('id,configurazione').maybeSingle();
-  if(error||!data){console.error(error);alert('Errore salvataggio News: '+(error?.message||'configurazione non aggiornata'));return}
-  t.configurazione=data.configurazione||{...c,news:next};
-  try{localStorage.setItem('padel_admin_state',JSON.stringify(window.adminState||{}))}catch(e){}
-  universalEditingId=null;
-  alert('News pubblicata correttamente.');
-  document.querySelector('[data-com-page="news"]')?.click();
-}
-function bindUniversalCapture(){
-  if(document.documentElement.dataset.universalNewsBound==='1')return;
-  document.documentElement.dataset.universalNewsBound='1';
-  document.addEventListener('click',e=>{
-    const edit=e.target.closest?.('[data-nai-edit]');
-    if(edit){universalEditingId=edit.dataset.naiEdit||null;return}
-    const publish=e.target.closest?.('#naiPublish');
-    if(publish){e.preventDefault();e.stopImmediatePropagation();publishUniversal()}
-  },true);
-}
-function runUniversal(){
-  cleanAI();
-  addUniversalTypes();
-  installUniversalFields();
-  installMenus();
-  bindUniversalCapture();
-}
-function run(){runUniversal()}
+function run(){cleanAI();installMenus();installUniversalContent()}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',run,{once:true});else run();
 window.addEventListener('admin:render',run);
 const obs=new MutationObserver(()=>run());obs.observe(document.body,{childList:true,subtree:true});
