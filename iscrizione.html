@@ -9,21 +9,23 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
-:root{--bg-image:url('2pages.jpg')}
+:root{--bg-image:url('sfondo2.jpg');--line:rgba(255,255,255,.22);--blue:#073b72}
 *{box-sizing:border-box}
-html{margin:0;min-height:100%;width:100%}
-body{margin:0;min-height:100vh;width:100%;font-family:'Open Sans',Arial,sans-serif;background:linear-gradient(rgba(7,18,25,.28),rgba(7,18,25,.42)),var(--bg-image) center/cover fixed no-repeat;color:#fff;overflow-x:hidden;display:grid;place-items:center;padding:24px}
-.card{width:min(760px,calc(100vw - 32px));margin:0;padding:24px 24px 22px;border:1px solid rgba(255,255,255,.24);border-radius:26px;background:rgba(255,255,255,.12);box-shadow:0 20px 55px rgba(0,0,0,.28),inset 0 1px 0 rgba(255,255,255,.16);backdrop-filter:blur(18px) saturate(125%);-webkit-backdrop-filter:blur(18px) saturate(125%);text-align:center;justify-self:center;align-self:center}
-.logo{display:block;width:150px;max-width:100%;height:auto;max-height:86px;margin:0 auto 16px;object-fit:contain;filter:brightness(1.24) contrast(.90) saturate(.82) drop-shadow(0 0 7px rgba(255,255,255,.18)) drop-shadow(0 8px 20px rgba(0,0,0,.20));opacity:.97}
-h2{margin:8px 0 16px;font-size:clamp(27px,5vw,34px);line-height:1.08;font-weight:700;letter-spacing:-.03em;color:#fff;text-shadow:0 2px 12px rgba(0,0,0,.28)}
-.info{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.22);padding:14px 16px;border-radius:16px;margin:12px 0;font-size:12px;font-weight:400;color:#fff;box-shadow:inset 0 1px 0 rgba(255,255,255,.12);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);line-height:1.55}
-.info b{font-weight:700}
-button{width:100%;height:36px;padding:0 14px;margin-top:10px;border:1px solid rgba(255,255,255,.28);border-radius:12px;cursor:pointer;font-family:'Open Sans',Arial,sans-serif;font-weight:800;font-size:10px;line-height:1;letter-spacing:0;color:#fff;background:rgba(255,255,255,.18);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);transition:.2s ease;text-transform:none}
-.btn{background:rgba(255,255,255,.22);box-shadow:none}.back{background:rgba(255,255,255,.08);box-shadow:none}
-button:hover{background:rgba(255,255,255,.28);transform:translateY(-1px)}button:disabled{opacity:.55;cursor:not-allowed;transform:none}
-.successo{color:#86efac;font-size:10px;font-weight:700;line-height:1.45;margin-top:12px}.errore{color:#fecaca;font-size:10px;font-weight:700;line-height:1.45;margin-top:12px}
+html,body{min-height:100%;margin:0}
+body{min-height:100vh;width:100%;font-family:'Open Sans',Arial,sans-serif;background:#06111f var(--bg-image) center/cover fixed no-repeat;color:#fff;overflow-x:hidden;display:flex;justify-content:center;align-items:center;padding:24px 16px}
+body:before{content:'';position:fixed;inset:0;background:linear-gradient(180deg,rgba(3,12,24,.30),rgba(3,12,24,.68));pointer-events:none;z-index:-1}
+.card{width:min(620px,100%);margin:0 auto;padding:24px 22px;border:1px solid var(--line);border-radius:18px;background:linear-gradient(135deg,rgba(255,255,255,.13),rgba(255,255,255,.055));backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);box-shadow:0 12px 35px rgba(0,0,0,.28);text-align:center}
+.logo{width:112px;height:auto;display:block;margin:0 auto 12px;filter:none;opacity:1}
+h2{margin:0 0 12px;font-size:22px;line-height:1.2;font-weight:800;letter-spacing:-.02em;color:#fff;text-shadow:none}
+.info{background:rgba(255,255,255,.09);border:1px solid rgba(255,255,255,.18);padding:12px 13px;border-radius:10px;margin:7px 0;font-size:13px;font-weight:400;color:rgba(255,255,255,.92);box-shadow:none;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);line-height:1.45}
+.info b{font-weight:800}
+button{display:block;width:100%;min-height:46px;padding:11px 14px;margin:10px 0 0;border:1px solid rgba(255,255,255,.20);border-radius:10px;cursor:pointer;font:800 13px 'Open Sans',Arial,sans-serif;line-height:1.2;letter-spacing:0;color:#073b72;background:#fff;box-shadow:none;backdrop-filter:none;-webkit-backdrop-filter:none;transition:.2s ease;text-transform:none}
+.btn{background:#fff;color:var(--blue)}.back{background:rgba(0,0,0,.32);color:#fff}
+button:hover{background:#fff;transform:translateY(-1px)}button:disabled{opacity:.55;cursor:not-allowed;transform:none}
+.successo{color:#86efac;font-size:13px;font-weight:700;line-height:1.4;margin-top:12px}.errore{color:#fecaca;font-size:13px;font-weight:700;line-height:1.4;margin-top:12px}
 #messaggio p{margin:0}
-@media(max-width:600px){body{padding:16px;background-attachment:scroll}.card{width:calc(100vw - 20px);padding:22px 16px 20px;border-radius:24px}.logo{width:135px;max-height:78px;margin-bottom:14px}h2{font-size:27px;margin:8px 0 14px}.info{padding:13px 14px;margin:10px 0;font-size:12px}button{height:36px;font-size:10px;margin-top:9px}}
+@media(max-width:767px){body{align-items:flex-start;padding:18px 12px 28px;background-attachment:scroll}.card{width:min(620px,100%);padding:20px 16px;border-radius:16px}.logo{width:100px;margin-bottom:10px}h2{font-size:20px}.info{font-size:13px;padding:12px 13px}button{min-height:46px;font-size:13px}}
+@media(max-width:380px){.card{padding:18px 13px}.logo{width:92px}h2{font-size:19px}.info{font-size:12px}button{min-height:44px;font-size:13px}}
 </style>
 </head>
 <body>
