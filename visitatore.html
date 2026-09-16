@@ -97,6 +97,36 @@ body:before,body:after{display:none!important}
 <style id="np-menu-glass-fix">
 .np-menu{background:rgba(255,255,255,.08)!important;backdrop-filter:blur(14px)!important;-webkit-backdrop-filter:blur(14px)!important;border-right:1px solid rgba(255,255,255,.20)!important;box-shadow:8px 0 32px rgba(0,0,0,.15)!important}
 </style>
-  <script src="sponsor-public-v2.js?v=8"></script>
+<style id="np-layout-controls-final">
+:root{--np-control-h:34px;--np-control-radius:10px;--np-control-font:9px;--np-control-pad:0 12px;--np-control-border:rgba(255,255,255,.18);--np-control-bg:rgba(255,255,255,.09);--np-control-primary:#fff;--np-control-primary-text:#073b72}
+.np-btn,.np-login,.np-back,.np-icon,.np-cal-nav button,.np-drawer-close,.np-poster-close{font-family:'Open Sans',Arial,sans-serif!important;-webkit-font-smoothing:antialiased!important}
+.np-btn{min-height:var(--np-control-h)!important;height:var(--np-control-h)!important;box-sizing:border-box!important;padding:var(--np-control-pad)!important;border:1px solid var(--np-control-border)!important;border-radius:var(--np-control-radius)!important;font-size:var(--np-control-font)!important;font-weight:800!important;letter-spacing:.45px!important;line-height:1!important;display:inline-flex!important;align-items:center!important;justify-content:center!important;white-space:nowrap!important;box-shadow:none!important}
+.np-primary{background:var(--np-control-primary)!important;color:var(--np-control-primary-text)!important;border-color:rgba(255,255,255,.72)!important;box-shadow:0 7px 18px rgba(0,0,0,.16)!important}
+.np-ghost{background:var(--np-control-bg)!important;color:#fff!important;border-color:var(--np-control-border)!important}
+.np-btn:hover{transform:translateY(-1px)!important;filter:brightness(1.04)!important}
+.np-login{min-height:var(--np-control-h)!important;height:var(--np-control-h)!important;box-sizing:border-box!important;padding:0 12px!important;border:1px solid rgba(255,255,255,.72)!important;border-radius:var(--np-control-radius)!important;background:rgba(255,255,255,.94)!important;color:#073b72!important;font-size:9px!important;font-weight:800!important;letter-spacing:.45px!important;line-height:1!important;box-shadow:0 7px 18px rgba(0,0,0,.15)!important}
+.np-login:hover{transform:translateY(-1px)!important;background:#fff!important}
+.np-icon{width:34px!important;height:34px!important;min-width:34px!important;border:1px solid rgba(255,255,255,.18)!important;border-radius:10px!important;background:rgba(255,255,255,.09)!important;color:#fff!important;font-size:17px!important;line-height:1!important;display:inline-flex!important;align-items:center!important;justify-content:center!important;box-sizing:border-box!important}
+.np-icon:hover{background:rgba(255,255,255,.15)!important;transform:translateY(-1px)!important}
+.np-back{left:max(16px,calc(50% - 300px))!important;bottom:18px!important;min-height:32px!important;height:32px!important;padding:0 11px!important;border:1px solid rgba(255,255,255,.18)!important;border-radius:10px!important;background:rgba(255,255,255,.09)!important;color:#fff!important;font-size:9px!important;font-weight:800!important;letter-spacing:.35px!important;line-height:1!important;box-shadow:0 8px 20px rgba(0,0,0,.18)!important}
+.np-back:hover{background:rgba(255,255,255,.15)!important;transform:translateY(-1px)!important}
+.np-hero-actions{display:flex!important;align-items:center!important;gap:7px!important;flex-wrap:wrap!important}
+.np-card-actions{display:grid!important;grid-template-columns:1fr 1fr!important;gap:6px!important}
+.np-card-actions .np-btn{width:100%!important}
+.np-month-actions{display:flex!important;align-items:center!important;gap:5px!important;flex-wrap:nowrap!important}
+.np-month-actions .np-btn{min-width:58px!important}
+.np-cal-nav{display:flex!important;align-items:center!important;gap:5px!important}
+.np-cal-nav button{width:34px!important;height:34px!important;min-width:34px!important;padding:0!important;border:1px solid rgba(255,255,255,.18)!important;border-radius:10px!important;background:rgba(255,255,255,.09)!important;color:#fff!important;display:inline-flex!important;align-items:center!important;justify-content:center!important;font-size:15px!important;line-height:1!important}
+.np-cal-nav button:hover{background:rgba(255,255,255,.15)!important;transform:translateY(-1px)!important}
+.np-drawer-actions{display:flex!important;align-items:center!important;gap:6px!important;flex-wrap:wrap!important}
+.np-drawer-actions .np-btn{min-width:82px!important}
+.np-drawer-close,.np-poster-close{display:inline-flex!important;align-items:center!important;justify-content:center!important;box-sizing:border-box!important}
+.np-drawer-close{width:32px!important;height:32px!important;border:1px solid rgba(255,255,255,.16)!important;border-radius:10px!important;background:rgba(255,255,255,.08)!important;color:#fff!important;font-size:20px!important;line-height:1!important}
+.np-poster-close{width:38px!important;height:38px!important;border:1px solid rgba(255,255,255,.16)!important;border-radius:10px!important;background:rgba(255,255,255,.12)!important;color:#fff!important;font-size:24px!important;line-height:1!important}
+.np-news-all .np-btn{min-width:150px!important}
+.np-menu-close .np-icon{flex:none!important}
+@media(max-width:600px){.np-login{min-width:34px!important;width:34px!important;padding:0!important;font-size:15px!important}.np-login span{display:none!important}.np-back{left:16px!important;bottom:16px!important}.np-btn{min-height:32px!important;height:32px!important;padding:0 10px!important;font-size:8px!important}.np-cal-nav button{width:32px!important;height:32px!important;min-width:32px!important}.np-month-actions{grid-column:2!important}.np-drawer-actions .np-btn{min-width:76px!important}.np-news-all .np-btn{min-width:140px!important}}
+</style>
+<script src="sponsor-public-v2.js?v=8"></script>
 </body>
 </html>
