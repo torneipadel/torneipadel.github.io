@@ -3,52 +3,117 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Dashboard Principale</title>
+<title>Next Point Padel</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
-:root{--bg-image:url('2pages.jpg');--blue:#073b72;--gold:#ffe76b;--glass:rgba(255,255,255,.12);--border:rgba(255,255,255,.22)}
+:root{--blue:#073b72;--gold:#ffe76b;--glass:rgba(255,255,255,.12);--border:rgba(255,255,255,.22)}
 *{box-sizing:border-box}
 html,body{margin:0;min-height:100%;font-family:'Open Sans',Arial,sans-serif;color:#fff}
-body{background:linear-gradient(rgba(3,12,24,.30),rgba(3,12,24,.62)),var(--bg-image) center/cover fixed no-repeat;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px 16px 45px;overflow-x:hidden}
-.box{width:min(620px,100%);height:620px;margin:0 auto;padding:30px 32px 28px;border-radius:18px;background:linear-gradient(135deg,rgba(255,255,255,.13),rgba(255,255,255,.055));backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border:1px solid rgba(255,255,255,.22);box-shadow:0 12px 35px rgba(0,0,0,.28);text-align:center;display:flex;flex-direction:column;justify-content:center}
-.logo{display:block;width:112px;max-width:72%;height:auto;margin:0 auto 14px;padding:0;border:0;border-radius:0;background:none;box-shadow:none;filter:none;opacity:1}
-h2{font-size:22px;line-height:1.2;margin:5px 0 7px;letter-spacing:-.02em}.email{font-size:13px;line-height:1.45;color:rgba(255,255,255,.68);margin-bottom:18px}
-.btn{width:100%;margin-top:10px;min-height:46px;padding:11px 14px;border:1px solid rgba(255,255,255,.20);border-radius:10px;cursor:pointer;font:800 13px/1.2 'Open Sans',Arial,sans-serif;letter-spacing:0;background:#fff;color:var(--blue);box-shadow:none;transition:.2s}.btn:hover{transform:translateY(-1px);filter:brightness(1.04)}
-.logout{width:100%;margin-top:14px;min-height:46px;padding:11px 14px;border:1px solid rgba(255,255,255,.20);border-radius:10px;cursor:pointer;font:800 13px/1.2 'Open Sans',Arial,sans-serif;letter-spacing:0;background:rgba(0,0,0,.32);color:#fff}.logout:hover{background:rgba(0,0,0,.38)}
-#status{margin-top:10px;min-height:18px;color:var(--gold);font-size:13px;line-height:1.45}.hidden{display:none}
-.menu-button{position:fixed;top:18px;right:18px;width:42px;height:42px;border:1px solid rgba(255,255,255,.18);border-radius:11px;background:rgba(255,255,255,.09);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);color:#fff;font:22px/1 'Open Sans',Arial,sans-serif;display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:1000}.menu-button:hover{background:rgba(255,255,255,.15)}
-.menu-panel{position:fixed;top:0;right:-280px;width:270px;height:100vh;background:rgba(255,255,255,.08);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-left:1px solid rgba(255,255,255,.20);box-shadow:-8px 0 32px rgba(0,0,0,.15);transition:.3s;padding-top:70px;z-index:999}.menu-panel.open{right:0}.menu-item{padding:14px 20px;font-size:14px;line-height:1.4;font-weight:600;letter-spacing:0;text-align:left;cursor:pointer;color:#fff}.menu-item:hover{background:rgba(255,255,255,.15)}
-.card-section{margin-top:9px;padding:0;display:flex;flex-direction:column;align-items:stretch}.card-section h3{font-size:14px;line-height:1.35;margin:0 0 5px}.card-section p{font-size:13px;line-height:1.45;color:rgba(255,255,255,.55);margin:0 0 8px;flex:1}.card-section .btn{margin-top:auto}
-#userMenu{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:16px}.sponsor-banner{width:100%;height:126px;margin:18px auto 0;border-radius:18px;overflow:hidden;position:relative;background:rgba(255,255,255,.07);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,.20);box-shadow:0 6px 24px rgba(0,0,0,.22)}.sponsor-title{height:29px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;letter-spacing:2px;text-transform:uppercase}.sponsor-window{height:97px;overflow:hidden;position:relative}.sponsor-track{height:100%;display:flex;width:max-content;align-items:center;gap:12px;padding:5px 10px 10px;animation:sponsorScroll 18s linear infinite}.sponsor-slide{width:235px;height:75px;flex:none;border-radius:14px;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.20);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);display:flex;flex-direction:column;align-items:center;justify-content:center;box-shadow:0 4px 16px rgba(0,0,0,.14);text-decoration:none;color:white}.sponsor-slide strong{font-size:17px;letter-spacing:1px}.sponsor-slide span{font-size:10px;opacity:.78;margin-top:4px}.sponsor-empty{height:75px;display:flex;align-items:center;justify-content:center;width:100%;font-size:12px;opacity:.8;padding:0 12px}@keyframes sponsorScroll{from{transform:translateX(0)}to{transform:translateX(calc(-50% - 6px))}}
-@media(max-width:767px){body{padding:18px 12px 28px;align-items:center}.box{width:min(620px,100%);height:auto;min-height:calc(100dvh - 46px);padding:28px 22px 24px;border-radius:16px}.logo{width:100px;max-width:72%;margin-bottom:12px}h2{font-size:20px}.email{font-size:13px;margin-bottom:16px}#userMenu{grid-template-columns:1fr;gap:10px}.card-section{margin-top:4px}.card-section h3{font-size:14px}.card-section p{font-size:13px}.btn{min-height:46px;font-size:13px}.logout{min-height:46px;margin-top:12px;font-size:13px}.menu-button{top:12px;right:12px;width:42px;height:42px}.menu-panel{width:min(280px,86vw)}.menu-item{padding:14px 18px;font-size:14px}.sponsor-banner{margin-top:14px;height:122px}.sponsor-title{height:27px;font-size:10px}.sponsor-window{height:95px}.sponsor-slide{width:220px;height:73px}.sponsor-slide strong{font-size:15px}.sponsor-slide span{font-size:9px}}
-@media(max-width:380px){body{padding:14px 10px 24px;align-items:center}.box{min-height:calc(100dvh - 38px);padding:24px 18px 22px;border-radius:16px}.logo{width:92px}h2{font-size:19px}.email{font-size:13px}.menu-item{font-size:14px}.card-section h3{font-size:14px}.card-section p{font-size:13px}.btn{font-size:13px}}
+body{background:linear-gradient(rgba(3,12,24,.30),rgba(3,12,24,.62)),url('2pages.jpg') center/cover fixed no-repeat;min-height:100vh;padding:22px 16px 40px;overflow-x:hidden}
+.menu-button{position:fixed;top:18px;right:18px;width:44px;height:44px;border:1px solid rgba(255,255,255,.20);border-radius:12px;background:rgba(255,255,255,.10);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);color:#fff;font:22px/1 'Open Sans',Arial,sans-serif;display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:1000;box-shadow:0 6px 20px rgba(0,0,0,.18)}
+.menu-button:hover{background:rgba(255,255,255,.17)}
+.menu-panel{position:fixed;top:0;right:-290px;width:280px;height:100vh;background:rgba(7,20,38,.82);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border-left:1px solid rgba(255,255,255,.20);box-shadow:-10px 0 35px rgba(0,0,0,.24);transition:.3s;padding-top:78px;z-index:999}.menu-panel.open{right:0}.menu-item{padding:15px 22px;font-size:14px;line-height:1.4;font-weight:600;text-align:left;cursor:pointer;color:#fff}.menu-item:hover{background:rgba(255,255,255,.12)}
+.page{width:min(760px,100%);margin:0 auto}
+.hero{padding:34px 26px 28px;border-radius:24px;background:linear-gradient(135deg,rgba(255,255,255,.15),rgba(255,255,255,.055));backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border:1px solid rgba(255,255,255,.23);box-shadow:0 16px 45px rgba(0,0,0,.28);text-align:center}
+.logo{display:block;width:112px;max-width:60%;height:auto;margin:0 auto 17px}
+.eyebrow{font-size:10px;font-weight:800;letter-spacing:2.4px;text-transform:uppercase;color:rgba(255,255,255,.72);margin-bottom:8px}
+h1{font-size:29px;line-height:1.12;margin:0;font-weight:800;letter-spacing:-.03em;text-shadow:0 3px 14px rgba(0,0,0,.18)}
+.welcome-name{font-size:16px;line-height:1.4;margin:9px 0 0;font-weight:600;color:rgba(255,255,255,.90)}
+.email{font-size:12px;line-height:1.4;margin:4px 0 0;color:rgba(255,255,255,.56)}
+.subtitle{max-width:520px;margin:17px auto 0;font-size:14px;line-height:1.55;color:rgba(255,255,255,.78)}
+.main-actions{display:grid;grid-template-columns:repeat(3,1fr);gap:11px;margin-top:24px}
+.action{min-height:92px;border:1px solid rgba(255,255,255,.18);border-radius:15px;background:rgba(255,255,255,.10);color:#fff;padding:15px 10px;cursor:pointer;text-align:center;font-family:'Open Sans',Arial,sans-serif;transition:.2s;box-shadow:0 6px 18px rgba(0,0,0,.10)}
+.action:hover{transform:translateY(-2px);background:rgba(255,255,255,.16);box-shadow:0 10px 24px rgba(0,0,0,.16)}
+.action-icon{display:block;font-size:25px;line-height:1;margin-bottom:9px}.action-title{display:block;font-size:12px;font-weight:800;letter-spacing:.2px}.action-text{display:block;font-size:10px;line-height:1.35;color:rgba(255,255,255,.62);margin-top:4px}
+.section{margin-top:15px;padding:20px;border-radius:20px;background:linear-gradient(135deg,rgba(255,255,255,.12),rgba(255,255,255,.055));backdrop-filter:blur(15px);-webkit-backdrop-filter:blur(15px);border:1px solid rgba(255,255,255,.18);box-shadow:0 9px 30px rgba(0,0,0,.18)}
+.section-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:13px}.section-title{font-size:13px;font-weight:800;letter-spacing:1px;text-transform:uppercase}.section-link{font-size:11px;font-weight:700;color:#fff;text-decoration:none;opacity:.72}.section-link:hover{opacity:1}
+.feature-card{display:flex;align-items:center;justify-content:space-between;gap:18px;padding:17px;border-radius:15px;background:rgba(255,255,255,.09);border:1px solid rgba(255,255,255,.13)}
+.feature-icon{width:48px;height:48px;flex:0 0 48px;border-radius:13px;background:rgba(255,255,255,.13);display:flex;align-items:center;justify-content:center;font-size:24px}.feature-content{flex:1;text-align:left}.feature-content strong{display:block;font-size:14px;line-height:1.35}.feature-content span{display:block;margin-top:4px;font-size:11px;line-height:1.45;color:rgba(255,255,255,.62)}
+.small-btn{border:0;border-radius:10px;background:#fff;color:var(--blue);padding:10px 13px;font:800 11px/1.2 'Open Sans',Arial,sans-serif;cursor:pointer;white-space:nowrap}.small-btn:hover{filter:brightness(1.05);transform:translateY(-1px)}
+.admin-area{margin-top:15px}.admin-btn{width:100%;min-height:46px;border:1px solid rgba(255,255,255,.20);border-radius:11px;background:rgba(255,255,255,.13);color:#fff;font:800 12px/1.2 'Open Sans',Arial,sans-serif;cursor:pointer}.admin-btn:hover{background:rgba(255,255,255,.19)}
+.account{margin-top:15px;text-align:center}.logout{min-height:42px;padding:10px 22px;border:1px solid rgba(255,255,255,.18);border-radius:11px;background:rgba(0,0,0,.25);color:#fff;font:700 11px/1.2 'Open Sans',Arial,sans-serif;cursor:pointer}.logout:hover{background:rgba(0,0,0,.35)}
+#status{margin-top:8px;min-height:16px;color:var(--gold);font-size:10px;line-height:1.4}.hidden{display:none!important}
+@media(max-width:600px){body{padding:16px 12px 30px}.menu-button{top:12px;right:12px}.hero{padding:29px 18px 22px;border-radius:20px}.logo{width:98px;margin-bottom:14px}h1{font-size:25px}.subtitle{font-size:13px;margin-top:15px}.main-actions{gap:8px;margin-top:20px}.action{min-height:86px;padding:13px 7px}.action-icon{font-size:22px}.action-title{font-size:11px}.action-text{font-size:9px}.section{padding:16px;margin-top:12px}.feature-card{padding:14px;gap:11px}.feature-icon{width:42px;height:42px;flex-basis:42px;font-size:21px}.feature-content strong{font-size:13px}.feature-content span{font-size:10px}.small-btn{padding:9px 10px;font-size:10px}.menu-panel{width:min(280px,86vw)}}
+@media(max-width:390px){.hero{padding:26px 14px 19px}h1{font-size:23px}.welcome-name{font-size:15px}.main-actions{grid-template-columns:1fr;gap:8px}.action{min-height:70px;display:grid;grid-template-columns:38px 1fr;grid-template-rows:auto auto;column-gap:8px;text-align:left;align-items:center}.action-icon{grid-row:1/3;margin:0;text-align:center}.action-title{font-size:11px}.action-text{margin:0;font-size:9px}}
 </style>
 </head>
 <body>
-<div class="menu-button" onclick="toggleMenu()">☰</div>
+<div class="menu-button" onclick="toggleMenu()" aria-label="Apri menu">☰</div>
 <div class="menu-panel" id="menuPanel">
-<div class="menu-item" onclick="location.href='2Page.html'">⌂ Home</div><div class="menu-item" onclick="location.href='tornei.html'">▣ Tornei</div><div class="menu-item" onclick="location.href='news.html'">≡ News</div><div class="menu-item" onclick="location.href='mercatino.html'">□ Mercatino</div><div class="menu-item" onclick="location.href='eventi.html'">◷ Eventi</div><div class="menu-item" onclick="location.href='informazioni.html'">ⓘ Informazioni Club</div><div class="menu-item" onclick="location.href='contatti.html'">☎ Contatti</div>
+<div class="menu-item" onclick="location.href='2Page.html'">⌂ Home</div>
+<div class="menu-item" onclick="location.href='tornei.html'">▣ Tornei</div>
+<div class="menu-item" onclick="location.href='news.html'">≡ News</div>
+<div class="menu-item" onclick="location.href='mercatino.html'">□ Mercatino</div>
+<div class="menu-item" onclick="location.href='eventi.html'">◷ Eventi</div>
+<div class="menu-item" onclick="location.href='informazioni.html'">ⓘ Informazioni Club</div>
+<div class="menu-item" onclick="location.href='contatti.html'">☎ Contatti</div>
 </div>
-<div class="box">
-<img src="logo_bianco.png" class="logo"><h2 id="welcome">Verifica in corso...</h2><div class="email" id="emailBox"></div>
-<div id="adminMenu" class="hidden"><button class="btn" onclick="apriGestioneTorneo()">⚙️ Gestione Torneo</button></div>
-<div id="userMenu" class="hidden">
-<div class="card-section"><h3>Calendario Tornei</h3><p>Consulta i tornei disponibili e procedi con l'iscrizione.</p><button class="btn" onclick="location.href='visitatore.html'">▣ Iscrizione Tornei</button></div>
-<div class="card-section"><h3>News e Comunicazioni</h3><p>Ultime comunicazioni del club.</p><button class="btn" onclick="location.href='news.html'">≡ News</button></div>
+
+<main class="page">
+<section class="hero">
+<img src="logo_bianco.png" class="logo" alt="Next Point Padel">
+<div class="eyebrow">NEXT POINT PADEL</div>
+<h1>Benvenuto</h1>
+<div class="welcome-name" id="welcomeName">Caricamento...</div>
+<div class="email" id="emailBox"></div>
+<p class="subtitle">Tutto quello che succede nel nostro club, in un unico posto.</p>
+
+<div class="main-actions">
+<button class="action" onclick="location.href='visitatore.html'">
+<span class="action-icon">🏆</span><span class="action-title">TORNEI</span><span class="action-text">Scopri i tornei e iscriviti</span>
+</button>
+<button class="action" onclick="location.href='news.html'">
+<span class="action-icon">📰</span><span class="action-title">NEWS</span><span class="action-text">News e comunicazioni</span>
+</button>
+<button class="action" onclick="location.href='eventi.html'">
+<span class="action-icon">📅</span><span class="action-title">EVENTI</span><span class="action-text">Scopri le prossime attività</span>
+</button>
 </div>
-<button class="logout" onclick="logout()">🚪 Esci</button><div id="status"></div>
+</section>
+
+<section class="section">
+<div class="section-head"><div class="section-title">🏆 Prossimi tornei</div><a class="section-link" href="visitatore.html">Vedi tutti →</a></div>
+<div class="feature-card">
+<div class="feature-icon">🎾</div>
+<div class="feature-content"><strong>Calendario tornei</strong><span>Consulta i tornei disponibili, le date e le modalità di iscrizione.</span></div>
+<button class="small-btn" onclick="location.href='visitatore.html'">SCOPRI</button>
 </div>
+</section>
+
+<section class="section">
+<div class="section-head"><div class="section-title">📰 Ultime news</div><a class="section-link" href="news.html">Leggi tutte →</a></div>
+<div class="feature-card">
+<div class="feature-icon">📣</div>
+<div class="feature-content"><strong>News e comunicazioni del club</strong><span>Rimani aggiornato su tornei, iniziative e comunicazioni.</span></div>
+<button class="small-btn" onclick="location.href='news.html'">LEGGI</button>
+</div>
+</section>
+
+<section class="section">
+<div class="section-head"><div class="section-title">📅 Prossimi eventi</div><a class="section-link" href="eventi.html">Scopri tutti →</a></div>
+<div class="feature-card">
+<div class="feature-icon">🎉</div>
+<div class="feature-content"><strong>Attività e appuntamenti</strong><span>Scopri le prossime attività organizzate da Next Point Padel.</span></div>
+<button class="small-btn" onclick="location.href='eventi.html'">SCOPRI</button>
+</div>
+</section>
+
+<div id="adminMenu" class="admin-area hidden"><button class="admin-btn" onclick="apriGestioneTorneo()">⚙️ Gestione Torneo</button></div>
+<div class="account"><button class="logout" onclick="logout()">🚪 Esci</button><div id="status"></div></div>
+</main>
+
 <script>
 const sb=window.sb=supabase.createClient("https://iybjvtmfaupgthqqsngd.supabase.co","sb_publishable_oLLML3_ne0I1dWKIinSRNA_K1Ao5SOl",{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});
 function toggleMenu(){document.getElementById("menuPanel").classList.toggle("open")}
-function esc(v){return String(v??"").replace(/[&<>\"]/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;"}[m]))}
-async function loadSponsors(){const track=document.getElementById("sponsorTrack");try{const {data,error}=await sb.from("tornei").select("id,nome,configurazione");if(error)throw error;const sponsors=[];const seen=new Set();(data||[]).forEach(t=>{const items=t?.configurazione&&Array.isArray(t.configurazione.sponsor)?t.configurazione.sponsor:[];items.forEach(s=>{if(!s||!s.nome)return;const key=String(s.id||((s.nome||"")+"|"+(s.url||"")));if(seen.has(key))return;seen.add(key);sponsors.push({nome:s.nome,descrizione:s.descrizione,url:s.url})})});if(!sponsors.length){track.innerHTML='<div class="sponsor-empty">Nessuno sponsor configurato</div>';track.style.animation="none";return}const make=s=>{const tag=s.url?"a":"div";const href=s.url?' href="'+esc(s.url)+'" target="_blank" rel="noopener noreferrer"':'';return '<'+tag+' class="sponsor-slide"'+href+'><strong>'+esc(s.nome)+'</strong><span>'+esc(s.descrizione||"Partner ufficiale")+'</span></'+tag+'>'};track.innerHTML=sponsors.map(make).join("")+sponsors.map(make).join("");if(sponsors.length===1){track.style.animation="none";track.style.justifyContent="center"}}catch(e){console.error("ERRORE SPONSOR:",e);track.innerHTML='<div class="sponsor-empty">Impossibile caricare gli sponsor</div>';track.style.animation="none"}}
-async function init(){const {data:{session}}=await sb.auth.getSession();if(!session){window.location.href="index.html";return}const user=session.user;document.getElementById("welcome").innerHTML="Benvenuto";document.getElementById("emailBox").innerHTML=user.email||"";const {data:profilo,error}=await sb.from("profili").select("nome,cognome,telefono,ruolo").eq("user_id",user.id).maybeSingle();console.log("PROFILO LETTO:",profilo,error);if(error){document.getElementById("status").innerHTML="Errore caricamento profilo";return}if(!profilo||!profilo.nome||!profilo.cognome||!profilo.telefono){window.location.href="profilo.html";return}document.getElementById("welcome").innerHTML="Benvenuto<br>"+profilo.nome+" "+(profilo.cognome||"");if(profilo.ruolo==="admin"){document.getElementById("adminMenu").classList.remove("hidden");document.getElementById("userMenu").classList.remove("hidden");document.getElementById("status").innerHTML="Accesso amministratore"}else{document.getElementById("userMenu").classList.remove("hidden");document.getElementById("status").innerHTML="Accesso giocatore"}}
-function apriGestioneTorneo(){window.location.href="admin.html"}async function logout(){await sb.auth.signOut();window.location.href="index.html"}window.addEventListener("load",()=>{init()})
+document.addEventListener("click",e=>{const p=document.getElementById("menuPanel"),b=document.querySelector(".menu-button");if(p.classList.contains("open")&&!p.contains(e.target)&&!b.contains(e.target))p.classList.remove("open")});
+async function init(){const {data:{session}}=await sb.auth.getSession();if(!session){window.location.href="index.html";return}const user=session.user;document.getElementById("emailBox").textContent=user.email||"";const {data:profilo,error}=await sb.from("profili").select("nome,cognome,telefono,ruolo").eq("user_id",user.id).maybeSingle();console.log("PROFILO LETTO:",profilo,error);if(error){document.getElementById("status").textContent="Errore caricamento profilo";return}if(!profilo||!profilo.nome||!profilo.cognome||!profilo.telefono){window.location.href="profilo.html";return}document.getElementById("welcomeName").textContent=profilo.nome+" "+(profilo.cognome||"");if(profilo.ruolo==="admin"){document.getElementById("adminMenu").classList.remove("hidden");document.getElementById("status").textContent="Accesso amministratore"}else{document.getElementById("status").textContent=""}}
+function apriGestioneTorneo(){window.location.href="admin.html"}
+async function logout(){await sb.auth.signOut();window.location.href="index.html"}
+window.addEventListener("load",init);
 </script>
-  <script src="sponsor-public-v2.js?v=8"></script>
+<script src="sponsor-public-v2.js?v=8"></script>
 </body>
 </html>
