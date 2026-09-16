@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Gestione Mercatino · Next Point Padel</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root{--bg:#071321;--panel:rgba(255,255,255,.10);--line:rgba(255,255,255,.20);--blue:#073b72;--gold:#ffe76b}
+*{box-sizing:border-box}body{margin:0;min-height:100vh;font-family:'Open Sans','Helvetica Neue',Arial,sans-serif;color:#fff;background:#06111f url('sfondo2.jpg') center/cover fixed no-repeat}body:before{content:'';position:fixed;inset:0;background:linear-gradient(180deg,rgba(3,12,24,.32),rgba(3,12,24,.78));pointer-events:none;z-index:-1}.page{width:min(980px,calc(100% - 24px));margin:auto;padding:18px 0 50px}.top{display:flex;align-items:center;gap:12px;padding:9px 12px;border:1px solid var(--line);border-radius:18px;background:rgba(4,15,29,.55);backdrop-filter:blur(18px);position:sticky;top:10px;z-index:20}.icon{width:40px;height:40px;border:1px solid var(--line);border-radius:11px;background:rgba(255,255,255,.09);color:#fff;font-size:20px;cursor:pointer}.logo{width:105px}.title{margin:28px 2px 18px}.eyebrow{font-size:10px;font-weight:800;letter-spacing:2px;color:var(--gold);text-transform:uppercase}h1{margin:7px 0;font-size:36px}p{color:rgba(255,255,255,.65);font-size:12px}.panel{border:1px solid var(--line);border-radius:22px;background:rgba(4,15,29,.48);backdrop-filter:blur(18px);padding:20px;margin-bottom:15px}.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.field{display:flex;flex-direction:column;gap:5px}.field.full{grid-column:1/-1}label{font-size:10px;font-weight:800;color:rgba(255,255,255,.65)}input,select,textarea{width:100%;border:1px solid rgba(255,255,255,.16);border-radius:10px;background:rgba(255,255,255,.08);color:#fff;padding:10px;font:12px 'Open Sans';outline:none}select option{color:#111}textarea{min-height:90px;resize:vertical}.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}button.action{border:0;border-radius:10px;padding:10px 14px;background:#fff;color:var(--blue);font:800 10px 'Open Sans';cursor:pointer}button.secondary{background:rgba(255,255,255,.10);color:#fff;border:1px solid rgba(255,255,255,.18)}.list{display:grid;gap:9px}.row{display:grid;grid-template-columns:78px 1fr auto;gap:12px;align-items:center;padding:10px;border:1px solid rgba(255,255,255,.14);border-radius:16px;background:rgba(255,255,255,.06)}.thumb{width:78px;height:65px;border-radius:10px;overflow:hidden;background:#0a3159;display:flex;align-items:center;justify-content:center}.thumb img{width:100%;height:100%;object-fit:cover}.row h3{font-size:14px;margin:0 0 4px}.row small{display:block;color:rgba(255,255,255,.55);font-size:9px}.row-actions{display:flex;gap:6px}.row-actions button{padding:8px 9px;font-size:9px}.status{font-size:10px;color:var(--gold);min-height:16px;margin-top:10px}.hidden{display:none!important}@media(max-width:650px){.grid{grid-template-columns:1fr}.field.full{grid-column:auto}.row{grid-template-columns:58px 1fr}.thumb{width:58px;height:58px}.row-actions{grid-column:2}.page{width:calc(100% - 18px)}}
+</style>
+</head>
+<body>
+<main class="page">
+<header class="top"><button class="icon" onclick="location.href='admin.html'">←</button><img class="logo" src="logo_bianco.png" alt="Next Point Padel"></header>
+<section class="title"><div class="eyebrow">ADMIN · CONTENUTI</div><h1>Mercatino</h1><p>Pubblica e gestisci gli articoli della bacheca interna del circolo.</p></section>
+<section class="panel">
+<form id="form">
+<input type="hidden" id="id">
+<div class="grid">
+<div class="field"><label>Titolo</label><input id="titolo" required></div>
+<div class="field"><label>Categoria</label><select id="categoria"><option value="racchette">Racchette</option><option value="abbigliamento">Abbigliamento</option><option value="accessori">Accessori</option><option value="altro">Altro</option></select></div>
+<div class="field"><label>Prezzo</label><input id="prezzo" placeholder="€ 120"></div>
+<div class="field"><label>Condizioni</label><input id="condizioni" placeholder="Ottime condizioni"></div>
+<div class="field full"><label>Anteprima</label><input id="anteprima" placeholder="Breve descrizione visibile nella bacheca"></div>
+<div class="field full"><label>Descrizione completa</label><textarea id="descrizione"></textarea></div>
+<div class="field"><label>Immagine · URL</label><input id="immagine" placeholder="https://..."></div>
+<div class="field"><label>Contatto venditore · email</label><input id="contatto" type="email"></div>
+<div class="field"><label>Stato</label><select id="stato"><option value="disponibile">Disponibile</option><option value="venduto">Venduto</option></select></div>
+<div class="field"><label>Pubblicazione</label><select id="pubblicato"><option value="false">Bozza</option><option value="true">Pubblicato</option></select></div>
+</div>
+<div class="actions"><button class="action" type="submit">SALVA ARTICOLO</button><button class="action secondary" type="button" onclick="resetForm()">NUOVO</button></div><div id="status" class="status"></div>
+</form>
+</section>
+<section class="panel"><h2 style="font-size:16px;margin-top:0">Articoli</h2><div id="list" class="list"><p>Caricamento...</p></div></section>
+</main>
+<script>
+const sb=supabase.createClient('https://iybjvtmfaupgthqqsngd.supabase.co','sb_publishable_oLLML3_ne0I1dWKIinSRNA_K1Ao5SOl',{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});
+const $=id=>document.getElementById(id), esc=v=>String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+let rows=[];
+function label(c){return({racchette:'Racchette',abbigliamento:'Abbigliamento',accessori:'Accessori',altro:'Altro'})[c]||'Altro'}
+async function guard(){const {data:{session}}=await sb.auth.getSession();if(!session){location.href='index.html';return false}const {data:p}=await sb.from('profili').select('ruolo').eq('user_id',session.user.id).maybeSingle();if(p?.ruolo!=='admin'){alert('Accesso riservato all’amministratore');location.href='2Page.html';return false}return true}
+async function load(){const {data,error}=await sb.from('mercatino').select('*').order('created_at',{ascending:false});if(error){$('list').innerHTML='<p>Errore caricamento articoli.</p>';return}rows=data||[];render()}
+function render(){if(!rows.length){$('list').innerHTML='<p>Nessun articolo inserito.</p>';return}$('list').innerHTML=rows.map((x,i)=>'<div class="row"><div class="thumb">'+(x.immagine?'<img src="'+esc(x.immagine)+'">':'🎾')+'</div><div><h3>'+esc(x.titolo)+'</h3><small>'+esc(label(x.categoria))+' · '+esc(x.prezzo||'Prezzo da definire')+' · '+esc(x.stato)+' · '+(x.pubblicato?'PUBBLICATO':'BOZZA')+'</small></div><div class="row-actions"><button class="action" onclick="edit('+i+')">MODIFICA</button><button class="action secondary" onclick="removeItem('+i+')">ELIMINA</button></div></div>').join('')}
+function resetForm(){ $('form').reset();$('id').value='';$('pubblicato').value='false';$('stato').value='disponibile';$('status').textContent=''; }
+window.edit=function(i){const x=rows[i];$('id').value=x.id;$('titolo').value=x.titolo||'';$('categoria').value=x.categoria||'altro';$('prezzo').value=x.prezzo||'';$('condizioni').value=x.condizioni||'';$('anteprima').value=x.anteprima||'';$('descrizione').value=x.descrizione||'';$('immagine').value=x.immagine||'';$('contatto').value=x.contatto||'';$('stato').value=x.stato||'disponibile';$('pubblicato').value=String(!!x.pubblicato);window.scrollTo({top:0,behavior:'smooth'})};
+window.removeItem=async function(i){const x=rows[i];if(!confirm('Eliminare questo articolo?'))return;const {error}=await sb.from('mercatino').delete().eq('id',x.id);if(error){$('status').textContent='Errore eliminazione';return}await load();resetForm()};
+$('form').addEventListener('submit',async e=>{e.preventDefault();$('status').textContent='Salvataggio...';const payload={titolo:$('titolo').value.trim(),categoria:$('categoria').value,categoria_label:label($('categoria').value),prezzo:$('prezzo').value.trim(),condizioni:$('condizioni').value.trim(),anteprima:$('anteprima').value.trim(),descrizione:$('descrizione').value.trim(),immagine:$('immagine').value.trim(),contatto:$('contatto').value.trim(),stato:$('stato').value,pubblicato:$('pubblicato').value==='true',updated_at:new Date().toISOString()};let result;if($('id').value)result=await sb.from('mercatino').update(payload).eq('id',$('id').value);else{const {data:{user}}=await sb.auth.getUser();result=await sb.from('mercatino').insert({...payload,created_by:user?.id}).select().single()}if(result.error){$('status').textContent='Errore: '+result.error.message;return}$('status').textContent='Articolo salvato.';await load();resetForm()});
+(async()=>{if(await guard())load()})();
+</script>
+</body>
+</html>
