@@ -11,10 +11,10 @@
   "theme_color": "#071219",
   "icons": [
     {
-      "src": "/logo_bianco.png",
-      "sizes": "192x192 512x512 1024x1024",
-      "type": "image/png",
-      "purpose": "any maskable"
+      "src": "/logo_scuro.jpg",
+      "sizes": "512x512",
+      "type": "image/jpeg",
+      "purpose": "any"
     }
   ]
 }
