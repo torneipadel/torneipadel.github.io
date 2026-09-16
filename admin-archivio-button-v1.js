@@ -211,6 +211,20 @@
     if (window.__ADMIN_ARCHIVE_BUTTON_V1__) return;
     window.__ADMIN_ARCHIVE_BUTTON_V1__ = true;
     window.addEventListener('admin:render', refreshArchiveUI);
+    const appContent = document.getElementById('appContent');
+    if (appContent) {
+      const navigationObserver = new MutationObserver(() => {
+        const archiveButtonMissing = !document.getElementById('adminArchiveOpenV1');
+        const selector = document.getElementById('torneoSelector');
+        const archivedVisible = !!selector && [...selector.options].some(option => {
+          if (!option.value) return false;
+          const torneo = (getState().tornei || []).find(t => String(t.id) === String(option.value));
+          return String(torneo?.stato || '').toLowerCase() === 'archiviato';
+        });
+        if (archiveButtonMissing || archivedVisible) refreshArchiveUI();
+      });
+      navigationObserver.observe(appContent, { childList: true, subtree: true });
+    }
     refreshArchiveUI();
   }
 
