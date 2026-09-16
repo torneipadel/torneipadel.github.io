@@ -21,11 +21,13 @@
 <div id="editor" class="editor">
 <h2 id="editorTitle">Inserisci il tuo articolo</h2><p class="editor-note">Puoi gestire solo gli articoli inseriti dal tuo account. Pubblicare significa renderli visibili nella bacheca quando sono disponibili.</p>
 <form id="myItemForm"><input type="hidden" id="itemId"><div class="form-grid">
+<div class="field full"><label>NOME COGNOME</label><input id="itemNomeCognome" placeholder="Nome e cognome (facoltativo)"></div>
 <div class="field full"><label>ARTICOLO / TITOLO *</label><input id="itemTitolo" required placeholder="Es. Racchetta Babolat Viper 2025"></div>
 <div class="field"><label>PREZZO</label><input id="itemPrezzo" placeholder="€ 120"></div>
 <div class="field"><label>CATEGORIA</label><select id="itemCategoria"><option value="racchette">Racchette</option><option value="abbigliamento">Abbigliamento</option><option value="accessori">Accessori</option><option value="altro">Altro</option></select></div>
 <div class="field"><label>CONDIZIONI</label><input id="itemCondizioni" placeholder="Ottime condizioni"></div>
 <div class="field"><label>CONTATTO EMAIL</label><input id="itemContatto" type="email" placeholder="nome@email.it"></div>
+<div class="field"><label>NUMERO TELEFONICO</label><input id="itemTelefono" type="tel" inputmode="tel" placeholder="Es. 333 1234567"></div>
 <div class="field full"><label>ANTEPRIMA</label><input id="itemAnteprima" placeholder="Breve descrizione che comparirà nella lista"></div>
 <div class="field full"><label>DESCRIZIONE COMPLETA *</label><textarea id="itemDescrizione" required placeholder="Descrivi il tuo articolo..."></textarea></div>
 <div class="field full"><label>FOTO</label><div class="photo-upload"><input id="itemFotoFile" class="photo-file" type="file" accept="image/png,image/jpeg,image/webp"><span id="photoName" class="photo-name">Nessuna foto selezionata</span><div class="photo-help">JPG, PNG o WEBP · massimo 5 MB</div><div id="photoPreview" class="photo-preview"><img id="photoPreviewImg" alt="Anteprima foto articolo"></div></div><input type="hidden" id="itemImmagine"></div>
