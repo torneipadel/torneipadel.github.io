@@ -70,6 +70,7 @@ async function loginUser(){const email=emailInput.value.trim();const password=pa
 async function resetPassword(){const email=emailInput.value.trim();if(!email){status.innerHTML=tr("enterEmail");return}status.innerHTML=tr("resetSending");const {error}=await sb.auth.resetPasswordForEmail(email,{redirectTo:window.location.origin+"/reset-password.html"});if(error){status.innerHTML="Errore: "+error.message;return}status.innerHTML=tr("resetSent")}
 loginBtn.addEventListener("click",loginUser);registerBtn.addEventListener("click",registerUser);registerLink.addEventListener("click",registerUser);forgotPassword.addEventListener("click",resetPassword);document.getElementById("loginForm").addEventListener("submit",function(){loginUser()});
 sb.auth.onAuthStateChange(function(event,session){});
+if("serviceWorker" in navigator){window.addEventListener("load",function(){navigator.serviceWorker.register("sw.js",{scope:"/"}).catch(function(error){console.error("Service Worker PWA:",error)})})}
 </script>
 </body>
 </html>
