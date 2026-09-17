@@ -62,7 +62,6 @@ async function renderArchive(){
     html+='<details style="border:1px solid rgba(255,255,255,.10);border-radius:9px;margin-top:8px;overflow:hidden">';
     html+='<summary style="cursor:pointer;padding:10px 12px;font-weight:700;list-style:none">Mese '+esc(monthKey)+'</summary>';
     html+='<div style="overflow:auto"><table style="width:100%;border-collapse:collapse;font-size:13px"><thead><tr>';
-    html+='<th style="text-align:left;padding:9px;border-bottom:1px solid rgba(255,255,255,.16)">Data</th>';
     html+='<th style="text-align:left;padding:9px;border-bottom:1px solid rgba(255,255,255,.16)">Torneo</th>';
     html+='<th style="text-align:left;padding:9px;border-bottom:1px solid rgba(255,255,255,.16)">ID Torneo</th>';
     html+='<th style="text-align:left;padding:9px;border-bottom:1px solid rgba(255,255,255,.16)">Apri</th></tr></thead><tbody>';
@@ -70,8 +69,7 @@ async function renderArchive(){
      const d=dateOf(t);
      const fullDate=d?d.toLocaleDateString('it-IT',{day:'2-digit',month:'2-digit',year:'numeric'}):'-';
      html+='<tr>';
-     html+='<td style="padding:9px;border-bottom:1px solid rgba(255,255,255,.08)">'+esc(fullDate)+'</td>';
-     html+='<td style="padding:9px;border-bottom:1px solid rgba(255,255,255,.08)">'+esc(nameOf(t))+'</td>';
+     html+='<td style="padding:9px;border-bottom:1px solid rgba(255,255,255,.08)">'+esc(fullDate)+' — '+esc(nameOf(t))+'</td>';
      html+='<td style="padding:9px;border-bottom:1px solid rgba(255,255,255,.08)">'+esc(t.id)+'</td>';
      html+='<td style="padding:9px;border-bottom:1px solid rgba(255,255,255,.08)"><button type="button" class="btn primary" data-open-archived-tournament="'+esc(t.id)+'" style="padding:6px 10px">Apri</button></td>';
      html+='</tr>';
