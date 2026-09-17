@@ -99,7 +99,23 @@ function ensureArchiveButton(){
    m.id='mobileArchivioTornei';
    m.textContent='📦 Archivio Tornei';
    m.addEventListener('click',()=>{document.getElementById('mobileOverlay')?.classList.remove('open');renderArchive()});
-   mobile.appendChild(m);
+   const logout=[...mobile.querySelectorAll('button')].find(x=>String(x.textContent||'').includes('Esci')||String(x.getAttribute('onclick')||'').includes('logoutAdmin'));
+   if(logout)mobile.insertBefore(m,logout);else mobile.appendChild(m);
+ }
+}
+
+function keepExitLast(){
+ const area=document.getElementById('areaAdmin');
+ if(!area)return;
+ const sidebar=area.querySelector('.sidebar');
+ if(sidebar){
+   const footer=sidebar.querySelector('.sidebar-footer');
+   if(footer&&sidebar.lastElementChild!==footer)sidebar.appendChild(footer);
+ }
+ const mobile=document.querySelector('.mobile-nav');
+ if(mobile){
+   const logout=[...mobile.querySelectorAll('button')].find(x=>String(x.textContent||'').includes('Esci')||String(x.getAttribute('onclick')||'').includes('logoutAdmin'));
+   if(logout&&mobile.lastElementChild!==logout)mobile.appendChild(logout);
  }
 }
 
@@ -128,7 +144,7 @@ function installRenderGuard(){
  const wrapped=function(){
    protectArchivedSelection();
    const r=original.apply(this,arguments);
-   requestAnimationFrame(()=>{filterMainSelector();ensureArchiveButton()});
+   requestAnimationFrame(()=>{filterMainSelector();ensureArchiveButton();keepExitLast()});
    return r;
  };
  wrapped.__archiveFinalGuard=true;
@@ -139,6 +155,7 @@ function installRenderGuard(){
 function boot(){
  ensureArchiveButton();
  filterMainSelector();
+ keepExitLast();
  installRenderGuard();
 }
 
@@ -148,9 +165,10 @@ const timer=setInterval(()=>{
  attempts++;
  ensureArchiveButton();
  filterMainSelector();
+ keepExitLast();
  if(installRenderGuard()||attempts>100)clearInterval(timer);
 },100);
 
-const observer=new MutationObserver(()=>{ensureArchiveButton();filterMainSelector()});
+const observer=new MutationObserver(()=>{ensureArchiveButton();filterMainSelector();keepExitLast()});
 if(document.body)observer.observe(document.body,{childList:true,subtree:true});
 })();
