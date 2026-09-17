@@ -16,31 +16,6 @@ async function loadArchivedFromServer(){
  return Array.isArray(data)?data:[];
 }
 
-function ensureArchiveButton(){
- const area=document.getElementById('areaAdmin');
- if(!area)return;
- const existing=document.getElementById('sideArchivioTornei');
- if(existing)return;
- const groups=[...area.querySelectorAll('.sidebar .nav-group')];
- const target=groups.find(g=>String(g.textContent||'').includes('Sistema'))||groups[groups.length-1];
- if(!target)return;
- const nav=target.querySelector('.nav');
- if(!nav)return;
- const b=document.createElement('button');
- b.type='button';
- b.id='sideArchivioTornei';
- b.textContent='📦 Archivio Tornei';
- b.addEventListener('click',openArchive);
- nav.appendChild(b);
- const mobile=document.querySelector('.mobile-nav');
- if(mobile&&!document.getElementById('mobileArchivioTornei')){
-   const m=b.cloneNode(true);
-   m.id='mobileArchivioTornei';
-   m.addEventListener('click',()=>{document.getElementById('mobileOverlay')?.classList.remove('open');openArchive()});
-   mobile.appendChild(m);
- }
-}
-
 function getBox(){
  let b=document.getElementById('archivioTorneiAdmin');
  if(!b){
@@ -99,6 +74,33 @@ async function renderArchive(){
    if(id&&typeof window.apriBoveConTorneo==='function')window.apriBoveConTorneo(id);
    else if(id)window.open('Bove.html?idTorneo='+encodeURIComponent(id),'_blank');
  }));
+}
+
+function ensureArchiveButton(){
+ const area=document.getElementById('areaAdmin');
+ if(!area)return;
+ if(!document.getElementById('sideArchivioTornei')){
+   const groups=[...area.querySelectorAll('.sidebar .nav-group')];
+   const target=groups.find(g=>String(g.textContent||'').includes('Sistema'))||groups[groups.length-1];
+   const nav=target?.querySelector('.nav');
+   if(nav){
+     const b=document.createElement('button');
+     b.type='button';
+     b.id='sideArchivioTornei';
+     b.textContent='📦 Archivio Tornei';
+     b.addEventListener('click',renderArchive);
+     nav.appendChild(b);
+   }
+ }
+ const mobile=document.querySelector('.mobile-nav');
+ if(mobile&&!document.getElementById('mobileArchivioTornei')){
+   const m=document.createElement('button');
+   m.type='button';
+   m.id='mobileArchivioTornei';
+   m.textContent='📦 Archivio Tornei';
+   m.addEventListener('click',()=>{document.getElementById('mobileOverlay')?.classList.remove('open');renderArchive()});
+   mobile.appendChild(m);
+ }
 }
 
 function filterMainSelector(){
