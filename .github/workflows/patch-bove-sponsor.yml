@@ -25,7 +25,6 @@ jobs:
           from pathlib import Path
           import re
 
-          # Sono le sole pagine pubbliche realmente presenti nel repository.
           PAGES = [
               '2Page.html',
               'Bove.html',
@@ -36,35 +35,14 @@ jobs:
               p = Path(filename)
               if not p.exists():
                   return False
-
               s = p.read_text(encoding='utf-8')
               original = s
-
-              # Rimuove esclusivamente le precedenti inclusioni del gestore sponsor.
-              s = re.sub(
-                  r'\s*<script[^>]+(?:tabellone-fix\.js|sponsor-global-fix\.js|sponsor-public-v2\.js)[^>]*></script>',
-                  '',
-                  s,
-                  flags=re.I
-              )
-
-              # Rende disponibile al gestore sponsor il client Supabase già creato dalla pagina.
-              s = s.replace(
-                  'const sb = supabase.createClient(',
-                  'const sb = window.sb = supabase.createClient(',
-                  1
-              )
-              s = s.replace(
-                  'const sb=supabase.createClient(',
-                  'const sb=window.sb=supabase.createClient(',
-                  1
-              )
-
-              # Una sola inclusione, sempre aggiornata.
+              s = re.sub(r'\s*<script[^>]+(?:tabellone-fix\.js|sponsor-global-fix\.js|sponsor-public-v2\.js)[^>]*></script>', '', s, flags=re.I)
+              s = s.replace('const sb = supabase.createClient(', 'const sb = window.sb = supabase.createClient(', 1)
+              s = s.replace('const sb=supabase.createClient(', 'const sb=window.sb=supabase.createClient(', 1)
               marker = '<script src="sponsor-public-v2.js?v=8"></script>'
               if '</body>' in s:
                   s = s.replace('</body>', '  ' + marker + '\n</body>', 1)
-
               p.write_text(s, encoding='utf-8')
               return s != original
 
@@ -72,7 +50,6 @@ jobs:
           for page in PAGES:
               if patch_page(page):
                   changed.append(page)
-
           print('Pagine sponsor aggiornate:', changed)
           PY
 
