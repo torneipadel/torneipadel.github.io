@@ -1,0 +1,35 @@
+name: One-off Bove KO save fix
+
+on:
+  push:
+    paths:
+      - '.github/one-off-bove-ko-save-trigger'
+
+permissions:
+  contents: write
+
+jobs:
+  fix:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: grafica-rifinitura
+          fetch-depth: 1
+      - name: Fix scalar final court/time recovery
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('Bove.html')
+          s=p.read_text(encoding='utf-8')
+          old='''arrayDaRecuperare.forEach(k=>{\nif(Array.isArray(configurazione[k])){\nstate[k]=configurazione[k];\n}\n});'''
+          new='''arrayDaRecuperare.forEach(k=>{\nif(Array.isArray(configurazione[k])){\nstate[k]=configurazione[k];\n}\n});\nif(Object.prototype.hasOwnProperty.call(configurazione,"fCamp")){\nstate.fCamp=configurazione.fCamp;\n}\nif(Object.prototype.hasOwnProperty.call(configurazione,"fTime")){\nstate.fTime=configurazione.fTime;\n}'''
+          if s.count(old)!=1: raise SystemExit(f'TARGET COUNT={s.count(old)}')
+          p.write_text(s.replace(old,new,1),encoding='utf-8')
+          PY
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add Bove.html
+          git rm .github/one-off-bove-ko-save-trigger .github/workflows/one-off-bove-ko-save-fix.yml
+          git commit -m 'Persist final court and time values on reload'
+          git push origin grafica-rifinitura
