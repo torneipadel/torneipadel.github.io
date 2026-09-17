@@ -277,6 +277,136 @@ input{width:100%;padding:5px;border-radius:4px;background:#0b1220;border:1px sol
     }
 
 }
+
+/* ============================
+   STAMPA TABELLONE
+   Solo presentazione di stampa
+   ============================ */
+@page{
+    size:A4 landscape;
+    margin:10mm;
+}
+
+@media print{
+
+    html,
+    body{
+        background:#fff !important;
+        color:#111 !important;
+        margin:0 !important;
+        padding:0 !important;
+        width:100% !important;
+    }
+
+    body > *{
+        display:none !important;
+    }
+
+    .finalContainer{
+        display:block !important;
+        width:100% !important;
+        margin:0 !important;
+        padding:0 !important;
+        border:0 !important;
+        border-radius:0 !important;
+        background:#fff !important;
+        color:#111 !important;
+    }
+
+    .finalContainer > h2{
+        display:block !important;
+        margin:0 0 8mm 0 !important;
+        padding:0 !important;
+        text-align:center !important;
+        color:#111 !important;
+        font-size:20px !important;
+    }
+
+    .finalContainer .groups{
+        display:grid !important;
+        grid-template-columns:repeat(3,minmax(0,1fr)) !important;
+        gap:7mm !important;
+        width:100% !important;
+        margin:0 !important;
+    }
+
+    .finalContainer .card{
+        display:block !important;
+        width:100% !important;
+        min-width:0 !important;
+        margin:0 !important;
+        padding:5mm !important;
+        overflow:visible !important;
+        background:#fff !important;
+        color:#111 !important;
+        border:1px solid #999 !important;
+        border-radius:5px !important;
+        box-shadow:none !important;
+        break-inside:avoid !important;
+        page-break-inside:avoid !important;
+    }
+
+    .finalContainer table{
+        width:100% !important;
+        min-width:0 !important;
+        margin:0 !important;
+        border-collapse:collapse !important;
+        color:#111 !important;
+        font-size:11px !important;
+    }
+
+    .finalContainer th,
+    .finalContainer td{
+        color:#111 !important;
+        background:#fff !important;
+        border:1px solid #bbb !important;
+        padding:5px 4px !important;
+    }
+
+    .finalContainer th{
+        font-weight:700 !important;
+    }
+
+    .finalContainer .match-card{
+        width:100% !important;
+        margin:0 0 5mm 0 !important;
+        padding:4mm !important;
+        background:#fff !important;
+        color:#111 !important;
+        border:1px solid #aaa !important;
+        border-radius:4px !important;
+        box-shadow:none !important;
+        break-inside:avoid !important;
+        page-break-inside:avoid !important;
+    }
+
+    .finalContainer .match-card:last-child{
+        margin-bottom:0 !important;
+    }
+
+    .finalContainer .match-card input{
+        background:#fff !important;
+        color:#111 !important;
+        border:1px solid #999 !important;
+        -webkit-print-color-adjust:exact;
+        print-color-adjust:exact;
+    }
+
+    .finalContainer .ko-schedule{
+        color:#333 !important;
+        font-weight:600 !important;
+        border-top:1px solid #ddd !important;
+        padding-top:3mm !important;
+    }
+
+    .finalContainer .winner-box{
+        color:#111 !important;
+        background:#f3f3f3 !important;
+        border:1px solid #999 !important;
+        padding:3mm !important;
+    }
+}
+
 </style>
 <script>
   const supabaseUrl = 'https://iybjvtmfaupgthqqsngd.supabase.co';
