@@ -17,9 +17,12 @@ function addAdminHomeActions(){
   '</div></div>';
   target.parentNode.insertBefore(card,target.nextSibling);
   document.getElementById('adminHomeNewTournament')?.addEventListener('click',()=>window.apriWizardTorneo?.());
-  document.getElementById('adminHomeNews')?.addEventListener('click',()=>window.openAdminCommunication?.('news'));
-  document.getElementById('adminHomeWhatsApp')?.addEventListener('click',()=>window.openAdminCommunication?.('whatsapp'));
+  document.getElementById('adminHomeNews')?.addEventListener('click',()=>document.querySelector('#areaAdmin [data-com-page="news"]')?.click());
+  document.getElementById('adminHomeWhatsApp')?.addEventListener('click',()=>document.querySelector('#areaAdmin [data-com-page="whatsapp"]')?.click());
 }
-if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',addAdminHomeActions);else addAdminHomeActions();
-new MutationObserver(addAdminHomeActions).observe(document.body,{childList:true,subtree:true});
+function start(){
+  addAdminHomeActions();
+  if(document.body)new MutationObserver(addAdminHomeActions).observe(document.body,{childList:true,subtree:true});
+}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start);else start();
 })();
