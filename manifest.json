@@ -11,7 +11,7 @@
   "theme_color": "#071219",
   "icons": [
     {
-      "src": "/logo_scuro.jpg",
+      "src": "/logo_perfetto.jpg",
       "sizes": "512x512",
       "type": "image/jpeg",
       "purpose": "any"
