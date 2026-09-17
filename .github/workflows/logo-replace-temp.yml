@@ -1,0 +1,66 @@
+name: Replace site logo - temporary
+
+on:
+  push:
+    paths:
+      - '.github/workflows/logo-replace-temp.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  replace-logo:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Replace only requested logos
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+
+          NEW = '/loghi/logo_senza_scritte.jpg'
+          replacements = {
+              '2Page.html': ('<img src="logo_bianco.png" class="logo" alt="Next Point Padel">', '<img src="/loghi/logo_senza_scritte.jpg" class="logo" alt="Next Point Padel">'),
+              'sponsor-pubblico.html': ('<img src="logo_bianco.png" class="logo" alt="Next Point Padel">', '<img src="/loghi/logo_senza_scritte.jpg" class="logo" alt="Next Point Padel">'),
+              'iscrizione.html': ('<img src="logo_bianco.png" class="logo" alt="NEXT POINT PADEL">', '<img src="/loghi/logo_senza_scritte.jpg" class="logo" alt="NEXT POINT PADEL">'),
+          }
+
+          for filename, (old, new) in replacements.items():
+              p = Path(filename)
+              s = p.read_text(encoding='utf-8')
+              if s.count(old) != 1:
+                  raise SystemExit(f'{filename}: expected exactly 1 old logo, found {s.count(old)}')
+              p.write_text(s.replace(old, new), encoding='utf-8')
+
+          p = Path('visitatore.html')
+          s = p.read_text(encoding='utf-8')
+          marker = '  <section class="np-hero">\n'
+          logo = '  <section class="np-hero">\n    <img src="/loghi/logo_senza_scritte.jpg" alt="Next Point Padel" style="display:block;width:112px;height:auto;margin:0 auto 12px;">\n'
+          if s.count(marker) != 1:
+              raise SystemExit(f'visitatore.html: expected exactly 1 hero marker, found {s.count(marker)}')
+          if NEW not in s:
+              s = s.replace(marker, logo, 1)
+          p.write_text(s, encoding='utf-8')
+
+          for filename in ['2Page.html','sponsor-pubblico.html','iscrizione.html','visitatore.html']:
+              s = Path(filename).read_text(encoding='utf-8')
+              if NEW not in s:
+                  raise SystemExit(f'{filename}: new logo missing')
+              if 'logo_bianco.png' in s:
+                  raise SystemExit(f'{filename}: old logo still present')
+
+          print('Logo replacement verified.')
+          PY
+
+      - name: Remove temporary workflow and commit
+        run: |
+          rm -f .github/workflows/logo-replace-temp.yml
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add 2Page.html sponsor-pubblico.html iscrizione.html visitatore.html .github/workflows/logo-replace-temp.yml
+          git diff --cached --check
+          git diff --cached --name-only
+          git commit -m 'Sostituisce il logo nelle pagine pubbliche richieste'
+          git push
