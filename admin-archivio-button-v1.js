@@ -115,7 +115,7 @@
 
       years.forEach(year => {
         const items = groups[year].slice().sort((a, b) => {
-          return (dateOf(a)?.getTime() || 0) - (dateOf(b)?.getTime() || 0);
+          return (dateOf(b)?.getTime() || 0) - (dateOf(a)?.getTime() || 0);
         });
 
         html += '<details style="border:1px solid rgba(255,255,255,.14);border-radius:10px;overflow:hidden">';
