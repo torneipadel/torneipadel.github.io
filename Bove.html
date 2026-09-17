@@ -9295,7 +9295,7 @@ ${match[1]}
 
 
 <div class="ko-schedule" style="display:flex;gap:18px;justify-content:center;align-items:center;flex-wrap:wrap;margin:8px 0;font-size:13px;">
-${type==="S" ? ` + "`" + `Campo ${index+1} — ${index===0 ? "20:00" : "20:30"}` + "`" + ` : ` + "`" + `Campo 1 — 21:00` + "`" + `}
+${type==="S" ? (index===0 ? "Campo 1 — 20:00" : "Campo 2 — 20:30") : "Campo 1 — 21:00"}
 </div>
 
 
