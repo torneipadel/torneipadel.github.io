@@ -9185,6 +9185,40 @@ function renderKO(){
 
 
 }
+function updateKOField(type,index,kind,val){
+
+    if(type==="S"){
+
+        if(!Array.isArray(state.sCamp))
+            state.sCamp=["Campo 1","Campo 2"];
+
+        if(!Array.isArray(state.sTime))
+            state.sTime=["20:00","20:30"];
+
+        if(kind==="campo")
+            state.sCamp[index]=val;
+
+        if(kind==="ora")
+            state.sTime[index]=val;
+
+    }else
+    if(type==="F"){
+
+        if(kind==="campo")
+            state.fCamp=val;
+
+        if(kind==="ora")
+            state.fTime=val;
+
+    }else{
+
+        return;
+
+    }
+
+    updateAndSync();
+
+}
 function renderMatchCard(titolo,match,type,index,risultato){
 
     let res =
@@ -9253,14 +9287,14 @@ ${match[1]}
 <input type="text"
 value="${type==="S" ? (state.sCamp[index]||("Campo "+(index+1))) : (state.fCamp||"Campo 1")}"
 style="width:90px;text-align:center"
-onchange="${type==="S" ? "state.sCamp[index]=this.value;updateAndSync()" : "state.fCamp=this.value;updateAndSync()"}">
+oninput="updateKOField('${type}',${index},'campo',this.value)">
 </label>
 
 <label>Ora:
 <input type="time"
 value="${type==="S" ? (state.sTime[index]||"20:00") : (state.fTime||"21:00")}"
 style="width:105px;text-align:center"
-onchange="${type==="S" ? "state.sTime[index]=this.value;updateAndSync()" : "state.fTime=this.value;updateAndSync()"}">
+oninput="updateKOField('${type}',${index},'ora',this.value)">
 </label>
 
 </div>
