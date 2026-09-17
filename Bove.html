@@ -9185,7 +9185,7 @@ function renderKO(){
 
 
 }
-function updateKOField(type,index,kind,val){
+async function updateKOField(type,index,kind,val){
 
     if(type==="S"){
 
@@ -9196,19 +9196,19 @@ function updateKOField(type,index,kind,val){
             state.sTime=["20:00","20:30"];
 
         if(kind==="campo")
-            state.sCamp[index]=val;
+            state.sCamp[index]=String(val||"").trim();
 
         if(kind==="ora")
-            state.sTime[index]=val;
+            state.sTime[index]=String(val||"").trim();
 
     }else
     if(type==="F"){
 
         if(kind==="campo")
-            state.fCamp=val;
+            state.fCamp=String(val||"").trim();
 
         if(kind==="ora")
-            state.fTime=val;
+            state.fTime=String(val||"").trim();
 
     }else{
 
@@ -9216,7 +9216,20 @@ function updateKOField(type,index,kind,val){
 
     }
 
-    updateAndSync();
+    localStorage.setItem("torneoState",JSON.stringify(state));
+
+    if(typeof sb!=="undefined" && state.idTorneo && state.nomeTorneo){
+
+        const {error}=await sb
+            .from("tornei")
+            .update({
+                configurazione:state
+            })
+            .eq("id",state.idTorneo);
+
+        if(error)
+            console.error("Errore salvataggio Campo/Ora KO:",error);
+    }
 
 }
 function renderMatchCard(titolo,match,type,index,risultato){
