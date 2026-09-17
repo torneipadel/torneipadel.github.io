@@ -1,6 +1,5 @@
 (function(){
   'use strict';
-  document.documentElement.classList.add('admin-auth-checking');
 
   const client=window.supabase.createClient(
     "https://iybjvtmfaupgthqqsngd.supabase.co",
@@ -8,14 +7,9 @@
     {auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}}
   );
 
-  async function verificaAccessoAdmin(){
+  async function verificaAccessoAdmin(session){
+    if(!session)return true;
     try{
-      const {data:{session}}=await client.auth.getSession();
-      if(!session){
-        window.location.href="index.html";
-        return;
-      }
-
       const {data:profilo,error}=await client
         .from("profili")
         .select("ruolo")
@@ -24,15 +18,20 @@
 
       if(error || !profilo || profilo.ruolo!=="admin"){
         window.location.href="2Page.html";
-        return;
+        return false;
       }
-
-      document.documentElement.classList.remove('admin-auth-checking');
+      return true;
     }catch(e){
       console.error("Errore verifica accesso amministratore:",e);
       window.location.href="2Page.html";
+      return false;
     }
   }
 
-  verificaAccessoAdmin();
+  client.auth.getSession().then(({data:{session}})=>verificaAccessoAdmin(session));
+
+  client.auth.onAuthStateChange((event,session)=>{
+    if(event==="SIGNED_IN" && session) verificaAccessoAdmin(session);
+    if(event==="SIGNED_OUT") window.location.href="index.html";
+  });
 })();
