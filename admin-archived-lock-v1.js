@@ -32,25 +32,63 @@ async function renderArchive(){
  b.innerHTML='<div style="padding:18px;text-align:center;opacity:.8">Caricamento archivio…</div>';
  const arr=await loadArchivedFromServer();
  const groups={};
- arr.forEach(t=>{const d=dateOf(t);const year=d?String(d.getFullYear()):'Senza anno';(groups[year]||(groups[year]=[])).push(t)});
- const years=Object.keys(groups).sort((a,c)=>{if(a==='Senza anno')return 1;if(c==='Senza anno')return -1;return Number(c)-Number(a)});
- let html='<div style="display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:12px"><div><strong style="font-size:18px">📦 Archivio Tornei</strong><div style="opacity:.7;font-size:12px;margin-top:3px">Tornei archiviati dal database</div></div><button type="button" id="chiudiArchivioAdmin" style="border:0;background:none;color:#fff;font-size:20px;cursor:pointer">✕</button></div>';
- if(!years.length){html+='<div style="padding:18px 4px;opacity:.72">Nessun torneo archiviato.</div>'}
- else{
+ arr.forEach(t=>{
+  const d=dateOf(t);
+  const year=d?String(d.getFullYear()):'Senza anno';
+  const month=d?d.getMonth()+1:0;
+  const monthKey=String(month).padStart(2,'0');
+  if(!groups[year])groups[year]={year,months:{}};
+  if(!groups[year].months[monthKey])groups[year].months[monthKey]={month,items:[]};
+  groups[year].months[monthKey].items.push(t);
+ });
+ const years=Object.keys(groups).sort((a,c)=>{
+  if(a==='Senza anno')return 1;
+  if(c==='Senza anno')return -1;
+  return Number(c)-Number(a);
+ });
+ let html='<div style="display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:12px"><div><strong style="font-size:18px">📦 Archivio Tornei</strong></div><button type="button" id="chiudiArchivioAdmin" style="border:0;background:none;color:#fff;font-size:20px;cursor:pointer">✕</button></div>';
+ if(!years.length){
+  html+='<div style="padding:18px 4px;opacity:.72">Nessun torneo archiviato.</div>';
+ }else{
   html+='<div style="display:flex;flex-direction:column;gap:8px">';
-  years.forEach((year,index)=>{
-   const items=groups[year].sort((a,c)=>(dateOf(c)?.getTime()||0)-(dateOf(a)?.getTime()||0));
+  years.forEach(year=>{
+   const yearGroup=groups[year];
    html+='<details style="border:1px solid rgba(255,255,255,.14);border-radius:10px;overflow:hidden">';
-   html+='<summary style="cursor:pointer;padding:12px 14px;font-weight:700;list-style:none;display:flex;align-items:center;justify-content:space-between"><span>📅 '+esc(year)+'</span><span style="opacity:.7;font-size:12px">'+items.length+' torneo'+(items.length===1?'':'i')+'</span></summary>';
-   html+='<div style="overflow:auto;padding:0 10px 10px"><table style="width:100%;border-collapse:collapse;font-size:13px"><thead><tr><th style="text-align:left;padding:9px;border-bottom:1px solid rgba(255,255,255,.16)">Mese</th><th style="text-align:left;padding:9px;border-bottom:1px solid rgba(255,255,255,.16)">Giorno</th><th style="text-align:left;padding:9px;border-bottom:1px solid rgba(255,255,255,.16)">Torneo</th><th style="text-align:left;padding:9px;border-bottom:1px solid rgba(255,255,255,.16)">Apri</th></tr></thead><tbody>';
-   items.forEach(t=>{const d=dateOf(t);const month=d?d.toLocaleDateString('it-IT',{month:'long'}):'-';const day=d?String(d.getDate()).padStart(2,'0'):'-';html+='<tr><td style="padding:9px;border-bottom:1px solid rgba(255,255,255,.08)">'+esc(month)+'</td><td style="padding:9px;border-bottom:1px solid rgba(255,255,255,.08)">'+esc(day)+'</td><td style="padding:9px;border-bottom:1px solid rgba(255,255,255,.08)">'+esc(nameOf(t))+'</td><td style="padding:9px;border-bottom:1px solid rgba(255,255,255,.08)"><button type="button" class="btn primary" data-open-archived-tournament="'+esc(t.id)+'" style="padding:6px 10px">Apri</button></td></tr>'});
-   html+='</tbody></table></div></details>';
+   html+='<summary style="cursor:pointer;padding:12px 14px;font-weight:700;list-style:none;display:flex;align-items:center;justify-content:space-between"><span>Anno '+esc(yearGroup.year)+'</span><span style="opacity:.7;font-size:12px">'+arr.filter(t=>{const d=dateOf(t);return (d?String(d.getFullYear()):'Senza anno')===String(yearGroup.year)}).length+' torneo'+(arr.filter(t=>{const d=dateOf(t);return (d?String(d.getFullYear()):'Senza anno')===String(yearGroup.year)}).length===1?'':'i')+'</span></summary>';
+   html+='<div style="padding:0 10px 10px">';
+   Object.keys(yearGroup.months).sort((a,c)=>Number(a)-Number(c)).forEach(monthKey=>{
+    const monthGroup=yearGroup.months[monthKey];
+    monthGroup.items.sort((a,c)=>(dateOf(a)?.getTime()||0)-(dateOf(c)?.getTime()||0));
+    html+='<details style="border:1px solid rgba(255,255,255,.10);border-radius:9px;margin-top:8px;overflow:hidden">';
+    html+='<summary style="cursor:pointer;padding:10px 12px;font-weight:700;list-style:none">Mese '+esc(monthKey)+'</summary>';
+    html+='<div style="overflow:auto"><table style="width:100%;border-collapse:collapse;font-size:13px"><thead><tr>';
+    html+='<th style="text-align:left;padding:9px;border-bottom:1px solid rgba(255,255,255,.16)">Data</th>';
+    html+='<th style="text-align:left;padding:9px;border-bottom:1px solid rgba(255,255,255,.16)">Torneo</th>';
+    html+='<th style="text-align:left;padding:9px;border-bottom:1px solid rgba(255,255,255,.16)">ID Torneo</th>';
+    html+='<th style="text-align:left;padding:9px;border-bottom:1px solid rgba(255,255,255,.16)">Apri</th></tr></thead><tbody>';
+    monthGroup.items.forEach(t=>{
+     const d=dateOf(t);
+     const fullDate=d?d.toLocaleDateString('it-IT',{day:'2-digit',month:'2-digit',year:'numeric'}):'-';
+     html+='<tr>';
+     html+='<td style="padding:9px;border-bottom:1px solid rgba(255,255,255,.08)">'+esc(fullDate)+'</td>';
+     html+='<td style="padding:9px;border-bottom:1px solid rgba(255,255,255,.08)">'+esc(nameOf(t))+'</td>';
+     html+='<td style="padding:9px;border-bottom:1px solid rgba(255,255,255,.08)">'+esc(t.id)+'</td>';
+     html+='<td style="padding:9px;border-bottom:1px solid rgba(255,255,255,.08)"><button type="button" class="btn primary" data-open-archived-tournament="'+esc(t.id)+'" style="padding:6px 10px">Apri</button></td>';
+     html+='</tr>';
+    });
+    html+='</tbody></table></div></details>';
+   });
+   html+='</div></details>';
   });
   html+='</div>';
  }
  b.innerHTML=html;
  b.querySelector('#chiudiArchivioAdmin')?.addEventListener('click',()=>{b.style.display='none'});
- b.querySelectorAll('[data-open-archived-tournament]').forEach(btn=>btn.addEventListener('click',()=>{const id=btn.getAttribute('data-open-archived-tournament');if(id&&typeof window.apriBoveConTorneo==='function')window.apriBoveConTorneo(id);else if(id)window.open('Bove.html?idTorneo='+encodeURIComponent(id),'_blank')}));
+ b.querySelectorAll('[data-open-archived-tournament]').forEach(btn=>btn.addEventListener('click',()=>{
+  const id=btn.getAttribute('data-open-archived-tournament');
+  if(id&&typeof window.apriBoveConTorneo==='function')window.apriBoveConTorneo(id);
+  else if(id)window.open('Bove.html?idTorneo='+encodeURIComponent(id),'_blank');
+ }));
 }
 
 window.renderArchivePanel=renderArchive;
