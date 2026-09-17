@@ -35,8 +35,11 @@ async function renderArchive(){
  arr.forEach(t=>{
   const d=dateOf(t);
   const year=d?String(d.getFullYear()):'Senza anno';
-  if(!groups[year])groups[year]=[];
-  groups[year].push(t);
+  const month=d?d.getMonth()+1:0;
+  const monthKey=String(month).padStart(2,'0');
+  if(!groups[year])groups[year]={year,months:{}};
+  if(!groups[year].months[monthKey])groups[year].months[monthKey]={month,items:[]};
+  groups[year].months[monthKey].items.push(t);
  });
  const years=Object.keys(groups).sort((a,c)=>{
   if(a==='Senza anno')return 1;
@@ -49,28 +52,31 @@ async function renderArchive(){
  }else{
   html+='<div style="display:flex;flex-direction:column;gap:8px">';
   years.forEach(year=>{
-   const items=groups[year].slice().sort((a,c)=>(dateOf(a)?.getTime()||0)-(dateOf(c)?.getTime()||0));
+   const yearGroup=groups[year];
    html+='<details style="border:1px solid rgba(255,255,255,.14);border-radius:10px;overflow:hidden">';
-   html+='<summary style="cursor:pointer;padding:12px 14px;font-weight:700;list-style:none;display:flex;align-items:center;justify-content:space-between"><span>Anno '+esc(year)+'</span><span style="opacity:.7;font-size:12px">'+items.length+' torneo'+(items.length===1?'':'i')+'</span></summary>';
-   html+='<div style="overflow:auto;padding:0 10px 10px"><table style="width:100%;border-collapse:collapse;font-size:13px"><thead><tr>';
-   html+='<th style="text-align:left;padding:9px;border-bottom:1px solid rgba(255,255,255,.16)">Mese</th>';
-   html+='<th style="text-align:left;padding:9px;border-bottom:1px solid rgba(255,255,255,.16)">Giorno</th>';
-   html+='<th style="text-align:left;padding:9px;border-bottom:1px solid rgba(255,255,255,.16)">Torneo</th>';
-   html+='<th style="text-align:left;padding:9px;border-bottom:1px solid rgba(255,255,255,.16)">ID Torneo</th>';
-   html+='<th style="text-align:left;padding:9px;border-bottom:1px solid rgba(255,255,255,.16)">Apri</th></tr></thead><tbody>';
-   items.forEach(t=>{
-    const d=dateOf(t);
-    const month=d?String(d.getMonth()+1).padStart(2,'0'):'-';
-    const day=d?String(d.getDate()).padStart(2,'0'):'-';
-    html+='<tr>';
-    html+='<td style="padding:9px;border-bottom:1px solid rgba(255,255,255,.08)">'+escape(month)+'</td>';
-    html+='<td style="padding:9px;border-bottom:1px solid rgba(255,255,255,.08)">'+escape(day)+'</td>';
-    html+='<td style="padding:9px;border-bottom:1px solid rgba(255,255,255,.08)">'+escape(nameOf(t))+'</td>';
-    html+='<td style="padding:9px;border-bottom:1px solid rgba(255,255,255,.08)">'+escape(t.id)+'</td>';
-    html+='<td style="padding:9px;border-bottom:1px solid rgba(255,255,255,.08)"><button type="button" class="btn primary" data-open-archived-tournament="'+escape(t.id)+'" style="padding:6px 10px">Apri</button></td>';
-    html+='</tr>';
+   html+='<summary style="cursor:pointer;padding:12px 14px;font-weight:700;list-style:none;display:flex;align-items:center;justify-content:space-between"><span>Anno '+esc(yearGroup.year)+'</span><span style="opacity:.7;font-size:12px">'+arr.filter(t=>{const d=dateOf(t);return (d?String(d.getFullYear()):'Senza anno')===String(yearGroup.year)}).length+' torneo'+(arr.filter(t=>{const d=dateOf(t);return (d?String(d.getFullYear()):'Senza anno')===String(yearGroup.year)}).length===1?'':'i')+'</span></summary>';
+   html+='<div style="padding:0 10px 10px">';
+   Object.keys(yearGroup.months).sort((a,c)=>Number(a)-Number(c)).forEach(monthKey=>{
+    const monthGroup=yearGroup.months[monthKey];
+    monthGroup.items.sort((a,c)=>(dateOf(a)?.getTime()||0)-(dateOf(c)?.getTime()||0));
+    html+='<details style="border:1px solid rgba(255,255,255,.10);border-radius:9px;margin-top:8px;overflow:hidden">';
+    html+='<summary style="cursor:pointer;padding:10px 12px;font-weight:700;list-style:none">Mese '+esc(monthKey)+'</summary>';
+    html+='<div style="overflow:auto"><table style="width:100%;border-collapse:collapse;font-size:13px"><thead><tr>';
+    html+='<th style="text-align:left;padding:9px;border-bottom:1px solid rgba(255,255,255,.16)">Torneo</th>';
+    html+='<th style="text-align:left;padding:9px;border-bottom:1px solid rgba(255,255,255,.16)">ID Torneo</th>';
+    html+='<th style="text-align:left;padding:9px;border-bottom:1px solid rgba(255,255,255,.16)">Apri</th></tr></thead><tbody>';
+    monthGroup.items.forEach(t=>{
+     const d=dateOf(t);
+     const fullDate=d?d.toLocaleDateString('it-IT',{day:'2-digit',month:'2-digit',year:'numeric'}):'-';
+     html+='<tr>';
+     html+='<td style="padding:9px;border-bottom:1px solid rgba(255,255,255,.08)">'+esc(fullDate)+' — '+esc(nameOf(t))+'</td>';
+     html+='<td style="padding:9px;border-bottom:1px solid rgba(255,255,255,.08)">'+esc(t.id)+'</td>';
+     html+='<td style="padding:9px;border-bottom:1px solid rgba(255,255,255,.08)"><button type="button" class="btn primary" data-open-archived-tournament="'+esc(t.id)+'" style="padding:6px 10px">Apri</button></td>';
+     html+='</tr>';
+    });
+    html+='</tbody></table></div></details>';
    });
-   html+='</tbody></table></div></details>';
+   html+='</div></details>';
   });
   html+='</div>';
  }
