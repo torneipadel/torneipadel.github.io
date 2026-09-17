@@ -1869,12 +1869,18 @@ short:{
 
     sTopRes:Array(2).fill("-"),
 
+    sCamp:["Campo 1","Campo 2"],
+
+    sTime:["20:00","20:30"],
 
 
     finalTop:[],
 
     fTopRes:"-",
 
+    fCamp:"Campo 1",
+
+    fTime:"21:00",
 
 
     campioneTop:null,
@@ -5534,7 +5540,7 @@ console.error("Errore recupero torneo Supabase:",err);
 }
 }
 if(configurazione){
-const arrayDaRecuperare=["A","B","C","D","E","F","Ares","Bres","Cres","Dres","Eres","Fres","Atime","Btime","Ctime","Dtime","Etime","Ftime","Acamp","Bcamp","Ccamp","Dcamp","Ecamp","Fcamp","qRes","sTopRes","fTopRes","finalTop"];
+const arrayDaRecuperare=["A","B","C","D","E","F","Ares","Bres","Cres","Dres","Eres","Fres","Atime","Btime","Ctime","Dtime","Etime","Ftime","Acamp","Bcamp","Ccamp","Dcamp","Ecamp","Fcamp","qRes","sTopRes","sCamp","sTime","finalTop","fTopRes","fCamp","fTime"];
 arrayDaRecuperare.forEach(k=>{
 if(Array.isArray(configurazione[k])){
 state[k]=configurazione[k];
@@ -10546,5 +10552,37 @@ window.addEventListener("load", async()=>{
 
 });
    </script>
+<script>
+(function(){
+    const originaleRenderMatchCard=window.renderMatchCard;
+    if(typeof originaleRenderMatchCard!=="function") return;
+    function esc(v){return String(v??"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");}
+    function salvaKOInfo(type,index,campo,ora){
+        if(type==="S"){
+            if(!Array.isArray(state.sCamp)) state.sCamp=["Campo 1","Campo 2"];
+            if(!Array.isArray(state.sTime)) state.sTime=["20:00","20:30"];
+            state.sCamp[index]=campo; state.sTime[index]=ora;
+        }else if(type==="F"){state.fCamp=campo; state.fTime=ora;}
+        if(typeof updateAndSync==="function") updateAndSync();
+    }
+    window.salvaKOInfo=salvaKOInfo;
+    window.renderMatchCard=function(titolo,match,type,index,risultato){
+        const html=originaleRenderMatchCard(titolo,match,type,index,risultato);
+        if(type!=="S"&&type!=="F") return html;
+        let campo,ora;
+        if(type==="S"){
+            if(!Array.isArray(state.sCamp)) state.sCamp=["Campo 1","Campo 2"];
+            if(!Array.isArray(state.sTime)) state.sTime=["20:00","20:30"];
+            campo=state.sCamp[index]??""; ora=state.sTime[index]??"";
+        }else{campo=state.fCamp??"Campo 1"; ora=state.fTime??"21:00";}
+        const meta=`<div class="match-extra" style="display:flex;gap:8px;align-items:center;justify-content:center;flex-wrap:wrap;">
+<label>Campo <input data-ko-campo value="${esc(campo)}" style="width:90px;" onchange="salvaKOInfo('${type}',${index},this.value,this.parentElement.parentElement.querySelector('[data-ko-time]').value)"></label>
+<label>Ora <input data-ko-time type="time" value="${esc(ora)}" style="width:105px;" onchange="salvaKOInfo('${type}',${index},this.parentElement.parentElement.querySelector('[data-ko-campo]').value,this.value)"></label>
+</div>`;
+        return html.replace(/<\/div>\s*$/,meta+"</div>");
+    };
+    setTimeout(()=>{if(typeof renderKO==="function") renderKO();},0);
+})();
+</script>
 </body>
 </html>
