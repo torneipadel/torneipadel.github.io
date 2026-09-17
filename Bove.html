@@ -5546,6 +5546,12 @@ if(Array.isArray(configurazione[k])){
 state[k]=configurazione[k];
 }
 });
+if(Object.prototype.hasOwnProperty.call(configurazione,"fCamp")){
+state.fCamp=configurazione.fCamp;
+}
+if(Object.prototype.hasOwnProperty.call(configurazione,"fTime")){
+state.fTime=configurazione.fTime;
+}
 if(configurazione.configurazione){
 const cfg=configurazione.configurazione;
 if(cfg.rules){
