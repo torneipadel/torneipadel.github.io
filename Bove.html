@@ -9247,9 +9247,21 @@ ${match[1]}
 
 
 
-<div>
+<div class="ko-schedule" style="display:flex;gap:10px;justify-content:center;align-items:center;flex-wrap:wrap;margin:8px 0;">
 
-Campo: Campo ${index+1}
+<label>Campo:
+<input type="text"
+value="${type==="S" ? (state.sCamp[index]||("Campo "+(index+1))) : (state.fCamp||"Campo 1")}"
+style="width:90px;text-align:center"
+onchange="${type==="S" ? "state.sCamp[index]=this.value;updateAndSync()" : "state.fCamp=this.value;updateAndSync()"}">
+</label>
+
+<label>Ora:
+<input type="time"
+value="${type==="S" ? (state.sTime[index]||"20:00") : (state.fTime||"21:00")}"
+style="width:105px;text-align:center"
+onchange="${type==="S" ? "state.sTime[index]=this.value;updateAndSync()" : "state.fTime=this.value;updateAndSync()"}">
+</label>
 
 </div>
 
