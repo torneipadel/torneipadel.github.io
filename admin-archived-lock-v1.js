@@ -75,11 +75,18 @@ async function renderArchive(){
    else if(id)window.open('Bove.html?idTorneo='+encodeURIComponent(id),'_blank');
  }));
 }
+window.renderArchivePanel=renderArchive;
 
 function ensureArchiveButton(){
  const area=document.getElementById('areaAdmin');
  if(!area)return;
- if(!document.getElementById('sideArchivioTornei')){
+ const existing=document.getElementById('sideArchivioTornei');
+ if(existing){
+   if(existing.dataset.archiveBound!=='1'){
+     existing.dataset.archiveBound='1';
+     existing.addEventListener('click',renderArchive);
+   }
+ }else{
    const groups=[...area.querySelectorAll('.sidebar .nav-group')];
    const target=groups.find(g=>String(g.textContent||'').includes('Sistema'))||groups[groups.length-1];
    const nav=target?.querySelector('.nav');
@@ -89,18 +96,28 @@ function ensureArchiveButton(){
      b.id='sideArchivioTornei';
      b.textContent='📦 Archivio Tornei';
      b.addEventListener('click',renderArchive);
+     b.dataset.archiveBound='1';
      nav.appendChild(b);
    }
  }
  const mobile=document.querySelector('.mobile-nav');
- if(mobile&&!document.getElementById('mobileArchivioTornei')){
-   const m=document.createElement('button');
-   m.type='button';
-   m.id='mobileArchivioTornei';
-   m.textContent='📦 Archivio Tornei';
-   m.addEventListener('click',()=>{document.getElementById('mobileOverlay')?.classList.remove('open');renderArchive()});
-   const logout=[...mobile.querySelectorAll('button')].find(x=>String(x.textContent||'').includes('Esci')||String(x.getAttribute('onclick')||'').includes('logoutAdmin'));
-   if(logout)mobile.insertBefore(m,logout);else mobile.appendChild(m);
+ if(mobile){
+   const existingMobile=document.getElementById('mobileArchivioTornei');
+   if(existingMobile){
+     if(existingMobile.dataset.archiveBound!=='1'){
+       existingMobile.dataset.archiveBound='1';
+       existingMobile.addEventListener('click',()=>{document.getElementById('mobileOverlay')?.classList.remove('open');renderArchive()});
+     }
+   }else{
+     const m=document.createElement('button');
+     m.type='button';
+     m.id='mobileArchivioTornei';
+     m.textContent='📦 Archivio Tornei';
+     m.addEventListener('click',()=>{document.getElementById('mobileOverlay')?.classList.remove('open');renderArchive()});
+     m.dataset.archiveBound='1';
+     const logout=[...mobile.querySelectorAll('button')].find(x=>String(x.textContent||'').includes('Esci')||String(x.getAttribute('onclick')||'').includes('logoutAdmin'));
+     if(logout)mobile.insertBefore(m,logout);else mobile.appendChild(m);
+   }
  }
 }
 
