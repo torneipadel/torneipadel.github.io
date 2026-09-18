@@ -6,7 +6,7 @@
 'use strict';
 const $=id=>document.getElementById(id);
 const state=()=>window.adminState||{};
-const current()=> (state().tornei||[]).find(t=>String(t.id)===String(state().torneoSelezionato))||null;
+const current=()=> (state().tornei||[]).find(t=>String(t.id)===String(state().torneoSelezionato))||null;
 const sb=()=>window.supabaseClient||window.sb;
 const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const approved=g=>g?.stato==='approvato'||g?.approvato===true;
