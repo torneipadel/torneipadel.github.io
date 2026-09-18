@@ -217,25 +217,84 @@ function render(t,ps){
 async function simulate(){
   const client=sb();if(!client)throw Error('Connessione Supabase non disponibile.');
   const nomeTorneo='TEST - Individuale Coppie Variabili - SIMULAZIONE';
-  if(!confirm('Creare una simulazione completa con 8 giocatori e 6 giornate? Il test precedente con lo stesso nome verrà sostituito.'))return;
+  if(!confirm('Creare una simulazione completa con 8 giocatori, 4 coppie per giornata, 6 partite per giornata e 6 giornate? Il test precedente con lo stesso nome verrà sostituito.'))return;
   const old=await client.from('tornei').select('id').eq('nome',nomeTorneo);if(old.error)throw old.error;
   for(const row of (old.data||[])){const d=await client.from('iscrizioni').delete().eq('torneo_id',row.id);if(d.error)throw d.error;const x=await client.from('tornei').delete().eq('id',row.id);if(x.error)throw x.error;}
   const now=new Date(),id=Date.now();
   const giocatori=[['Marco','Rossi'],['Luca','Bianchi'],['Andrea','Verdi'],['Paolo','Neri'],['Stefano','Galli'],['Matteo','Conti'],['Davide','Romano'],['Fabio','Costa']];
   const baseConfigurazione={coppie:[],partecipanti:[],rules:{locked:true,tipoTorneo:'individualeCoppieVariabili',formulaScelta:'individualeCoppieVariabili',numeroSquadre:0,numeroGiocatori:8,numeroGironi:0},rotazione:{version:2,numeroGiocatori:8,puntiVittoria:3,puntiPareggio:1,puntiSconfitta:0,campoDefault:'Campo 1',oraDefault:'19:00',numeroGiornate:6,giornate:[]}};
-  const tr=await client.from('tornei').insert({id,nome:nomeTorneo,data:now.toISOString().slice(0,10),data_torneo:now.toISOString().slice(0,10),descrizione:'SIMULAZIONE AUTOMATICA: 8 giocatori, 6 giornate, risultati realistici.',posti:8,stato:'attivo',pubblicato:false,iscrizioni_chiuse:true,formula:'individualeCoppieVariabili',configurazione:baseConfigurazione}).select('*').limit(1).maybeSingle();
+  const tr=await client.from('tornei').insert({id,nome:nomeTorneo,data:now.toISOString().slice(0,10),data_torneo:now.toISOString().slice(0,10),descrizione:'SIMULAZIONE AUTOMATICA: 8 giocatori, 4 coppie per giornata, tutti contro tutti nella stessa giornata, 6 giornate.',posti:8,stato:'attivo',pubblicato:false,iscrizioni_chiuse:true,formula:'individualeCoppieVariabili',configurazione:baseConfigurazione}).select('*').limit(1).maybeSingle();
   if(tr.error)throw tr.error;
   const rows=giocatori.map(p=>({torneo_id:id,nome_giocatore:p[0]+' '+p[1],nome:p[0],cognome:p[1],stato:'approvato',approvato:true,categoria:'Individuale Coppie Variabili'}));
   const ir=await client.from('iscrizioni').insert(rows).select('*');
   if(ir.error){await client.from('tornei').delete().eq('id',id);throw ir.error;}
-  const byName=Object.fromEntries((ir.data||rows).map(p=>[name(p),key(p)])),idFor=(n,c)=>byName[n+' '+c],D=(numero,offset,partite)=>({numero,data:new Date(now.getTime()+offset*86400000).toISOString().slice(0,10),partite,riposo:[]}),K=(a,b)=>[idFor(a[0],a[1]),idFor(a[2],a[3])],m=(idn,a,b,ra,rb,campo,ora)=>({id:idn,coppiaA:K(a),coppiaB:K(b),risA:String(ra),risB:String(rb),campo,ora}),G=(numero,offset,partite)=>D(numero,offset,partite);
+  const byName=Object.fromEntries((ir.data||rows).map(p=>[name(p),key(p)]));
+  const idFor=(n,c)=>byName[n+' '+c];
+  const D=(numero,offset,pairs,results)=>({
+    numero,
+    data:new Date(now.getTime()+offset*86400000).toISOString().slice(0,10),
+    partite:pairs.map((pair,i)=>({
+      id:'g'+numero+'-m'+(i+1),
+      coppiaA:pair[0].map(x=>idFor(x[0],x[1])),
+      coppiaB:pair[1].map(x=>idFor(x[0],x[1])),
+      risA:String(results[i][0]),
+      risB:String(results[i][1]),
+      campo:i%2===0?'Campo 1':'Campo 2',
+      ora:'19:00'
+    })),
+    riposo:[]
+  });
+  const P=(a,b)=>[a,b];
+  const M=(a,b,c,d)=>P([[a[0],a[1]],[b[0],b[1]]],[[c[0],c[1]],[d[0],d[1]]]);
   const giornate=[
-    G(1,0,[m('g1-m1',['Marco','Rossi','Luca','Bianchi'],['Andrea','Verdi','Paolo','Neri'],6,4,'Campo 1','19:00'),m('g1-m2',['Stefano','Galli','Matteo','Conti'],['Davide','Romano','Fabio','Costa'],5,7,'Campo 2','19:00')]),
-    G(2,1,[m('g2-m1',['Marco','Rossi','Andrea','Verdi'],['Stefano','Galli','Davide','Romano'],7,5,'Campo 1','19:00'),m('g2-m2',['Luca','Bianchi','Paolo','Neri'],['Matteo','Conti','Fabio','Costa'],6,6,'Campo 2','19:00')]),
-    G(3,2,[m('g3-m1',['Marco','Rossi','Paolo','Neri'],['Matteo','Conti','Davide','Romano'],4,6,'Campo 1','19:00'),m('g3-m2',['Luca','Bianchi','Stefano','Galli'],['Andrea','Verdi','Fabio','Costa'],7,5,'Campo 2','19:00')]),
-    G(4,3,[m('g4-m1',['Marco','Rossi','Stefano','Galli'],['Fabio','Costa','Paolo','Neri'],6,6,'Campo 1','19:00'),m('g4-m2',['Luca','Bianchi','Matteo','Conti'],['Andrea','Verdi','Davide','Romano'],6,4,'Campo 2','19:00')]),
-    G(5,4,[m('g5-m1',['Marco','Rossi','Matteo','Conti'],['Luca','Bianchi','Fabio','Costa'],7,5,'Campo 1','19:00'),m('g5-m2',['Andrea','Verdi','Stefano','Galli'],['Paolo','Neri','Davide','Romano'],6,6,'Campo 2','19:00')]),
-    G(6,5,[m('g6-m1',['Marco','Rossi','Davide','Romano'],['Andrea','Verdi','Matteo','Conti'],5,7,'Campo 1','19:00'),m('g6-m2',['Luca','Bianchi','Paolo','Neri'],['Stefano','Galli','Fabio','Costa'],6,4,'Campo 2','19:00')])
+    D(1,0,[
+      M(['Marco','Rossi'],['Luca','Bianchi'],['Andrea','Verdi'],['Paolo','Neri']),
+      M(['Marco','Rossi'],['Luca','Bianchi'],['Stefano','Galli'],['Matteo','Conti']),
+      M(['Marco','Rossi'],['Luca','Bianchi'],['Davide','Romano'],['Fabio','Costa']),
+      M(['Andrea','Verdi'],['Paolo','Neri'],['Stefano','Galli'],['Matteo','Conti']),
+      M(['Andrea','Verdi'],['Paolo','Neri'],['Davide','Romano'],['Fabio','Costa']),
+      M(['Stefano','Galli'],['Matteo','Conti'],['Davide','Romano'],['Fabio','Costa'])
+    ],[[6,4],[7,5],[5,7],[6,6],[4,6],[7,5]]),
+    D(2,1,[
+      M(['Marco','Rossi'],['Andrea','Verdi'],['Luca','Bianchi'],['Stefano','Galli']),
+      M(['Marco','Rossi'],['Andrea','Verdi'],['Paolo','Neri'],['Davide','Romano']),
+      M(['Marco','Rossi'],['Andrea','Verdi'],['Matteo','Conti'],['Fabio','Costa']),
+      M(['Luca','Bianchi'],['Stefano','Galli'],['Paolo','Neri'],['Davide','Romano']),
+      M(['Luca','Bianchi'],['Stefano','Galli'],['Matteo','Conti'],['Fabio','Costa']),
+      M(['Paolo','Neri'],['Davide','Romano'],['Matteo','Conti'],['Fabio','Costa'])
+    ],[[7,5],[6,4],[5,7],[6,6],[7,5],[4,6]]),
+    D(3,2,[
+      M(['Marco','Rossi'],['Paolo','Neri'],['Luca','Bianchi'],['Matteo','Conti']),
+      M(['Marco','Rossi'],['Paolo','Neri'],['Stefano','Galli'],['Fabio','Costa']),
+      M(['Marco','Rossi'],['Paolo','Neri'],['Andrea','Verdi'],['Davide','Romano']),
+      M(['Luca','Bianchi'],['Matteo','Conti'],['Stefano','Galli'],['Fabio','Costa']),
+      M(['Luca','Bianchi'],['Matteo','Conti'],['Andrea','Verdi'],['Davide','Romano']),
+      M(['Stefano','Galli'],['Fabio','Costa'],['Andrea','Verdi'],['Davide','Romano'])
+    ],[[4,6],[7,5],[6,6],[5,7],[6,4],[7,5]]),
+    D(4,3,[
+      M(['Marco','Rossi'],['Stefano','Galli'],['Luca','Bianchi'],['Davide','Romano']),
+      M(['Marco','Rossi'],['Stefano','Galli'],['Matteo','Conti'],['Fabio','Costa']),
+      M(['Marco','Rossi'],['Stefano','Galli'],['Andrea','Verdi'],['Paolo','Neri']),
+      M(['Luca','Bianchi'],['Davide','Romano'],['Matteo','Conti'],['Fabio','Costa']),
+      M(['Luca','Bianchi'],['Davide','Romano'],['Andrea','Verdi'],['Paolo','Neri']),
+      M(['Matteo','Conti'],['Fabio','Costa'],['Andrea','Verdi'],['Paolo','Neri'])
+    ],[[6,6],[7,5],[5,7],[6,4],[7,5],[4,6]]),
+    D(5,4,[
+      M(['Marco','Rossi'],['Matteo','Conti'],['Luca','Bianchi'],['Paolo','Neri']),
+      M(['Marco','Rossi'],['Matteo','Conti'],['Andrea','Verdi'],['Fabio','Costa']),
+      M(['Marco','Rossi'],['Matteo','Conti'],['Stefano','Galli'],['Davide','Romano']),
+      M(['Luca','Bianchi'],['Paolo','Neri'],['Andrea','Verdi'],['Fabio','Costa']),
+      M(['Luca','Bianchi'],['Paolo','Neri'],['Stefano','Galli'],['Davide','Romano']),
+      M(['Andrea','Verdi'],['Fabio','Costa'],['Stefano','Galli'],['Davide','Romano'])
+    ],[[7,5],[6,4],[5,7],[6,6],[4,6],[7,5]]),
+    D(6,5,[
+      M(['Marco','Rossi'],['Davide','Romano'],['Luca','Bianchi'],['Fabio','Costa']),
+      M(['Marco','Rossi'],['Davide','Romano'],['Andrea','Verdi'],['Stefano','Galli']),
+      M(['Marco','Rossi'],['Davide','Romano'],['Paolo','Neri'],['Matteo','Conti']),
+      M(['Luca','Bianchi'],['Fabio','Costa'],['Andrea','Verdi'],['Stefano','Galli']),
+      M(['Luca','Bianchi'],['Fabio','Costa'],['Paolo','Neri'],['Matteo','Conti']),
+      M(['Andrea','Verdi'],['Stefano','Galli'],['Paolo','Neri'],['Matteo','Conti'])
+    ],[[5,7],[6,4],[7,5],[6,6],[5,7],[6,4]])
   ];
   const configurazione={...baseConfigurazione,rotazione:{...baseConfigurazione.rotazione,giornate}};
   const up=await client.from('tornei').update({configurazione}).eq('id',id).select('*').limit(1).maybeSingle();
@@ -243,7 +302,7 @@ async function simulate(){
   const s=state();s.tornei=(s.tornei||[]).filter(t=>String(t.id)!==String(id));s.tornei.push(up.data||tr.data);s.torneoSelezionato=id;window.adminState=s;
   try{localStorage.setItem('padel_admin_state',JSON.stringify(s))}catch(e){}
   window.iscrizioniTorneo=ir.data||rows;render(up.data||tr.data,window.iscrizioniTorneo);
-  alert('Simulazione creata: 8 giocatori, 6 giornate, 12 partite e risultati già inseriti.');
+  alert('Simulazione corretta: 8 giocatori, 4 coppie per giornata, 6 partite per giornata, 6 giornate e 36 partite totali con risultati inseriti.');
 }
 async function open(){
   let t=current();if(!t){alert('Seleziona prima un torneo.');return}if(!isRotation(t))return;
