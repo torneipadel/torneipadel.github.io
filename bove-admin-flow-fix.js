@@ -128,13 +128,24 @@
     const id = (typeof state !== 'undefined' ? state?.idTorneo : null) || new URLSearchParams(location.search).get('idTorneo');
     if (!client || !id) { alert('Torneo non disponibile.'); return false; }
     if (!confirm('ATTENZIONE: eliminare definitivamente questo torneo e le relative iscrizioni?')) return false;
+
     const r1 = await client.from('iscrizioni').delete().eq('torneo_id', id);
-    if (r1.error) { alert('Eliminazione iscrizioni non riuscita: ' + r1.error.message); return false; }
-    const r2 = await client.from('iscritti').delete().eq('torneo_id', id);
-    if (r2.error) { alert('Eliminazione partecipanti non riuscita: ' + r2.error.message); return false; }
-    const r3 = await client.from('tornei').delete().eq('id', id);
-    if (r3.error) { alert('Eliminazione torneo non riuscita: ' + r3.error.message); return false; }
-    try { localStorage.removeItem('torneoState'); localStorage.removeItem('savedTeams'); } catch (e) {}
+    if (r1.error) {
+      alert('Eliminazione iscrizioni non riuscita: ' + r1.error.message);
+      return false;
+    }
+
+    const r2 = await client.from('tornei').delete().eq('id', id);
+    if (r2.error) {
+      alert('Eliminazione torneo non riuscita: ' + r2.error.message);
+      return false;
+    }
+
+    try {
+      localStorage.removeItem('torneoState');
+      localStorage.removeItem('savedTeams');
+    } catch (e) {}
+
     window.location.href = 'admin.html';
     return true;
   }
