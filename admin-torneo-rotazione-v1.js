@@ -133,7 +133,22 @@ function generateRound(t,ps,scheduledSlot){
   }
   const activeKeys=new Set(best.active.map(key)),resting=ps.filter(p=>!activeKeys.has(key(p))).map(key);
   const numero=c.rotazione.giornate.length+1,slot=scheduledSlot||nextCalendarSlot(t),data=slot.data,ora=slot.ora||c.rotazione.oraDefault;
-  const partite=best.groups.map((v,i)=>({id:'g'+numero+'-m'+(i+1),coppiaA:v[0],coppiaB:v[1],risA:'',risB:'',campo:c.rotazione.campoDefault,ora}));
+  const coppie=best.groups.flatMap(v=>v);
+  const partite=[];
+  let matchNumero=1;
+  for(let i=0;i<coppie.length;i++){
+    for(let j=i+1;j<coppie.length;j++){
+      partite.push({
+        id:'g'+numero+'-m'+(matchNumero++),
+        coppiaA:coppie[i],
+        coppiaB:coppie[j],
+        risA:'',
+        risB:'',
+        campo:c.rotazione.campoDefault,
+        ora
+      });
+    }
+  }
   c.rotazione.giornate.push({numero,data,partite,riposo:resting});return c;
 }
 function playerMap(ps){return Object.fromEntries(ps.map(p=>[key(p),name(p)]))}
