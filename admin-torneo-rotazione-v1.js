@@ -138,8 +138,21 @@ function generateRound(t,ps,scheduledSlot){
 }
 function playerMap(ps){return Object.fromEntries(ps.map(p=>[key(p),name(p)]))}
 function inputScore(v){return v===''?'':String(Math.max(0,Number(v)||0))}
+function isolateKingUi(){
+  const controls=$('adminTournamentControls');
+  if(controls)controls.style.setProperty('display','none','important');
+  const title=$('topbarTitle');
+  if(title)title.textContent='King Torneo Individuale a Coppie Variabili';
+  const app=$('appContent')?.closest('.app');
+  if(app){
+    app.querySelectorAll('.sidebar .nav button[data-page]').forEach(b=>b.classList.remove('active'));
+    $('sideKing')?.classList.add('active');
+    $('mobileKing')?.classList.add('active');
+  }
+}
 function render(t,ps){
   const root=$('appContent');if(!root)return;
+  isolateKingUi();
   const c=config(t),r=c.rotazione,pm=playerMap(ps),rank=standings(t,ps),h=history(c);
   const limiteGiornate=r.numeroGiornate==='manuale'?'manuale':Number(r.numeroGiornate);
   const limiteRaggiunto=limiteGiornate!=='manuale'&&r.giornate.length>=limiteGiornate;
@@ -219,16 +232,23 @@ async function open(){
   }catch(e){alert(e.message||e)}
 }
 function inject(){
-  const root=$('appContent'),t=current();if(!root||!t||!isRotation(t))return;
-  const grid=root.querySelector('.management-grid .action-grid');if(grid&&!root.querySelector('#adminRotationAction')){
-    const classic=[...grid.querySelectorAll('button')];classic.forEach(b=>{if(!b.id||!['publish','closeReg'].includes(b.id))b.style.display='none'});
-    const b=document.createElement('button');b.type='button';b.className='btn action-tile';b.id='adminRotationAction';b.innerHTML='🏆 <strong>Gestione torneo</strong><span>Giocatori · Giornate · Calendario · Risultati · Classifica</span>';b.onclick=null;b.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();open()});grid.insertBefore(b,grid.firstChild);
-  }
-  if(grid&&!root.querySelector('#adminRotationSimulation')){
-    const s=document.createElement('button');s.type='button';s.className='btn action-tile';s.id='adminRotationSimulation';s.innerHTML='🧪 <strong>Crea simulazione completa</strong><span>8 giocatori · 6 giornate · 12 risultati</span>';s.addEventListener('click',async e=>{e.preventDefault();e.stopPropagation();if(s.dataset.busy==='1')return;s.dataset.busy='1';s.disabled=true;try{await simulate()}catch(e){alert(e.message||e)}finally{s.dataset.busy='0';s.disabled=false}});grid.insertBefore(s,grid.firstChild);
-  }
-  const sideTab=$('sideTabellone'),sideCal=$('sideCalendario');if(sideTab)sideTab.style.display='none';if(sideCal)sideCal.style.display='none';
-  root.closest('.app')?.querySelectorAll('.sidebar .nav button[data-page="coppie"],.sidebar .nav button[data-page="dati"],.mobile-nav button[data-page="coppie"],.mobile-nav button[data-page="dati"]').forEach(b=>b.style.display='none');
+  const root=$('appContent'),t=current();
+  if(!root||!t||!isRotation(t))return;
+  const controls=$('adminTournamentControls');
+  if(controls)controls.style.setProperty('display','none','important');
+  const app=root.closest('.app');
+  if(!app)return;
+  app.querySelectorAll('.sidebar .nav button[data-page]').forEach(b=>b.classList.remove('active'));
+  const kingButton=$('sideKing');
+  if(kingButton)kingButton.classList.add('active');
+  const mobileKing=$('mobileKing');
+  if(mobileKing)mobileKing.classList.add('active');
+  const sideTab=$('sideTabellone'),sideCal=$('sideCalendario');
+  if(sideTab)sideTab.style.display='none';
+  if(sideCal)sideCal.style.display='none';
+  app.querySelectorAll('.sidebar .nav button[data-page="coppie"],.sidebar .nav button[data-page="dati"],.mobile-nav button[data-page="coppie"],.mobile-nav button[data-page="dati"]').forEach(b=>b.style.display='none');
+  const title=$('topbarTitle');
+  if(title)title.textContent='King Torneo Individuale a Coppie Variabili';
 }
 async function openSeparated(){const list=state().tornei||[],king=list.find(t=>String(t?.formula||t?.configurazione?.rules?.formulaScelta||'')==='individualeCoppieVariabili');if(!king){alert('Non esiste ancora un King Torneo Individuale a Coppie Variabili.');return}const st=state();st.torneoSelezionato=king.id;window.adminState=st;try{localStorage.setItem('padel_admin_state',JSON.stringify(st))}catch(e){}await open()}
 window.apriKingSeparato=openSeparated;
