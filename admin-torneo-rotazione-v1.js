@@ -108,40 +108,57 @@ function parseDate(s){const p=String(s||'').split('-').map(Number);return p.leng
 function nextCalendarSlot(t){const c=config(t),cal=c.rotazione.calendario||{},giorni=Array.isArray(cal.giorni)?cal.giorni:[],orari=cal.orari&&typeof cal.orari==='object'?cal.orari:{},fallback=String(cal.ora||c.rotazione.oraDefault||'19:00');const last=(c.rotazione.giornate||[]).map(g=>parseDate(g.data)).filter(Boolean).sort((a,b)=>b-a)[0];const now=new Date(),base=last?new Date(last.getTime()+86400000):now; if(!giorni.length)return {data:isoDate(base),ora:c.rotazione.oraDefault};for(let i=0;i<370;i++){const d=new Date(base.getTime()+i*86400000),js=d.getUTCDay(),giorno=js===0?7:js,ora=String(orari[String(giorno)]||fallback),parts=ora.split(':').map(Number),candidate=new Date(d.getTime());candidate.setHours(parts[0]||0,parts[1]||0,0,0);if(!giorni.includes(giorno))continue;if(candidate.getTime()<=now.getTime() && !last)continue;return {data:isoDate(d),ora}}return {data:isoDate(base),ora:fallback}}
 function calendarText(cal){const giorni=Array.isArray(cal?.giorni)?cal.giorni:[],orari=cal?.orari&&typeof cal.orari==='object'?cal.orari:{};return giorni.length?giorni.map(n=>dayName(n)+' '+String(orari[String(n)]||cal.ora||'')).join(' · '):'Non programmato'}
 function generateRound(t,ps,scheduledSlot){
-  if(ps.length<4)throw Error('Servono almeno 4 giocatori approvati.');
-  const c=config(t),h=history(c),rank=standings(t,ps);const configured=Math.max(4,Number(c.rotazione.numeroGiocatori)||ps.length);ps=ps.slice(0,configured);
+  if(ps.length<8)throw Error('Servono almeno 8 giocatori approvati per creare una giornata.');
+  const c=config(t),h=history(c),rank=standings(t,ps);
+  const configured=Math.max(4,Number(c.rotazione.numeroGiocatori)||ps.length);
+  if(![8,16].includes(configured))throw Error('Il numero giocatori del King deve essere 8 oppure 16: corrispondono a 4 oppure 8 coppie.');
+  if(ps.length<configured)throw Error('Servono '+configured+' giocatori approvati; al momento sono '+ps.length+'.');
+  ps=ps.slice(0,configured);
   const played=Object.fromEntries(rank.map(x=>[x.id,x.partite]));
-  const matches=Math.floor(ps.length/4),activeCount=matches*4;
+  const coppieCount=configured/2;
   let best=null,bestScore=Infinity;
-  for(let attempt=0;attempt<700;attempt++){
-    const shuffled=ps.slice().sort((a,b)=>(played[key(a)]-played[key(b)])+(Math.random()-.5)*0.9);
-    const active=shuffled.slice(0,activeCount);let score=0;const groups=[];
-    for(let i=0;i<active.length;i+=4){
-      const g=active.slice(i,i+4).map(key),variants=[[[g[0],g[1]],[g[2],g[3]]],[[g[0],g[2]],[g[1],g[3]]],[[g[0],g[3]],[g[1],g[2]]]];
-      let localBest=null,localScore=Infinity;
-      variants.forEach(v=>{
-        const [A,B]=v;
-        const partnerPenalty=A.concat(B).reduce((s,x,j,arr)=>{const y=arr[j%2===0?j+1:j-1];return s+(h.partner[x]?.[y]||0)*10000},0);
-        const opponentPenalty=A.reduce((s,x)=>s+B.reduce((z,y)=>z+(h.opp[x]?.[y]||0)*35,0),0);
-        const groupKey=[...g].sort().join('|'),groupPenalty=(h.groups[groupKey]||0)*20,vscore=partnerPenalty+opponentPenalty+groupPenalty;
-        if(vscore<localScore){localScore=vscore;localBest=v}
-      });
-      score+=localScore;groups.push(localBest);
+  for(let attempt=0;attempt<1200;attempt++){
+    const shuffled=ps.slice().sort((a,b)=>(played[key(a)]||0)-(played[key(b)]||0)+(Math.random()-.5)*1.5);
+    const pairs=[];
+    const remaining=shuffled.slice();
+    while(remaining.length){
+      let pair=null,pairScore=Infinity;
+      for(let i=0;i<remaining.length;i++){
+        for(let j=i+1;j<remaining.length;j++){
+          const a=key(remaining[i]),b=key(remaining[j]);
+          const repeat=(h.partner[a]?.[b]||0)+(h.partner[b]?.[a]||0);
+          const playedPenalty=Math.abs((played[a]||0)-(played[b]||0))*3;
+          const score=repeat*100000+playedPenalty+Math.random()*0.01;
+          if(score<pairScore){pairScore=score;pair=[remaining[i],remaining[j]]}
+        }
+      }
+      pairs.push(pair.map(key));
+      const used=new Set(pair.map(key));
+      for(let i=remaining.length-1;i>=0;i--)if(used.has(key(remaining[i])))remaining.splice(i,1);
     }
-    const vals=active.map(p=>played[key(p)]||0);score+=Math.max(...vals)-Math.min(...vals);
-    if(score<bestScore){bestScore=score;best={active,groups}}
+    let score=0;
+    for(let i=0;i<pairs.length;i++){
+      const a=pairs[i][0],b=pairs[i][1];
+      score+=(h.partner[a]?.[b]||0)*100000;
+      score+=Math.abs((played[a]||0)-(played[b]||0))*10;
+      for(let j=i+1;j<pairs.length;j++){
+        const c1=pairs[j][0],c2=pairs[j][1];
+        score+=(h.opp[a]?.[c1]||0)+(h.opp[a]?.[c2]||0)+(h.opp[b]?.[c1]||0)+(h.opp[b]?.[c2]||0);
+      }
+    }
+    const vals=pairs.flatMap(p=>p).map(id=>played[id]||0);
+    score+=(Math.max(...vals)-Math.min(...vals))*20;
+    if(score<bestScore){bestScore=score;best=pairs}
   }
-  const activeKeys=new Set(best.active.map(key)),resting=ps.filter(p=>!activeKeys.has(key(p))).map(key);
   const numero=c.rotazione.giornate.length+1,slot=scheduledSlot||nextCalendarSlot(t),data=slot.data,ora=slot.ora||c.rotazione.oraDefault;
-  const coppie=best.groups.flatMap(v=>v);
   const partite=[];
   let matchNumero=1;
-  for(let i=0;i<coppie.length;i++){
-    for(let j=i+1;j<coppie.length;j++){
+  for(let i=0;i<best.length;i++){
+    for(let j=i+1;j<best.length;j++){
       partite.push({
         id:'g'+numero+'-m'+(matchNumero++),
-        coppiaA:coppie[i],
-        coppiaB:coppie[j],
+        coppiaA:best[i],
+        coppiaB:best[j],
         risA:'',
         risB:'',
         campo:c.rotazione.campoDefault,
@@ -149,6 +166,8 @@ function generateRound(t,ps,scheduledSlot){
       });
     }
   }
+  const activeKeys=new Set(best.flat());
+  const resting=ps.filter(p=>!activeKeys.has(key(p))).map(key);
   c.rotazione.giornate.push({numero,data,partite,riposo:resting});return c;
 }
 function playerMap(ps){return Object.fromEntries(ps.map(p=>[key(p),name(p)]))}
