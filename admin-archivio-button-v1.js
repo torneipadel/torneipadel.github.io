@@ -171,7 +171,11 @@
 
   function ensureArchiveButton() {
     const bar = document.getElementById('adminTournamentControls');
-    const topActions = document.querySelector('.topbar-actions');
+    if (!bar) {
+      removeArchivedFromMainSelector();
+      return;
+    }
+
     const legacy = document.getElementById('adminArchiveOpen');
     if (legacy) legacy.remove();
 
@@ -182,15 +186,8 @@
       button.type = 'button';
       button.className = 'btn action-tile';
       button.textContent = '📦 Archivio Tornei';
+      bar.appendChild(button);
     }
-
-    const host = bar || topActions;
-    if (!host) {
-      removeArchivedFromMainSelector();
-      return;
-    }
-
-    if (button.parentElement !== host) host.appendChild(button);
 
     button.onclick = () => {
       const panel = getPanel();
