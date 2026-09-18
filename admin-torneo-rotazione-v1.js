@@ -55,7 +55,7 @@ function config(t){
 async function save(t,c){
   const client=sb();
   if(!client)throw Error('Connessione Supabase non disponibile.');
-  const r=await client.from('tornei').update({configurazione:c,formula:'individualeCoppieVariabili'}).eq('id',t.id).select('*').single();
+  const r=await client.from('tornei').update({configurazione:c,formula:'individualeCoppieVariabili'}).eq('id',t.id).select('*').limit(1).maybeSingle();
   if(r.error)throw r.error;
   Object.assign(t,r.data||{});
   try{localStorage.setItem('padel_admin_state',JSON.stringify(state()))}catch(e){}
@@ -109,7 +109,7 @@ function nextCalendarSlot(t){const c=config(t),cal=c.rotazione.calendario||{},gi
 function calendarText(cal){const giorni=Array.isArray(cal?.giorni)?cal.giorni:[],orari=cal?.orari&&typeof cal.orari==='object'?cal.orari:{};return giorni.length?giorni.map(n=>dayName(n)+' '+String(orari[String(n)]||cal.ora||'')).join(' · '):'Non programmato'}
 function generateRound(t,ps,scheduledSlot){
   if(ps.length<4)throw Error('Servono almeno 4 giocatori approvati.');
-  const c=config(t),h=history(c),rank=standings(t,ps);
+  const c=config(t),h=history(c),rank=standings(t,ps);const configured=Math.max(4,Number(c.rotazione.numeroGiocatori)||ps.length);ps=ps.slice(0,configured);
   const played=Object.fromEntries(rank.map(x=>[x.id,x.partite]));
   const matches=Math.floor(ps.length/4),activeCount=matches*4;
   let best=null,bestScore=Infinity;
@@ -178,7 +178,7 @@ function render(t,ps){
   root.querySelectorAll('[data-r]').forEach(inp=>{inp.addEventListener('change',async()=>{try{const nc=config(t),g=nc.rotazione.giornate.find(x=>String(x.numero)===String(inp.dataset.r));if(!g)return;const m=g.partite[Number(inp.dataset.m)];if(!m)return;m[inp.dataset.s==='a'?'risA':'risB']=inputScore(inp.value);await save(t,nc);render(t,ps)}catch(e){alert(e.message||e)}})});
   root.querySelectorAll('[data-date]').forEach(inp=>{inp.addEventListener('change',async()=>{try{const nc=config(t),g=nc.rotazione.giornate.find(x=>String(x.numero)===String(inp.dataset.date));if(!g||!inp.value)return;g.data=inp.value;await save(t,nc);render(t,ps)}catch(e){alert(e.message||e)}})});
   root.querySelectorAll('[data-meta]').forEach(inp=>{inp.addEventListener('change',async()=>{try{const nc=config(t),g=nc.rotazione.giornate.find(x=>String(x.numero)===String(inp.dataset.meta));if(!g)return;const m=g.partite[Number(inp.dataset.mi)];if(!m)return;m[inp.dataset.k]=inp.value;await save(t,nc)}catch(e){alert(e.message||e)}})});
-  root.querySelectorAll('[data-save-pair]').forEach(btn=>{btn.addEventListener('click',async()=>{try{const nc=config(t),g=nc.rotazione.giornate.find(x=>String(x.numero)===String(btn.dataset.savePair));if(!g)return;const m=g.partite[Number(btn.dataset.mi)];if(!m)return;const vals=[...btn.parentElement.querySelectorAll('[data-pair]')].map(x=>x.value);if(vals.length!==4||new Set(vals).size!==4)throw Error('Ogni giocatore può comparire una sola volta nella giornata.');m.coppiaA=vals.slice(0,2);m.coppiaB=vals.slice(2,4);await save(t,nc);render(t,ps)}catch(e){alert(e.message||e)}})});
+  root.querySelectorAll('[data-save-pair]').forEach(btn=>{btn.addEventListener('click',async()=>{try{const nc=config(t),g=nc.rotazione.giornate.find(x=>String(x.numero)===String(btn.dataset.savePair));if(!g)return;const m=g.partite[Number(btn.dataset.mi)];if(!m)return;const vals=[...btn.parentElement.querySelectorAll('[data-pair]')].map(x=>x.value);if(vals.length!==4||new Set(vals).size!==4)throw Error('Ogni giocatore può comparire una sola volta nella partita.');const other=(g.partite||[]).filter((_,idx)=>idx!==Number(btn.dataset.mi));if(other.some(x=>[...(x.coppiaA||[]),...(x.coppiaB||[])].some(id=>vals.includes(String(id)))))throw Error('Un giocatore non può essere presente in due partite della stessa giornata.');m.coppiaA=vals.slice(0,2);m.coppiaB=vals.slice(2,4);await save(t,nc);render(t,ps)}catch(e){alert(e.message||e)}})});
 }
 async function simulate(){
   const client=sb();if(!client)throw Error('Connessione Supabase non disponibile.');
@@ -189,7 +189,7 @@ async function simulate(){
   const now=new Date(),id=Date.now();
   const giocatori=[['Marco','Rossi'],['Luca','Bianchi'],['Andrea','Verdi'],['Paolo','Neri'],['Stefano','Galli'],['Matteo','Conti'],['Davide','Romano'],['Fabio','Costa']];
   const baseConfigurazione={coppie:[],partecipanti:[],rules:{locked:true,tipoTorneo:'individualeCoppieVariabili',formulaScelta:'individualeCoppieVariabili',numeroSquadre:0,numeroGiocatori:8,numeroGironi:0},rotazione:{version:2,numeroGiocatori:8,puntiVittoria:3,puntiPareggio:1,puntiSconfitta:0,campoDefault:'Campo 1',oraDefault:'19:00',numeroGiornate:6,giornate:[]}};
-  const tr=await client.from('tornei').insert({id,nome:nomeTorneo,data:now.toISOString().slice(0,10),data_torneo:now.toISOString().slice(0,10),descrizione:'SIMULAZIONE AUTOMATICA: 8 giocatori, 6 giornate, risultati realistici.',posti:8,stato:'attivo',pubblicato:false,iscrizioni_chiuse:true,formula:'individualeCoppieVariabili',configurazione:baseConfigurazione}).select('*').single();
+  const tr=await client.from('tornei').insert({id,nome:nomeTorneo,data:now.toISOString().slice(0,10),data_torneo:now.toISOString().slice(0,10),descrizione:'SIMULAZIONE AUTOMATICA: 8 giocatori, 6 giornate, risultati realistici.',posti:8,stato:'attivo',pubblicato:false,iscrizioni_chiuse:true,formula:'individualeCoppieVariabili',configurazione:baseConfigurazione}).select('*').limit(1).maybeSingle();
   if(tr.error)throw tr.error;
   const rows=giocatori.map(p=>({torneo_id:id,nome_giocatore:p[0]+' '+p[1],nome:p[0],cognome:p[1],stato:'approvato',approvato:true,categoria:'Individuale Coppie Variabili'}));
   const ir=await client.from('iscrizioni').insert(rows).select('*');
@@ -204,7 +204,7 @@ async function simulate(){
     G(6,5,[m('g6-m1',['Marco','Rossi','Davide','Romano'],['Andrea','Verdi','Matteo','Conti'],5,7,'Campo 1','19:00'),m('g6-m2',['Luca','Bianchi','Paolo','Neri'],['Stefano','Galli','Fabio','Costa'],6,4,'Campo 2','19:00')])
   ];
   const configurazione={...baseConfigurazione,rotazione:{...baseConfigurazione.rotazione,giornate}};
-  const up=await client.from('tornei').update({configurazione}).eq('id',id).select('*').single();
+  const up=await client.from('tornei').update({configurazione}).eq('id',id).select('*').limit(1).maybeSingle();
   if(up.error){await client.from('iscrizioni').delete().eq('torneo_id',id);await client.from('tornei').delete().eq('id',id);throw up.error;}
   const s=state();s.tornei=(s.tornei||[]).filter(t=>String(t.id)!==String(id));s.tornei.push(up.data||tr.data);s.torneoSelezionato=id;window.adminState=s;
   try{localStorage.setItem('padel_admin_state',JSON.stringify(s))}catch(e){}
