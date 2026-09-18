@@ -248,52 +248,52 @@ async function simulate(){
   const M=(a,b,c,d)=>P([[a[0],a[1]],[b[0],b[1]]],[[c[0],c[1]],[d[0],d[1]]]);
   const giornate=[
     D(1,0,[
-      M(['Marco','Rossi'],['Luca','Bianchi'],['Andrea','Verdi'],['Paolo','Neri']),
-      M(['Marco','Rossi'],['Luca','Bianchi'],['Stefano','Galli'],['Matteo','Conti']),
-      M(['Marco','Rossi'],['Luca','Bianchi'],['Davide','Romano'],['Fabio','Costa']),
-      M(['Andrea','Verdi'],['Paolo','Neri'],['Stefano','Galli'],['Matteo','Conti']),
-      M(['Andrea','Verdi'],['Paolo','Neri'],['Davide','Romano'],['Fabio','Costa']),
-      M(['Stefano','Galli'],['Matteo','Conti'],['Davide','Romano'],['Fabio','Costa'])
+      M(['Fabio','Costa'],['Marco','Rossi'],['Luca','Bianchi'],['Davide','Romano']),
+      M(['Fabio','Costa'],['Marco','Rossi'],['Andrea','Verdi'],['Matteo','Conti']),
+      M(['Fabio','Costa'],['Marco','Rossi'],['Paolo','Neri'],['Stefano','Galli']),
+      M(['Luca','Bianchi'],['Davide','Romano'],['Andrea','Verdi'],['Matteo','Conti']),
+      M(['Luca','Bianchi'],['Davide','Romano'],['Paolo','Neri'],['Stefano','Galli']),
+      M(['Andrea','Verdi'],['Matteo','Conti'],['Paolo','Neri'],['Stefano','Galli'])
     ],[[6,4],[7,5],[5,7],[6,6],[4,6],[7,5]]),
     D(2,1,[
-      M(['Marco','Rossi'],['Andrea','Verdi'],['Luca','Bianchi'],['Stefano','Galli']),
-      M(['Marco','Rossi'],['Andrea','Verdi'],['Paolo','Neri'],['Davide','Romano']),
-      M(['Marco','Rossi'],['Andrea','Verdi'],['Matteo','Conti'],['Fabio','Costa']),
-      M(['Luca','Bianchi'],['Stefano','Galli'],['Paolo','Neri'],['Davide','Romano']),
-      M(['Luca','Bianchi'],['Stefano','Galli'],['Matteo','Conti'],['Fabio','Costa']),
-      M(['Paolo','Neri'],['Davide','Romano'],['Matteo','Conti'],['Fabio','Costa'])
+      M(['Fabio','Costa'],['Davide','Romano'],['Marco','Rossi'],['Matteo','Conti']),
+      M(['Fabio','Costa'],['Davide','Romano'],['Luca','Bianchi'],['Stefano','Galli']),
+      M(['Fabio','Costa'],['Davide','Romano'],['Andrea','Verdi'],['Paolo','Neri']),
+      M(['Marco','Rossi'],['Matteo','Conti'],['Luca','Bianchi'],['Stefano','Galli']),
+      M(['Marco','Rossi'],['Matteo','Conti'],['Andrea','Verdi'],['Paolo','Neri']),
+      M(['Luca','Bianchi'],['Stefano','Galli'],['Andrea','Verdi'],['Paolo','Neri'])
     ],[[7,5],[6,4],[5,7],[6,6],[7,5],[4,6]]),
     D(3,2,[
-      M(['Marco','Rossi'],['Paolo','Neri'],['Luca','Bianchi'],['Matteo','Conti']),
-      M(['Marco','Rossi'],['Paolo','Neri'],['Stefano','Galli'],['Fabio','Costa']),
-      M(['Marco','Rossi'],['Paolo','Neri'],['Andrea','Verdi'],['Davide','Romano']),
-      M(['Luca','Bianchi'],['Matteo','Conti'],['Stefano','Galli'],['Fabio','Costa']),
-      M(['Luca','Bianchi'],['Matteo','Conti'],['Andrea','Verdi'],['Davide','Romano']),
-      M(['Stefano','Galli'],['Fabio','Costa'],['Andrea','Verdi'],['Davide','Romano'])
+      M(['Fabio','Costa'],['Matteo','Conti'],['Davide','Romano'],['Stefano','Galli']),
+      M(['Fabio','Costa'],['Matteo','Conti'],['Marco','Rossi'],['Paolo','Neri']),
+      M(['Fabio','Costa'],['Matteo','Conti'],['Luca','Bianchi'],['Andrea','Verdi']),
+      M(['Davide','Romano'],['Stefano','Galli'],['Marco','Rossi'],['Paolo','Neri']),
+      M(['Davide','Romano'],['Stefano','Galli'],['Luca','Bianchi'],['Andrea','Verdi']),
+      M(['Marco','Rossi'],['Paolo','Neri'],['Luca','Bianchi'],['Andrea','Verdi'])
     ],[[4,6],[7,5],[6,6],[5,7],[6,4],[7,5]]),
     D(4,3,[
-      M(['Marco','Rossi'],['Stefano','Galli'],['Luca','Bianchi'],['Davide','Romano']),
-      M(['Marco','Rossi'],['Stefano','Galli'],['Matteo','Conti'],['Fabio','Costa']),
-      M(['Marco','Rossi'],['Stefano','Galli'],['Andrea','Verdi'],['Paolo','Neri']),
-      M(['Luca','Bianchi'],['Davide','Romano'],['Matteo','Conti'],['Fabio','Costa']),
-      M(['Luca','Bianchi'],['Davide','Romano'],['Andrea','Verdi'],['Paolo','Neri']),
-      M(['Matteo','Conti'],['Fabio','Costa'],['Andrea','Verdi'],['Paolo','Neri'])
+      M(['Fabio','Costa'],['Stefano','Galli'],['Matteo','Conti'],['Paolo','Neri']),
+      M(['Fabio','Costa'],['Stefano','Galli'],['Davide','Romano'],['Andrea','Verdi']),
+      M(['Fabio','Costa'],['Stefano','Galli'],['Marco','Rossi'],['Luca','Bianchi']),
+      M(['Matteo','Conti'],['Paolo','Neri'],['Davide','Romano'],['Andrea','Verdi']),
+      M(['Matteo','Conti'],['Paolo','Neri'],['Marco','Rossi'],['Luca','Bianchi']),
+      M(['Davide','Romano'],['Andrea','Verdi'],['Marco','Rossi'],['Luca','Bianchi'])
     ],[[6,6],[7,5],[5,7],[6,4],[7,5],[4,6]]),
     D(5,4,[
-      M(['Marco','Rossi'],['Matteo','Conti'],['Luca','Bianchi'],['Paolo','Neri']),
-      M(['Marco','Rossi'],['Matteo','Conti'],['Andrea','Verdi'],['Fabio','Costa']),
-      M(['Marco','Rossi'],['Matteo','Conti'],['Stefano','Galli'],['Davide','Romano']),
-      M(['Luca','Bianchi'],['Paolo','Neri'],['Andrea','Verdi'],['Fabio','Costa']),
-      M(['Luca','Bianchi'],['Paolo','Neri'],['Stefano','Galli'],['Davide','Romano']),
-      M(['Andrea','Verdi'],['Fabio','Costa'],['Stefano','Galli'],['Davide','Romano'])
+      M(['Fabio','Costa'],['Paolo','Neri'],['Stefano','Galli'],['Andrea','Verdi']),
+      M(['Fabio','Costa'],['Paolo','Neri'],['Matteo','Conti'],['Luca','Bianchi']),
+      M(['Fabio','Costa'],['Paolo','Neri'],['Davide','Romano'],['Marco','Rossi']),
+      M(['Stefano','Galli'],['Andrea','Verdi'],['Matteo','Conti'],['Luca','Bianchi']),
+      M(['Stefano','Galli'],['Andrea','Verdi'],['Davide','Romano'],['Marco','Rossi']),
+      M(['Matteo','Conti'],['Luca','Bianchi'],['Davide','Romano'],['Marco','Rossi'])
     ],[[7,5],[6,4],[5,7],[6,6],[4,6],[7,5]]),
     D(6,5,[
-      M(['Marco','Rossi'],['Davide','Romano'],['Luca','Bianchi'],['Fabio','Costa']),
-      M(['Marco','Rossi'],['Davide','Romano'],['Andrea','Verdi'],['Stefano','Galli']),
-      M(['Marco','Rossi'],['Davide','Romano'],['Paolo','Neri'],['Matteo','Conti']),
-      M(['Luca','Bianchi'],['Fabio','Costa'],['Andrea','Verdi'],['Stefano','Galli']),
-      M(['Luca','Bianchi'],['Fabio','Costa'],['Paolo','Neri'],['Matteo','Conti']),
-      M(['Andrea','Verdi'],['Stefano','Galli'],['Paolo','Neri'],['Matteo','Conti'])
+      M(['Fabio','Costa'],['Andrea','Verdi'],['Paolo','Neri'],['Luca','Bianchi']),
+      M(['Fabio','Costa'],['Andrea','Verdi'],['Stefano','Galli'],['Marco','Rossi']),
+      M(['Fabio','Costa'],['Andrea','Verdi'],['Matteo','Conti'],['Davide','Romano']),
+      M(['Paolo','Neri'],['Luca','Bianchi'],['Stefano','Galli'],['Marco','Rossi']),
+      M(['Paolo','Neri'],['Luca','Bianchi'],['Matteo','Conti'],['Davide','Romano']),
+      M(['Stefano','Galli'],['Marco','Rossi'],['Matteo','Conti'],['Davide','Romano'])
     ],[[5,7],[6,4],[7,5],[6,6],[5,7],[6,4]])
   ];
   const configurazione={...baseConfigurazione,rotazione:{...baseConfigurazione.rotazione,giornate}};
