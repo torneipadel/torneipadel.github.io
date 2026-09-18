@@ -182,6 +182,24 @@ function inject(){
 }
 window.apriGestioneIndividualeCoppieVariabili=open;
 window.apriGestioneRotazione=open;
+(function(){
+  const install=()=>{
+    const original=window.renderCleanAdmin;
+    if(typeof original!=='function'||original.__rotationAutoOpen)return;
+    const wrapped=function(){
+      const r=original.apply(this,arguments);
+      requestAnimationFrame(()=>{
+        const t=current();
+        if(t&&isRotation(t)&&document.getElementById('appContent')?.querySelector('.management-grid'))open();
+      });
+      return r;
+    };
+    wrapped.__rotationAutoOpen=true;
+    window.renderCleanAdmin=wrapped;
+  };
+  install();
+  window.addEventListener('admin:rendered',install);
+})();
 window.addEventListener('admin:rendered',()=>requestAnimationFrame(()=>{inject();const t=current();if(t&&isRotation(t)&&$('appContent')?.querySelector('.management-grid'))open()}));
 window.addEventListener('admin:render',()=>requestAnimationFrame(inject));
 new MutationObserver(()=>requestAnimationFrame(inject)).observe(document.body,{childList:true,subtree:true});
