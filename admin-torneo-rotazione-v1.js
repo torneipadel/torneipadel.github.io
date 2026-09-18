@@ -255,94 +255,107 @@ function render(t,ps){
   root.querySelectorAll('[data-save-squads]').forEach(btn=>{btn.addEventListener('click',async()=>{try{const nc=config(t),g=nc.rotazione.giornate.find(x=>String(x.numero)===String(btn.dataset.saveSquads));if(!g)return;const raw=daySquads(g),squads=raw.map((s,si)=>({id:s.id,nome:'Squadra '+(si+1),giocatori:[...root.querySelectorAll('[data-squad="'+g.numero+'"][data-si="'+si+'"]')].sort((a,b)=>Number(a.dataset.pi)-Number(b.dataset.pi)).map(x=>String(x.value))}));validateDaySquads(squads,ps);g.squadre=squads;g.partite=rebuildDayMatches(g,squads,nc);g.riposo=[];await save(t,nc);render(t,ps)}catch(e){alert(e.message||e)}})});
 }
 async function simulate(){
-  const client=sb();if(!client)throw Error('Connessione Supabase non disponibile.');
-  const nomeTorneo='TEST - Individuale Coppie Variabili - SIMULAZIONE';
-  if(!confirm('Creare una simulazione completa con 8 giocatori, 4 coppie per giornata, 6 partite per giornata e 6 giornate? Il test precedente con lo stesso nome verrà sostituito.'))return;
-  const old=await client.from('tornei').select('id').eq('nome',nomeTorneo);if(old.error)throw old.error;
-  for(const row of (old.data||[])){const d=await client.from('iscrizioni').delete().eq('torneo_id',row.id);if(d.error)throw d.error;const x=await client.from('tornei').delete().eq('id',row.id);if(x.error)throw x.error;}
-  const now=new Date(),id=Date.now();
-  const giocatori=[['Marco','Rossi'],['Luca','Bianchi'],['Andrea','Verdi'],['Paolo','Neri'],['Stefano','Galli'],['Matteo','Conti'],['Davide','Romano'],['Fabio','Costa']];
-  const baseConfigurazione={coppie:[],partecipanti:[],rules:{locked:true,tipoTorneo:'individualeCoppieVariabili',formulaScelta:'individualeCoppieVariabili',numeroSquadre:0,numeroGiocatori:8,numeroGironi:0},rotazione:{version:2,numeroGiocatori:8,puntiVittoria:3,puntiPareggio:1,puntiSconfitta:0,campoDefault:'Campo 1',oraDefault:'19:00',numeroGiornate:6,giornate:[]}};
-  const tr=await client.from('tornei').insert({id,nome:nomeTorneo,data:now.toISOString().slice(0,10),data_torneo:now.toISOString().slice(0,10),descrizione:'SIMULAZIONE AUTOMATICA: 8 giocatori, 4 coppie per giornata, tutti contro tutti nella stessa giornata, 6 giornate.',posti:8,stato:'attivo',pubblicato:false,iscrizioni_chiuse:true,formula:'individualeCoppieVariabili',configurazione:baseConfigurazione}).select('*').limit(1).maybeSingle();
-  if(tr.error)throw tr.error;
-  const rows=giocatori.map(p=>({torneo_id:id,nome_giocatore:p[0]+' '+p[1],nome:p[0],cognome:p[1],stato:'approvato',approvato:true,categoria:'Individuale Coppie Variabili'}));
-  const ir=await client.from('iscrizioni').insert(rows).select('*');
-  if(ir.error){await client.from('tornei').delete().eq('id',id);throw ir.error;}
-  const byName=Object.fromEntries((ir.data||rows).map(p=>[name(p),key(p)]));
-  const idFor=(n,c)=>byName[n+' '+c];
-  const D=(numero,offset,pairs,results)=>({
-    numero,
-    data:new Date(now.getTime()+offset*86400000).toISOString().slice(0,10),
-    partite:pairs.map((pair,i)=>({
-      id:'g'+numero+'-m'+(i+1),
-      coppiaA:pair[0].map(x=>idFor(x[0],x[1])),
-      coppiaB:pair[1].map(x=>idFor(x[0],x[1])),
-      risA:String(results[i][0]),
-      risB:String(results[i][1]),
-      campo:i%2===0?'Campo 1':'Campo 2',
-      ora:'19:00'
-    })),
-    riposo:[]
+  const t=current();
+  if(!t)throw Error('Seleziona prima il torneo di simulazione.');
+  if(String(t.nome||'').trim()!=='TEST - Individuale Coppie Variabili - SIMULAZIONE')throw Error('Questa simulazione deve essere eseguita sul torneo TEST - Individuale Coppie Variabili - SIMULAZIONE.');
+  const ps=await players(t);
+  if(ps.length!==8)throw Error('La simulazione richiede esattamente 8 giocatori approvati; al momento sono '+ps.length+'.');
+  if(!confirm('Generare sul torneo già esistente 6 giornate complete, con 4 coppie, 6 partite e risultati già giocati per ogni giornata?'))return;
+
+  const byName=Object.fromEntries(ps.map(p=>[name(p),key(p)]));
+  const required=['Marco Rossi','Luca Bianchi','Andrea Verdi','Paolo Neri','Stefano Galli','Matteo Conti','Davide Romano','Fabio Costa'];
+  const missing=required.filter(n=>!byName[n]);
+  if(missing.length)throw Error('Mancano questi giocatori approvati: '+missing.join(', '));
+
+  const idFor=n=>byName[n];
+  const pair=(a,b)=>[idFor(a),idFor(b)];
+  const match=(a,b,c,d,ra,rb,campo,ora,numero,mi)=>({
+    id:'g'+numero+'-m'+mi,
+    coppiaA:pair(a,b),
+    coppiaB:pair(c,d),
+    risA:String(ra),
+    risB:String(rb),
+    campo:campo||'Campo 1',
+    ora:ora||'19:00'
   });
-  const P=(a,b)=>[a,b];
-  const M=(a,b,c,d)=>P([[a[0],a[1]],[b[0],b[1]]],[[c[0],c[1]],[d[0],d[1]]]);
-  const giornate=[
-    D(1,0,[
-      M(['Fabio','Costa'],['Marco','Rossi'],['Luca','Bianchi'],['Davide','Romano']),
-      M(['Fabio','Costa'],['Marco','Rossi'],['Andrea','Verdi'],['Matteo','Conti']),
-      M(['Fabio','Costa'],['Marco','Rossi'],['Paolo','Neri'],['Stefano','Galli']),
-      M(['Luca','Bianchi'],['Davide','Romano'],['Andrea','Verdi'],['Matteo','Conti']),
-      M(['Luca','Bianchi'],['Davide','Romano'],['Paolo','Neri'],['Stefano','Galli']),
-      M(['Andrea','Verdi'],['Matteo','Conti'],['Paolo','Neri'],['Stefano','Galli'])
-    ],[[6,4],[7,5],[5,7],[6,6],[4,6],[7,5]]),
-    D(2,1,[
-      M(['Fabio','Costa'],['Davide','Romano'],['Marco','Rossi'],['Matteo','Conti']),
-      M(['Fabio','Costa'],['Davide','Romano'],['Luca','Bianchi'],['Stefano','Galli']),
-      M(['Fabio','Costa'],['Davide','Romano'],['Andrea','Verdi'],['Paolo','Neri']),
-      M(['Marco','Rossi'],['Matteo','Conti'],['Luca','Bianchi'],['Stefano','Galli']),
-      M(['Marco','Rossi'],['Matteo','Conti'],['Andrea','Verdi'],['Paolo','Neri']),
-      M(['Luca','Bianchi'],['Stefano','Galli'],['Andrea','Verdi'],['Paolo','Neri'])
-    ],[[7,5],[6,4],[5,7],[6,6],[7,5],[4,6]]),
-    D(3,2,[
-      M(['Fabio','Costa'],['Matteo','Conti'],['Davide','Romano'],['Stefano','Galli']),
-      M(['Fabio','Costa'],['Matteo','Conti'],['Marco','Rossi'],['Paolo','Neri']),
-      M(['Fabio','Costa'],['Matteo','Conti'],['Luca','Bianchi'],['Andrea','Verdi']),
-      M(['Davide','Romano'],['Stefano','Galli'],['Marco','Rossi'],['Paolo','Neri']),
-      M(['Davide','Romano'],['Stefano','Galli'],['Luca','Bianchi'],['Andrea','Verdi']),
-      M(['Marco','Rossi'],['Paolo','Neri'],['Luca','Bianchi'],['Andrea','Verdi'])
-    ],[[4,6],[7,5],[6,6],[5,7],[6,4],[7,5]]),
-    D(4,3,[
-      M(['Fabio','Costa'],['Stefano','Galli'],['Matteo','Conti'],['Paolo','Neri']),
-      M(['Fabio','Costa'],['Stefano','Galli'],['Davide','Romano'],['Andrea','Verdi']),
-      M(['Fabio','Costa'],['Stefano','Galli'],['Marco','Rossi'],['Luca','Bianchi']),
-      M(['Matteo','Conti'],['Paolo','Neri'],['Davide','Romano'],['Andrea','Verdi']),
-      M(['Matteo','Conti'],['Paolo','Neri'],['Marco','Rossi'],['Luca','Bianchi']),
-      M(['Davide','Romano'],['Andrea','Verdi'],['Marco','Rossi'],['Luca','Bianchi'])
-    ],[[6,6],[7,5],[5,7],[6,4],[7,5],[4,6]]),
-    D(5,4,[
-      M(['Fabio','Costa'],['Paolo','Neri'],['Stefano','Galli'],['Andrea','Verdi']),
-      M(['Fabio','Costa'],['Paolo','Neri'],['Matteo','Conti'],['Luca','Bianchi']),
-      M(['Fabio','Costa'],['Paolo','Neri'],['Davide','Romano'],['Marco','Rossi']),
-      M(['Stefano','Galli'],['Andrea','Verdi'],['Matteo','Conti'],['Luca','Bianchi']),
-      M(['Stefano','Galli'],['Andrea','Verdi'],['Davide','Romano'],['Marco','Rossi']),
-      M(['Matteo','Conti'],['Luca','Bianchi'],['Davide','Romano'],['Marco','Rossi'])
-    ],[[7,5],[6,4],[5,7],[6,6],[4,6],[7,5]]),
-    D(6,5,[
-      M(['Fabio','Costa'],['Andrea','Verdi'],['Paolo','Neri'],['Luca','Bianchi']),
-      M(['Fabio','Costa'],['Andrea','Verdi'],['Stefano','Galli'],['Marco','Rossi']),
-      M(['Fabio','Costa'],['Andrea','Verdi'],['Matteo','Conti'],['Davide','Romano']),
-      M(['Paolo','Neri'],['Luca','Bianchi'],['Stefano','Galli'],['Marco','Rossi']),
-      M(['Paolo','Neri'],['Luca','Bianchi'],['Matteo','Conti'],['Davide','Romano']),
-      M(['Stefano','Galli'],['Marco','Rossi'],['Matteo','Conti'],['Davide','Romano'])
-    ],[[5,7],[6,4],[7,5],[6,6],[5,7],[6,4]])
+  const plans=[
+    {
+      pairs:[['Fabio Costa','Marco Rossi'],['Luca Bianchi','Davide Romano'],['Andrea Verdi','Matteo Conti'],['Paolo Neri','Stefano Galli']],
+      results:[[6,4],[7,5],[5,7],[6,6],[4,6],[7,5]]
+    },
+    {
+      pairs:[['Fabio Costa','Davide Romano'],['Marco Rossi','Matteo Conti'],['Luca Bianchi','Stefano Galli'],['Andrea Verdi','Paolo Neri']],
+      results:[[7,5],[6,4],[5,7],[6,6],[7,5],[4,6]]
+    },
+    {
+      pairs:[['Fabio Costa','Matteo Conti'],['Davide Romano','Stefano Galli'],['Marco Rossi','Paolo Neri'],['Luca Bianchi','Andrea Verdi']],
+      results:[[4,6],[7,5],[6,6],[5,7],[6,4],[7,5]]
+    },
+    {
+      pairs:[['Fabio Costa','Stefano Galli'],['Matteo Conti','Paolo Neri'],['Davide Romano','Andrea Verdi'],['Marco Rossi','Luca Bianchi']],
+      results:[[6,6],[7,5],[5,7],[6,4],[7,5],[4,6]]
+    },
+    {
+      pairs:[['Fabio Costa','Paolo Neri'],['Stefano Galli','Andrea Verdi'],['Matteo Conti','Luca Bianchi'],['Davide Romano','Marco Rossi']],
+      results:[[7,5],[6,4],[5,7],[6,6],[4,6],[7,5]]
+    },
+    {
+      pairs:[['Fabio Costa','Andrea Verdi'],['Paolo Neri','Luca Bianchi'],['Stefano Galli','Marco Rossi'],['Matteo Conti','Davide Romano']],
+      results:[[5,7],[6,4],[7,5],[6,6],[5,7],[6,4]]
+    }
   ];
-  const configurazione={...baseConfigurazione,rotazione:{...baseConfigurazione.rotazione,giornate}};
-  const up=await client.from('tornei').update({configurazione}).eq('id',id).select('*').limit(1).maybeSingle();
-  if(up.error){await client.from('iscrizioni').delete().eq('torneo_id',id);await client.from('tornei').delete().eq('id',id);throw up.error;}
-  const s=state();s.tornei=(s.tornei||[]).filter(t=>String(t.id)!==String(id));s.tornei.push(up.data||tr.data);s.torneoSelezionato=id;window.adminState=s;
+
+  const c=config(t);
+  c.rotazione.version=2;
+  c.rotazione.numeroGiocatori=8;
+  c.rotazione.numeroGiornate=6;
+  c.rotazione.puntiVittoria=3;
+  c.rotazione.puntiPareggio=1;
+  c.rotazione.puntiSconfitta=0;
+  c.rotazione.campoDefault=c.rotazione.campoDefault||'Campo 1';
+  c.rotazione.oraDefault=c.rotazione.oraDefault||'19:00';
+  const baseDate=new Date();
+  c.rotazione.giornate=plans.map((plan,di)=>{
+    const data=new Date(baseDate.getTime()+di*86400000).toISOString().slice(0,10);
+    const squadre=plan.pairs.map((p,i)=>({
+      id:'g'+(di+1)+'-s'+(i+1),
+      nome:'Squadra '+(i+1),
+      giocatori:p.map(idFor)
+    }));
+    const partite=[];
+    let mi=1;
+    for(let i=0;i<squadre.length;i++){
+      for(let j=i+1;j<squadre.length;j++){
+        const r=plan.results[mi-1];
+        partite.push({
+          id:'g'+(di+1)+'-m'+mi,
+          coppiaA:squadre[i].giocatori.slice(),
+          coppiaB:squadre[j].giocatori.slice(),
+          risA:String(r[0]),
+          risB:String(r[1]),
+          campo:(mi%2===1)?c.rotazione.campoDefault:'Campo 2',
+          ora:c.rotazione.oraDefault
+        });
+        mi++;
+      }
+    }
+    return {
+      numero:di+1,
+      data,
+      squadre,
+      partite,
+      riposo:[]
+    };
+  });
+
+  const saved=await save(t,c);
+  const s=state();
+  s.tornei=(s.tornei||[]).map(x=>String(x.id)===String(saved.id)?saved:x);
+  s.torneoSelezionato=saved.id;
+  window.adminState=s;
   try{localStorage.setItem('padel_admin_state',JSON.stringify(s))}catch(e){}
-  window.iscrizioniTorneo=ir.data||rows;render(up.data||tr.data,window.iscrizioniTorneo);
-  alert('Simulazione corretta: 8 giocatori, 4 coppie per giornata, 6 partite per giornata, 6 giornate e 36 partite totali con risultati inseriti.');
+  render(saved,ps);
+  alert('Simulazione completata sul torneo esistente: 6 giornate, 4 coppie, 6 partite e risultati già giocati per ogni giornata.');
 }
 async function open(){
   let t=current();if(!t){alert('Seleziona prima un torneo.');return}if(!isRotation(t))return;
