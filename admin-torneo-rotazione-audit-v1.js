@@ -30,7 +30,7 @@ function audit(){
       oraDefault:r.oraDefault??null
     },
     iscritti:{totali:iscritti.length,approvati:approvati.length},
-    calendario:{giornate:gionate.length,partite:partite.length,risultati:risultati.length,campiMancanti:campiMancanti.length,oreMancanti:oreMancanti.length},
+    calendario:{giornate:giornate.length,partite:partite.length,risultati:risultati.length,campiMancanti:campiMancanti.length,oreMancanti:oreMancanti.length},
     funzioni:{
       openGestione:typeof window.apriGestioneIndividualeCoppieVariabili==='function',
       openRotazione:typeof window.apriGestioneRotazione==='function',
