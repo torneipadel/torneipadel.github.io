@@ -167,7 +167,7 @@ function inject(){
   const sideTab=$('sideTabellone'),sideCal=$('sideCalendario');
   if(sideTab)sideTab.style.display='none';
   if(sideCal)sideCal.style.display='none';
-  root.closest('.app')?.querySelectorAll('.sidebar .nav button[data-page="iscritti"],.sidebar .nav button[data-page="partecipanti"],.sidebar .nav button[data-page="coppie"],.sidebar .nav button[data-page="dati"]').forEach(b=>b.style.display='none');
+  root.closest('.app')?.querySelectorAll('.sidebar .nav button[data-page="iscritti"],.sidebar .nav button[data-page="partecipanti"],.sidebar .nav button[data-page="coppie"],.sidebar .nav button[data-page="dati"],.mobile-nav button[data-page="iscritti"],.mobile-nav button[data-page="partecipanti"],.mobile-nav button[data-page="coppie"],.mobile-nav button[data-page="dati"]').forEach(b=>b.style.display='none');
 }
 window.apriGestioneIndividualeCoppieVariabili=open;
 window.apriGestioneRotazione=open;
