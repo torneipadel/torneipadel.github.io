@@ -2,7 +2,7 @@
 (()=>{
 'use strict';
 const FORMULE=[
- ['italiana',"🇮🇹 Torneo all'italiana"],['gironiFinale','🏆 Gironi + Fase Finale'],['eliminazione','⚔️ Eliminazione Diretta'],['svizzero','🇨🇭 Torneo Svizzero'],['americano','🎾 Americano Padel'],['mexicano','🇲🇽 Mexicano Padel'],['king','👑 King of the Court'],['short','⏱ Short Format'],['manuale','⚙️ Torneo Personalizzato']
+ ['italiana',"🇮🇹 Torneo all'italiana"],['gironiFinale','🏆 Gironi + Fase Finale'],['individualeCoppieVariabili','🏆 Torneo Individuale a Coppie Variabili'],['eliminazione','⚔️ Eliminazione Diretta'],['svizzero','🇨🇭 Torneo Svizzero'],['americano','🎾 Americano Padel'],['mexicano','🇲🇽 Mexicano Padel'],['king','👑 King of the Court'],['short','⏱ Short Format'],['manuale','⚙️ Torneo Personalizzato']
 ];
 const CONFIG={
  italiana:{title:"Torneo all'italiana",desc:'Tutti contro tutti.',fields:[['turni','Turni','number',1,20,1],['campi','Campi','number',1,20,1]]},
@@ -53,6 +53,13 @@ function historicalConfig(key,posti){
       o.turni=5;
       o.criterio='punti';
       break;
+    case 'individualeCoppieVariabili':
+      o.puntiVittoria=3;
+      o.puntiPareggio=1;
+      o.puntiSconfitta=0;
+      o.campoDefault='';
+      o.oraDefault='';
+      break;
   }
   return o;
 }
@@ -63,7 +70,7 @@ function openWizard(){if($('adminFlowV18'))$('adminFlowV18').remove();style();le
 const names=()=>{$('afCurrentName').textContent=nome.value.trim()||'Nuovo torneo';$('afTitle').textContent='🏆 '+(nome.value.trim()||'Nuovo torneo')};
 const players=()=>{const n=Number(posti.value)||0;gioc.value=n*2;$('afSquadreOut').textContent=n;$('afGiocOut').textContent=n*2};
 const show=n=>{step=Math.max(1,Math.min(7,n));names();players();steps.forEach(x=>x.classList.toggle('active',Number(x.dataset.s)===step));$('afBack').style.visibility=step===1?'hidden':'visible';$('afNext').textContent=step===7?'Crea torneo':'Avanti';if(step===5&&formula){$('afFormulaName').textContent=(FORMULE.find(x=>x[0]===formula)||[])[1]||formula;renderConfig(formula,$('afFormulaConfig'),cfg)}if(step===6){$('afSummary').innerHTML='<b>'+esc(nome.value.trim()||'Nuovo torneo')+'</b><br>Data: '+esc($('afData').value||'-')+'<br>Squadre: '+posti.value+'<br>Giocatori: '+gioc.value+'<br>Formula: '+esc((FORMULE.find(x=>x[0]===formula)||[])[1]||'nessuna')+'<br><br>Configurazione formula<br>'+Object.keys(cfg).filter(k=>k!=='formula').map(k=>esc(k)+': '+esc(cfg[k])).join('<br>')};syncMarkers(ov)};
-posti.onchange=players;nome.oninput=names;ov.querySelectorAll('[data-f]').forEach(b=>b.onclick=()=>{ov.querySelectorAll('[data-f]').forEach(x=>x.classList.remove('sel'));b.classList.add('sel');formula=b.dataset.f;cfg=historicalConfig(formula,Number(posti.value)||8);window.formulaScelta=formula;window.formulaConfig=cfg;syncMarkers(ov)});$('afBack').onclick=()=>show(step-1);$('afCancel').onclick=()=>ov.remove();$('afNext').onclick=async()=>{if(step===1&&(!nome.value.trim()||!$('afData').value)){alert('Inserisci nome e data del torneo.');return}if(step===4&&!formula){alert('Seleziona una formula.');return}if(step===5){cfg=readConfig($('afFormulaConfig'),formula);window.formulaConfig=cfg}if(step<7){show(step+1);return}$('afNext').disabled=true;$('afCreateStatus').textContent='Salvataggio in corso…';try{await create(nome.value.trim(),$('afData').value,Number(posti.value),$('afDescrizione').value.trim(),formula,cfg);ov.remove()}catch(e){$('afNext').disabled=false;$('afCreateStatus').textContent='';alert('Creazione torneo non riuscita: '+(e.message||e))}};show(1);return ov}
+posti.onchange=players;nome.oninput=names;ov.querySelectorAll('[data-f]').forEach(b=>b.onclick=()=>{ov.querySelectorAll('[data-f]').forEach(x=>x.classList.remove('sel'));b.classList.add('sel');formula=b.dataset.f;if(formula==='individualeCoppieVariabili'){const label=posti.parentElement?.querySelector('label');if(label)label.textContent='Numero giocatori';posti.innerHTML=Array.from({length:21},(_,i)=>'<option>'+String(i+4)+'</option>').join('');if(Number(posti.value)<4||Number(posti.value)>24)posti.value='8';$('afSquadreOut').textContent=posti.value;$('afGiocOut').textContent=posti.value;}else{const label=posti.parentElement?.querySelector('label');if(label)label.textContent='Numero squadre';posti.innerHTML='<option>8</option><option>12</option><option>16</option><option>20</option><option>24</option>';if(!['8','12','16','20','24'].includes(String(posti.value)))posti.value='8';players()}cfg=historicalConfig(formula,Number(posti.value)||8);window.formulaScelta=formula;window.formulaConfig=cfg;syncMarkers(ov)});$('afBack').onclick=()=>show(step-1);$('afCancel').onclick=()=>ov.remove();$('afNext').onclick=async()=>{if(step===1&&(!nome.value.trim()||!$('afData').value)){alert('Inserisci nome e data del torneo.');return}if(step===4&&!formula){alert('Seleziona una formula.');return}if(step===5){cfg=readConfig($('afFormulaConfig'),formula);window.formulaConfig=cfg}if(step<7){show(step+1);return}$('afNext').disabled=true;$('afCreateStatus').textContent='Salvataggio in corso…';try{await create(nome.value.trim(),$('afData').value,Number(posti.value),$('afDescrizione').value.trim(),formula,cfg);ov.remove()}catch(e){$('afNext').disabled=false;$('afCreateStatus').textContent='';alert('Creazione torneo non riuscita: '+(e.message||e))}};show(1);return ov}
 async function create(nome,data,posti,descrizione,formula,formulaConfig){
  const id=Date.now(),numeroGironi=Math.max(1,Math.ceil(posti/4));
  const sCamp=[formulaConfig?.sCampo1||'',formulaConfig?.sCampo2||''];
@@ -72,7 +79,7 @@ async function create(nome,data,posti,descrizione,formula,formulaConfig){
  const fTime=formulaConfig?.fOra||'';
  const formulaGironi=formula==='gironiFinale'?'gironi':(formulaConfig?.formulaGironi||'');
  const formulaFinale=formula==='gironiFinale'?(formulaConfig?.formulaFinale||'eliminazione'):(formulaConfig?.formulaFinale||'');
- const configurazione={nomeTorneo:nome,dataTorneo:data,coppie:[],partecipanti:[],sCamp,sTime,fCamp,fTime,rules:{locked:false,tipoTorneo:formula||'',formatoTorneo:formula||'',numeroSquadre:posti,numeroGiocatori:posti*2,numeroGironi,squadrePerGirone:formulaConfig?.squadrePerGirone||4,formulaGironi,formulaFinale,formulaScelta:formula||'',formulaConfig:formulaConfig||{}}};
+ const configurazione={nomeTorneo:nome,dataTorneo:data,coppie:[],partecipanti:[],sCamp,sTime,fCamp,fTime,rules:{locked:false,tipoTorneo:formula||'',formatoTorneo:formula||'',numeroSquadre:formula==='individualeCoppieVariabili'?0:posti,numeroGiocatori:formula==='individualeCoppieVariabili'?posti:posti*2,numeroGironi:formula==='individualeCoppieVariabili'?0:numeroGironi,squadrePerGirone:formulaConfig?.squadrePerGirone||4,formulaGironi,formulaFinale,formulaScelta:formula||'',formulaConfig:formulaConfig||{}}};if(formula==='individualeCoppieVariabili'){configurazione.rotazione={version:2,numeroGiocatori:posti,giornate:[],puntiVittoria:Number(formulaConfig?.puntiVittoria??3),puntiPareggio:Number(formulaConfig?.puntiPareggio??1),puntiSconfitta:Number(formulaConfig?.puntiSconfitta??0),campoDefault:formulaConfig?.campoDefault||'',oraDefault:formulaConfig?.oraDefault||''};}
  if(!window.sb)throw Error('Supabase non disponibile');
  const r=await window.sb.from('tornei').upsert({id,nome,data,data_torneo:data,posti,descrizione,formula:formula||null,stato:'bozza',pubblicato:false,iscrizioni_chiuse:false,configurazione},{onConflict:'id'});
  if(r.error)throw r.error;
