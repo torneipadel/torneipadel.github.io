@@ -170,40 +170,18 @@ async function simulate(){
     ['Marco','Rossi'],['Luca','Bianchi'],['Andrea','Verdi'],['Paolo','Neri'],
     ['Stefano','Galli'],['Matteo','Conti'],['Davide','Romano'],['Fabio','Costa']
   ];
-  const configurazione={
+  const baseConfigurazione={
     coppie:[],partecipanti:[],
     rules:{locked:true,tipoTorneo:'individualeCoppieVariabili',formulaScelta:'individualeCoppieVariabili',numeroSquadre:0,numeroGiocatori:8,numeroGironi:0},
-    rotazione:{
-      version:2,numeroGiocatori:8,puntiVittoria:3,puntiPareggio:1,puntiSconfitta:0,campoDefault:'',oraDefault:'',
-      giornate:[
-        {numero:1,data:new Date(now.getTime()).toISOString().slice(0,10),partite:[
-          {id:'g1-m1',coppiaA:['1','2'],coppiaB:['3','4'],risA:'6',risB:'4',campo:'Campo 1',ora:'19:00'},
-          {id:'g1-m2',coppiaA:['5','6'],coppiaB:['7','8'],risA:'5',risB:'7',campo:'Campo 2',ora:'19:00'}],riposo:[]},
-        {numero:2,data:new Date(now.getTime()+86400000).toISOString().slice(0,10),partite:[
-          {id:'g2-m1',coppiaA:['1','3'],coppiaB:['5','7'],risA:'7',risB:'5',campo:'Campo 1',ora:'19:00'},
-          {id:'g2-m2',coppiaA:['2','4'],coppiaB:['6','8'],risA:'6',risB:'6',campo:'Campo 2',ora:'19:00'}],riposo:[]},
-        {numero:3,data:new Date(now.getTime()+2*86400000).toISOString().slice(0,10),partite:[
-          {id:'g3-m1',coppiaA:['1','4'],coppiaB:['6','7'],risA:'4',risB:'6',campo:'Campo 1',ora:'19:00'},
-          {id:'g3-m2',coppiaA:['2','5'],coppiaB:['3','8'],risA:'7',risB:'5',campo:'Campo 2',ora:'19:00'}],riposo:[]},
-        {numero:4,data:new Date(now.getTime()+3*86400000).toISOString().slice(0,10),partite:[
-          {id:'g4-m1',coppiaA:['1','5'],coppiaB:['8','4'],risA:'6',risB:'6',campo:'Campo 1',ora:'19:00'},
-          {id:'g4-m2',coppiaA:['2','6'],coppiaB:['3','7'],risA:'6',risB:'4',campo:'Campo 2',ora:'19:00'}],riposo:[]},
-        {numero:5,data:new Date(now.getTime()+4*86400000).toISOString().slice(0,10),partite:[
-          {id:'g5-m1',coppiaA:['1','6'],coppiaB:['2','8'],risA:'7',risB:'5',campo:'Campo 1',ora:'19:00'},
-          {id:'g5-m2',coppiaA:['3','5'],coppiaB:['4','7'],risA:'6',risB:'6',campo:'Campo 2',ora:'19:00'}],riposo:[]},
-        {numero:6,data:new Date(now.getTime()+5*86400000).toISOString().slice(0,10),partite:[
-          {id:'g6-m1',coppiaA:['1','7'],coppiaB:['3','6'],risA:'5',risB:'7',campo:'Campo 1',ora:'19:00'},
-          {id:'g6-m2',coppiaA:['2','4'],coppiaB:['5','8'],risA:'6',risB:'4',campo:'Campo 2',ora:'19:00'}],riposo:[]}
-      ]
-    }
+    rotazione:{version:2,numeroGiocatori:8,puntiVittoria:3,puntiPareggio:1,puntiSconfitta:0,campoDefault:'',oraDefault:'',giornate:[]}
   };
   const tr=await client.from('tornei').insert({
     id,nome:nomeTorneo,data:now.toISOString().slice(0,10),data_torneo:now.toISOString().slice(0,10),
     descrizione:'SIMULAZIONE AUTOMATICA: 8 giocatori, 6 giornate, risultati realistici.',
-    posti:8,stato:'attivo',pubblicato:false,iscrizioni_chiuse:true,formula:'individualeCoppieVariabili',configurazione
+    posti:8,stato:'attivo',pubblicato:false,iscrizioni_chiuse:true,formula:'individualeCoppieVariabili',configurazione:baseConfigurazione
   }).select('*').single();
   if(tr.error)throw tr.error;
-  const rows=giocatori.map((p,i)=>({
+  const rows=giocatori.map(p=>({
     torneo_id:id,nome_giocatore:p[0]+' '+p[1],nome:p[0],cognome:p[1],
     stato:'approvato',approvato:true,categoria:'Individuale Coppie Variabili'
   }));
@@ -212,14 +190,35 @@ async function simulate(){
     await client.from('tornei').delete().eq('id',id);
     throw ir.error;
   }
+  const byName=Object.fromEntries((ir.data||rows).map(p=>[name(p),key(p)]));
+  const idFor=(n,c)=>byName[n+' '+c];
+  const D=(numero,offset,partite)=>({numero,data:new Date(now.getTime()+offset*86400000).toISOString().slice(0,10),partite,riposo:[]});
+  const K=(a,b)=>[idFor(a[0],a[1]),idFor(a[2],a[3])];
+  const m=(idn,a,b,ra,rb,campo,ora)=>({id:idn,coppiaA:K(a),coppiaB:K(b),risA:String(ra),risB:String(rb),campo,ora});
+  const G=(numero,offset,partite)=>D(numero,offset,partite);
+  const giornate=[
+    G(1,0,[m('g1-m1',['Marco','Rossi','Luca','Bianchi'],['Andrea','Verdi','Paolo','Neri'],6,4,'Campo 1','19:00'),m('g1-m2',['Stefano','Galli','Matteo','Conti'],['Davide','Romano','Fabio','Costa'],5,7,'Campo 2','19:00')]),
+    G(2,1,[m('g2-m1',['Marco','Rossi','Andrea','Verdi'],['Stefano','Galli','Davide','Romano'],7,5,'Campo 1','19:00'),m('g2-m2',['Luca','Bianchi','Paolo','Neri'],['Matteo','Conti','Fabio','Costa'],6,6,'Campo 2','19:00')]),
+    G(3,2,[m('g3-m1',['Marco','Rossi','Paolo','Neri'],['Matteo','Conti','Davide','Romano'],4,6,'Campo 1','19:00'),m('g3-m2',['Luca','Bianchi','Stefano','Galli'],['Andrea','Verdi','Fabio','Costa'],7,5,'Campo 2','19:00')]),
+    G(4,3,[m('g4-m1',['Marco','Rossi','Stefano','Galli'],['Fabio','Costa','Paolo','Neri'],6,6,'Campo 1','19:00'),m('g4-m2',['Luca','Bianchi','Matteo','Conti'],['Andrea','Verdi','Davide','Romano'],6,4,'Campo 2','19:00')]),
+    G(5,4,[m('g5-m1',['Marco','Rossi','Matteo','Conti'],['Luca','Bianchi','Fabio','Costa'],7,5,'Campo 1','19:00'),m('g5-m2',['Andrea','Verdi','Stefano','Galli'],['Paolo','Neri','Davide','Romano'],6,6,'Campo 2','19:00')]),
+    G(6,5,[m('g6-m1',['Marco','Rossi','Davide','Romano'],['Andrea','Verdi','Matteo','Conti'],5,7,'Campo 1','19:00'),m('g6-m2',['Luca','Bianchi','Paolo','Neri'],['Stefano','Galli','Fabio','Costa'],6,4,'Campo 2','19:00')])
+  ];
+  const configurazione={...baseConfigurazione,rotazione:{...baseConfigurazione.rotazione,giornate}};
+  const up=await client.from('tornei').update({configurazione}).eq('id',id).select('*').single();
+  if(up.error){
+    await client.from('iscrizioni').delete().eq('torneo_id',id);
+    await client.from('tornei').delete().eq('id',id);
+    throw up.error;
+  }
   const s=state();
   s.tornei=(s.tornei||[]).filter(t=>String(t.id)!==String(id));
-  s.tornei.push(tr.data);
+  s.tornei.push(up.data||tr.data);
   s.torneoSelezionato=id;
   window.adminState=s;
   try{localStorage.setItem('padel_admin_state',JSON.stringify(s))}catch(e){}
   window.iscrizioniTorneo=ir.data||rows;
-  render(tr.data,window.iscrizioniTorneo);
+  render(up.data||tr.data,window.iscrizioniTorneo);
   alert('Simulazione creata: 8 giocatori, 6 giornate, 12 partite e risultati già inseriti.');
 }
 async function open(){
