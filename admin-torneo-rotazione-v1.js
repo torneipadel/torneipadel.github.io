@@ -230,25 +230,7 @@ async function openSeparated(){const list=state().tornei||[],king=list.find(t=>S
 window.apriKingSeparato=openSeparated;
 window.apriGestioneIndividualeCoppieVariabili=open;
 window.apriGestioneRotazione=open;
-(function(){
-  const install=()=>{
-    const original=window.renderCleanAdmin;
-    if(typeof original!=='function'||original.__rotationAutoOpen)return;
-    const wrapped=function(){
-      const r=original.apply(this,arguments);
-      requestAnimationFrame(()=>{
-        const t=current();
-        if(t&&isRotation(t)&&document.getElementById('appContent')?.querySelector('.management-grid'))open();
-      });
-      return r;
-    };
-    wrapped.__rotationAutoOpen=true;
-    window.renderCleanAdmin=wrapped;
-  };
-  install();
-  window.addEventListener('admin:rendered',install);
-})();
-window.addEventListener('admin:rendered',()=>requestAnimationFrame(()=>{inject();const t=current();if(t&&isRotation(t)&&$('appContent')?.querySelector('.management-grid'))open()}));
+window.addEventListener('admin:rendered',()=>requestAnimationFrame(inject));
 window.addEventListener('admin:render',()=>requestAnimationFrame(inject));
 new MutationObserver(()=>requestAnimationFrame(inject)).observe(document.body,{childList:true,subtree:true});
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>setTimeout(inject,100));else setTimeout(inject,100);
