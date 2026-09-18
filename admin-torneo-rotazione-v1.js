@@ -135,7 +135,7 @@ function render(t,ps){
   '<div><label>Campo predefinito</label><input id="rotCampo" value="'+esc(r.campoDefault)+'"></div>'+
   '<div><label>Ora predefinita</label><input id="rotOra" type="time" value="'+esc(r.oraDefault)+'"></div>'+
   '</div><button class="btn primary" id="rotSaveRules">💾 Salva impostazioni</button></div></div>'+
-  '<div class="card"><div class="card-head"><div><h2>👥 Giocatori</h2><span class="notice">'+ps.length+' iscritti approvati</span></div><button class="btn primary" id="rotNewRound">＋ Genera nuova giornata</button></div><div class="card-body">'+
+  '<div class="card"><div class="card-head"><div><h2>👥 Giocatori</h2><span class="notice">'+ps.length+' iscritti approvati</span></div><div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn" id="rotSimulate">🧪 Crea simulazione completa</button><button class="btn primary" id="rotNewRound">＋ Genera nuova giornata</button></div></div><div class="card-body">'+
   '<div class="list">'+ps.map((p,i)=>{const s=rank.find(x=>x.id===key(p));return '<div class="list-item"><div><strong>'+esc(name(p))+'</strong><small>'+((s?.partite)||0)+' partite · '+((s?.punti)||0)+' punti · differenza '+((s?.differenza)||0)+'</small></div></div>'}).join('')+'</div></div></div>'+
   '<div class="card"><div class="card-head"><h2>📅 Calendario e giornate</h2><span class="notice">'+r.giornate.length+' giornate</span></div><div class="card-body">'+
   (r.giornate.length?r.giornate.map(g=>'<div class="card" style="margin:10px 0"><div class="card-head"><h3>Giornata '+g.numero+'</h3><span class="notice">'+esc(g.data||'-')+(g.riposo?.length?' · Riposo: '+esc(g.riposo.map(id=>pm[id]||'Giocatore').join(', ')):'')+'</span></div><div class="card-body">'+
@@ -146,9 +146,81 @@ function render(t,ps){
   '<div class="card"><div class="card-head"><h2>🔄 Controllo rotazioni</h2><span class="notice">Lo storico viene usato per evitare ripetizioni e riequilibrare le presenze.</span></div><div class="card-body"><div class="info-row"><span>Partite per giocatore</span><b>'+minPlayed+' – '+maxPlayed+'</b></div><div class="info-row"><span>Coppie già registrate</span><b>'+Object.values(h.partner).reduce((n,o)=>n+Object.values(o).reduce((a,v)=>a+v,0),0)/2+'</b></div><div class="info-row"><span>Giornate completate</span><b>'+r.giornate.filter(g=>(g.partite||[]).length&&g.partite.every(m=>m.risA!==''&&m.risB!=='')).length+' / '+r.giornate.length+'</b></div></div></div>';
   $('rotBack').onclick=()=>window.openAdminPage?.('torneo');
   $('rotSaveRules').onclick=async()=>{try{const nc=config(t);nc.rotazione.numeroGiocatori=Math.max(4,Number($('rotN').value)||ps.length);nc.rotazione.puntiVittoria=Math.max(0,Number($('rotPV').value)||0);nc.rotazione.puntiPareggio=Math.max(0,Number($('rotPP').value)||0);nc.rotazione.puntiSconfitta=Math.max(0,Number($('rotPS').value)||0);nc.rotazione.campoDefault=$('rotCampo').value.trim();nc.rotazione.oraDefault=$('rotOra').value;await save(t,nc);render(t,ps)}catch(e){alert(e.message||e)}};
+  $('rotSimulate').onclick=async()=>{try{await simulate()}catch(e){alert(e.message||e)}};
   $('rotNewRound').onclick=async()=>{try{const fresh=await players();if(Number(r.numeroGiocatori)>0&&fresh.length<Number(r.numeroGiocatori))throw Error('Servono '+r.numeroGiocatori+' giocatori approvati; al momento sono '+fresh.length+'.');const nc=generateRound(t,fresh);await save(t,nc);render(t,fresh)}catch(e){alert(e.message||e)}};
   root.querySelectorAll('[data-r]').forEach(inp=>inp.addEventListener('change',async()=>{try{const nc=config(t),g=nc.rotazione.giornate.find(x=>String(x.numero)===String(inp.dataset.r));if(!g)return;const m=g.partite[Number(inp.dataset.m)];if(!m)return;m[inp.dataset.s==='a'?'risA':'risB']=inputScore(inp.value);await save(t,nc);render(t,ps)}catch(e){alert(e.message||e)}}));
   root.querySelectorAll('[data-meta]').forEach(inp=>inp.addEventListener('change',async()=>{try{const nc=config(t),g=nc.rotazione.giornate.find(x=>String(x.numero)===String(inp.dataset.meta));if(!g)return;const m=g.partite[Number(inp.dataset.mi)];if(!m)return;m[inp.dataset.k]=inp.value;await save(t,nc)}catch(e){alert(e.message||e)}}));
+}
+async function simulate(){
+  const client=sb();
+  if(!client)throw Error('Connessione Supabase non disponibile.');
+  const nomeTorneo='TEST - Individuale Coppie Variabili - SIMULAZIONE';
+  if(!confirm('Creare una simulazione completa con 8 giocatori e 6 giornate? Il test precedente con lo stesso nome verrà sostituito.'))return;
+  const old=await client.from('tornei').select('id').eq('nome',nomeTorneo);
+  if(old.error)throw old.error;
+  for(const row of (old.data||[])){
+    const d=await client.from('iscrizioni').delete().eq('torneo_id',row.id);
+    if(d.error)throw d.error;
+    const x=await client.from('tornei').delete().eq('id',row.id);
+    if(x.error)throw x.error;
+  }
+  const now=new Date();
+  const id=Date.now();
+  const giocatori=[
+    ['Marco','Rossi'],['Luca','Bianchi'],['Andrea','Verdi'],['Paolo','Neri'],
+    ['Stefano','Galli'],['Matteo','Conti'],['Davide','Romano'],['Fabio','Costa']
+  ];
+  const configurazione={
+    coppie:[],partecipanti:[],
+    rules:{locked:true,tipoTorneo:'individualeCoppieVariabili',formulaScelta:'individualeCoppieVariabili',numeroSquadre:0,numeroGiocatori:8,numeroGironi:0},
+    rotazione:{
+      version:2,numeroGiocatori:8,puntiVittoria:3,puntiPareggio:1,puntiSconfitta:0,campoDefault:'',oraDefault:'',
+      giornate:[
+        {numero:1,data:new Date(now.getTime()).toISOString().slice(0,10),partite:[
+          {id:'g1-m1',coppiaA:['1','2'],coppiaB:['3','4'],risA:'6',risB:'4',campo:'Campo 1',ora:'19:00'},
+          {id:'g1-m2',coppiaA:['5','6'],coppiaB:['7','8'],risA:'5',risB:'7',campo:'Campo 2',ora:'19:00'}],riposo:[]},
+        {numero:2,data:new Date(now.getTime()+86400000).toISOString().slice(0,10),partite:[
+          {id:'g2-m1',coppiaA:['1','3'],coppiaB:['5','7'],risA:'7',risB:'5',campo:'Campo 1',ora:'19:00'},
+          {id:'g2-m2',coppiaA:['2','4'],coppiaB:['6','8'],risA:'6',risB:'6',campo:'Campo 2',ora:'19:00'}],riposo:[]},
+        {numero:3,data:new Date(now.getTime()+2*86400000).toISOString().slice(0,10),partite:[
+          {id:'g3-m1',coppiaA:['1','4'],coppiaB:['6','7'],risA:'4',risB:'6',campo:'Campo 1',ora:'19:00'},
+          {id:'g3-m2',coppiaA:['2','5'],coppiaB:['3','8'],risA:'7',risB:'5',campo:'Campo 2',ora:'19:00'}],riposo:[]},
+        {numero:4,data:new Date(now.getTime()+3*86400000).toISOString().slice(0,10),partite:[
+          {id:'g4-m1',coppiaA:['1','5'],coppiaB:['8','4'],risA:'6',risB:'6',campo:'Campo 1',ora:'19:00'},
+          {id:'g4-m2',coppiaA:['2','6'],coppiaB:['3','7'],risA:'6',risB:'4',campo:'Campo 2',ora:'19:00'}],riposo:[]},
+        {numero:5,data:new Date(now.getTime()+4*86400000).toISOString().slice(0,10),partite:[
+          {id:'g5-m1',coppiaA:['1','6'],coppiaB:['2','8'],risA:'7',risB:'5',campo:'Campo 1',ora:'19:00'},
+          {id:'g5-m2',coppiaA:['3','5'],coppiaB:['4','7'],risA:'6',risB:'6',campo:'Campo 2',ora:'19:00'}],riposo:[]},
+        {numero:6,data:new Date(now.getTime()+5*86400000).toISOString().slice(0,10),partite:[
+          {id:'g6-m1',coppiaA:['1','7'],coppiaB:['3','6'],risA:'5',risB:'7',campo:'Campo 1',ora:'19:00'},
+          {id:'g6-m2',coppiaA:['2','4'],coppiaB:['5','8'],risA:'6',risB:'4',campo:'Campo 2',ora:'19:00'}],riposo:[]}
+      ]
+    }
+  };
+  const tr=await client.from('tornei').insert({
+    id,nome:nomeTorneo,data:now.toISOString().slice(0,10),data_torneo:now.toISOString().slice(0,10),
+    descrizione:'SIMULAZIONE AUTOMATICA: 8 giocatori, 6 giornate, risultati realistici.',
+    posti:8,stato:'attivo',pubblicato:false,iscrizioni_chiuse:true,formula:'individualeCoppieVariabili',configurazione
+  }).select('*').single();
+  if(tr.error)throw tr.error;
+  const rows=giocatori.map((p,i)=>({
+    torneo_id:id,nome_giocatore:p[0]+' '+p[1],nome:p[0],cognome:p[1],
+    stato:'approvato',approvato:true,categoria:'Individuale Coppie Variabili'
+  }));
+  const ir=await client.from('iscrizioni').insert(rows).select('*');
+  if(ir.error){
+    await client.from('tornei').delete().eq('id',id);
+    throw ir.error;
+  }
+  const s=state();
+  s.tornei=(s.tornei||[]).filter(t=>String(t.id)!==String(id));
+  s.tornei.push(tr.data);
+  s.torneoSelezionato=id;
+  window.adminState=s;
+  try{localStorage.setItem('padel_admin_state',JSON.stringify(s))}catch(e){}
+  window.iscrizioniTorneo=ir.data||rows;
+  render(tr.data,window.iscrizioniTorneo);
+  alert('Simulazione creata: 8 giocatori, 6 giornate, 12 partite e risultati già inseriti.');
 }
 async function open(){
   const t=current();
