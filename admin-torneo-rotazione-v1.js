@@ -164,10 +164,58 @@ function render(t,ps){
   $('rotSaveRules').onclick=async()=>{try{const nc=config(t);nc.rotazione.numeroGiocatori=Math.max(4,Number($('rotN').value)||ps.length);nc.rotazione.puntiVittoria=Math.max(0,Number($('rotPV').value)||0);nc.rotazione.puntiPareggio=Math.max(0,Number($('rotPP').value)||0);nc.rotazione.puntiSconfitta=Math.max(0,Number($('rotPS').value)||0);nc.rotazione.campoDefault=$('rotCampo').value.trim();nc.rotazione.oraDefault=$('rotOra').value;nc.rotazione.calendario.attivo=$('rotCalActive').checked;nc.rotazione.calendario.giorni=[...root.querySelectorAll('.rotDay:checked')].map(x=>Number(x.value)).sort((a,b)=>a-b);nc.rotazione.calendario.ora=$('rotCalOra').value||nc.rotazione.oraDefault;nc.rotazione.calendario.orari={};root.querySelectorAll('.rotDayTime').forEach(x=>{nc.rotazione.calendario.orari[String(x.dataset.day)]=x.value||nc.rotazione.calendario.ora});const ng=$('rotNG').value;nc.rotazione.numeroGiornate=ng==='manuale'?'manuale':Number(ng);if(nc.rotazione.numeroGiornate!=='manuale'&&nc.rotazione.giornate.length>nc.rotazione.numeroGiornate)throw Error('Il torneo contiene già '+nc.rotazione.giornate.length+' giornate. Non puoi impostare un limite inferiore a quelle già create.');await save(t,nc);render(t,ps)}catch(e){alert(e.message||e)}};
   $('rotSimulate').onclick=async()=>{try{await simulate()}catch(e){alert(e.message||e)}};
   $('rotNewRound').onclick=async()=>{try{const fresh=await players(t);const limite=Number(r.numeroGiornate);if(Number.isFinite(limite)&&r.giornate.length>=limite)throw Error('Il torneo è completo: sono state raggiunte le '+limite+' giornate previste.');if(Number(r.numeroGiocatori)>0&&fresh.length<Number(r.numeroGiocatori))throw Error('Servono '+r.numeroGiocatori+' giocatori approvati; al momento sono '+fresh.length+'.');if(r.calendario.attivo&&!r.calendario.giorni.length)throw Error('Il calendario fisso è attivo ma non hai selezionato nessun giorno.');const scheduled=r.calendario.attivo?nextCalendarSlot(t):{data:new Date().toISOString().slice(0,10),ora:r.oraDefault};const nc=generateRound(t,fresh,scheduled);const saved=await save(t,nc);t=saved||t;const currentState=state();currentState.tornei=(currentState.tornei||[]).map(x=>String(x.id)===String(t.id)?t:x);currentState.torneoSelezionato=t.id;window.adminState=currentState;render(t,fresh)}catch(e){alert(e.message||e)}};
-  root.querySelectorAll('[data-r]').forEach(inp=>inp.addEventListener('change',async()=>{try{const nc=config(t),g=nc.rotazione.giornate.find(x=>String(x.numero)===String(inp.dataset.r));if(!g)return;const m=g.partite[Number(inp.dataset.m)];if(!m)return;m[inp.dataset.s==='a'?'risA':'risB']=inputScore(inp.value);await save(t,nc);render(t,ps)}catch(e){alert(e.message||e)}}));
-  root.querySelectorAll('[data-date]').forEach(inp=>inp.addEventListener('change',async()=>{try{const nc=config(t),g=nc.rotazione.giornate.find(x=>String(x.numero)===String(inp.dataset.date));if(!g)return;if(!inp.value)return;g.data=inp.value;await save(t,nc);render(t,ps)}catch(e){alert(e.message||e)}}));
-  root.querySelectorAll('[data-meta]').forEach(inp=>inp.addEventListener('change',async()=>{try{const nc=config(t),g=nc.rotazione.giornate.find(x=>String(x.numero)===String(inp.dataset.meta));if(!g)return;const m=g.partite[Number(inp.dataset.mi)];if(!m)return;m[inp.dataset.k]=inp.value;await save(t,nc)}catch(e){alert(e.message||e)}));
-  root.querySelectorAll('[data-save-pair]').forEach(btn=>btn.addEventListener('click',async()=>{try{const nc=config(t),g=nc.rotazione.giornate.find(x=>String(x.numero)===String(btn.dataset.savePair));if(!g)return;const m=g.partite[Number(btn.dataset.mi)];if(!m)return;const vals=[...btn.parentElement.querySelectorAll('[data-pair]')].map(x=>x.value);if(vals.length!==4||new Set(vals).size!==4)throw Error('Ogni giocatore può comparire una sola volta nella giornata.');m.coppiaA=vals.slice(0,2);m.coppiaB=vals.slice(2,4);await save(t,nc);render(t,ps)}catch(e){alert(e.message||e)}));
+  root.querySelectorAll('[data-r]').forEach(inp=>{
+    inp.addEventListener('change',async()=>{
+      try{
+        const nc=config(t),g=nc.rotazione.giornate.find(x=>String(x.numero)===String(inp.dataset.r));
+        if(!g)return;
+        const m=g.partite[Number(inp.dataset.m)];
+        if(!m)return;
+        m[inp.dataset.s==='a'?'risA':'risB']=inputScore(inp.value);
+        await save(t,nc);
+        render(t,ps);
+      }catch(e){alert(e.message||e)}
+    });
+  });
+  root.querySelectorAll('[data-date]').forEach(inp=>{
+    inp.addEventListener('change',async()=>{
+      try{
+        const nc=config(t),g=nc.rotazione.giornate.find(x=>String(x.numero)===String(inp.dataset.date));
+        if(!g||!inp.value)return;
+        g.data=inp.value;
+        await save(t,nc);
+        render(t,ps);
+      }catch(e){alert(e.message||e)}
+    });
+  });
+  root.querySelectorAll('[data-meta]').forEach(inp=>{
+    inp.addEventListener('change',async()=>{
+      try{
+        const nc=config(t),g=nc.rotazione.giornate.find(x=>String(x.numero)===String(inp.dataset.meta));
+        if(!g)return;
+        const m=g.partite[Number(inp.dataset.mi)];
+        if(!m)return;
+        m[inp.dataset.k]=inp.value;
+        await save(t,nc);
+      }catch(e){alert(e.message||e)}
+    });
+  });
+  root.querySelectorAll('[data-save-pair]').forEach(btn=>{
+    btn.addEventListener('click',async()=>{
+      try{
+        const nc=config(t),g=nc.rotazione.giornate.find(x=>String(x.numero)===String(btn.dataset.savePair));
+        if(!g)return;
+        const m=g.partite[Number(btn.dataset.mi)];
+        if(!m)return;
+        const vals=[...btn.parentElement.querySelectorAll('[data-pair]')].map(x=>x.value);
+        if(vals.length!==4||new Set(vals).size!==4)throw Error('Ogni giocatore può comparire una sola volta nella giornata.');
+        m.coppiaA=vals.slice(0,2);
+        m.coppiaB=vals.slice(2,4);
+        await save(t,nc);
+        render(t,ps);
+      }catch(e){alert(e.message||e)}
+    });
+  });
 }
 async function simulate(){
   const client=sb();if(!client)throw Error('Connessione Supabase non disponibile.');
