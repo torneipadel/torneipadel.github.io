@@ -185,13 +185,15 @@ async function open(){
     const client=sb();
     if(client){const fresh=await client.from('tornei').select('*').eq('id',t.id).single();if(fresh.error)throw fresh.error;if(fresh.data){t=fresh.data;const s=state();s.tornei=(s.tornei||[]).map(x=>String(x.id)===String(t.id)?t:x);window.adminState=s;try{localStorage.setItem('padel_admin_state',JSON.stringify(s))}catch(e){}}}
     const normalized=config(t);
-    if(String(t.nome||'').trim()==='TEST - Individuale Coppie Variabili - SIMULAZIONE' && normalized.rotazione.numeroGiornate==='manuale') normalized.rotazione.numeroGiornate=6;
+    const isSimulation=String(t.nome||'').trim()==='TEST - Individuale Coppie Variabili - SIMULAZIONE';
+    const simulationNeedsDayLimit=isSimulation&&normalized.rotazione.numeroGiornate==='manuale';
+    if(simulationNeedsDayLimit) normalized.rotazione.numeroGiornate=6;
     const raw=t.configurazione&&typeof t.configurazione==='object'?t.configurazione:{};
     const rawRot=raw.rotazione&&typeof raw.rotazione==='object'?raw.rotazione:{};
     const rawGames=Array.isArray(rawRot.giornate)?rawRot.giornate:[];
     const rawMissingDefaults=!rawRot.campoDefault||!rawRot.oraDefault;
     const rawMissingMeta=rawGames.some(g=>(g.partite||[]).some(m=>!m.campo||!m.ora));
-    if(rawMissingDefaults||rawMissingMeta){
+    if(rawMissingDefaults||rawMissingMeta||simulationNeedsDayLimit){
       t=await save(t,normalized);
     }
     render(t,await players(t));
