@@ -156,7 +156,7 @@ async function simulate(){
   for(const row of (old.data||[])){const d=await client.from('iscrizioni').delete().eq('torneo_id',row.id);if(d.error)throw d.error;const x=await client.from('tornei').delete().eq('id',row.id);if(x.error)throw x.error;}
   const now=new Date(),id=Date.now();
   const giocatori=[['Marco','Rossi'],['Luca','Bianchi'],['Andrea','Verdi'],['Paolo','Neri'],['Stefano','Galli'],['Matteo','Conti'],['Davide','Romano'],['Fabio','Costa']];
-  const baseConfigurazione={coppie:[],partecipanti:[],rules:{locked:true,tipoTorneo:'individualeCoppieVariabili',formulaScelta:'individualeCoppieVariabili',numeroSquadre:0,numeroGiocatori:8,numeroGironi:0},rotazione:{version:2,numeroGiocatori:8,puntiVittoria:3,puntiPareggio:1,puntiSconfitta:0,campoDefault:'Campo 1',oraDefault:'19:00',giornate:[]}};
+  const baseConfigurazione={coppie:[],partecipanti:[],rules:{locked:true,tipoTorneo:'individualeCoppieVariabili',formulaScelta:'individualeCoppieVariabili',numeroSquadre:0,numeroGiocatori:8,numeroGironi:0},rotazione:{version:2,numeroGiocatori:8,puntiVittoria:3,puntiPareggio:1,puntiSconfitta:0,campoDefault:'Campo 1',oraDefault:'19:00',numeroGiornate:6,giornate:[]}};
   const tr=await client.from('tornei').insert({id,nome:nomeTorneo,data:now.toISOString().slice(0,10),data_torneo:now.toISOString().slice(0,10),descrizione:'SIMULAZIONE AUTOMATICA: 8 giocatori, 6 giornate, risultati realistici.',posti:8,stato:'attivo',pubblicato:false,iscrizioni_chiuse:true,formula:'individualeCoppieVariabili',configurazione:baseConfigurazione}).select('*').single();
   if(tr.error)throw tr.error;
   const rows=giocatori.map(p=>({torneo_id:id,nome_giocatore:p[0]+' '+p[1],nome:p[0],cognome:p[1],stato:'approvato',approvato:true,categoria:'Individuale Coppie Variabili'}));
