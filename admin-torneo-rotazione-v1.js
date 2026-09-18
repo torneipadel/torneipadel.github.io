@@ -153,19 +153,58 @@ function generateRound(t,ps,scheduledSlot){
   const numero=c.rotazione.giornate.length+1,slot=scheduledSlot||nextCalendarSlot(t),data=slot.data,ora=slot.ora||c.rotazione.oraDefault;
   const partite=[];
   let matchNumero=1;
-  for(let i=0;i<best.length;i++){
-    for(let j=i+1;j<best.length;j++){
-      partite.push({
-        id:'g'+numero+'-m'+(matchNumero++),
-        coppiaA:best[i],
-        coppiaB:best[j],
-        risA:'',
-        risB:'',
-        campo:c.rotazione.campoDefault,
-        ora
-      });
+  const matchPairs=[];
+  if(best.length===4){
+    for(let i=0;i<best.length;i++){
+      for(let j=i+1;j<best.length;j++) matchPairs.push([i,j]);
     }
+  }else{
+    /* Con 8 coppie ogni coppia deve giocare ESATTAMENTE 3 match.
+       Generiamo le 7 giornate di un round-robin tra le 8 coppie
+       e scegliamo 3 turni, privilegiando gli avversari meno già incontrati. */
+    const indices=best.map((_,i)=>i);
+    let bestRounds=null,bestRoundScore=Infinity;
+    for(let attempt=0;attempt<300;attempt++){
+      const order=indices.slice().sort(()=>Math.random()-.5);
+      const fixed=order[0],rotating=order.slice(1),rounds=[];
+      for(let r=0;r<7;r++){
+        const arr=[fixed,...rotating];
+        const round=[];
+        for(let i=0;i<4;i++) round.push([arr[i],arr[7-i]]);
+        rounds.push(round);
+        rotating.unshift(rotating.pop());
+      }
+      const roundScore=combo=>{
+        let score=0;
+        combo.forEach(round=>{
+          round.forEach(([i,j])=>{
+            const a=best[i],b=best[j];
+            score+=(h.opp[a[0]]?.[b[0]]||0)+(h.opp[a[0]]?.[b[1]]||0)
+                  +(h.opp[a[1]]?.[b[0]]||0)+(h.opp[a[1]]?.[b[1]]||0);
+          });
+        });
+        return score;
+      };
+      for(let a=0;a<7;a++)for(let b=a+1;b<7;b++)for(let d=b+1;d<7;d++){
+        const combo=[rounds[a],rounds[b],rounds[d]];
+        const score=roundScore(combo)+Math.random()*0.01;
+        if(score<bestRoundScore){bestRoundScore=score;bestRounds=combo;}
+      }
+    }
+    if(!bestRounds)throw Error('Impossibile costruire la rotazione della giornata.');
+    bestRounds.forEach(round=>round.forEach(pair=>matchPairs.push(pair)));
   }
+  matchPairs.forEach(([i,j])=>{
+    partite.push({
+      id:'g'+numero+'-m'+(matchNumero++),
+      coppiaA:best[i],
+      coppiaB:best[j],
+      risA:'',
+      risB:'',
+      campo:c.rotazione.campoDefault,
+      ora
+    });
+  });
   const activeKeys=new Set(best.flat());
   const resting=ps.filter(p=>!activeKeys.has(key(p))).map(key);
   const squadre=best.map((pair,i)=>({id:'g'+numero+'-s'+(i+1),nome:'Squadra '+(i+1),giocatori:pair.map(String)}));
