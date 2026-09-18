@@ -226,7 +226,7 @@ function daySquads(g){
 }
 function autoDaySquads(t,ps,g){
   const c=config(t),h=history(c),all=ps.slice();
-  if(all.length!==8)throw Error('L’automatizzazione richiede esattamente 8 giocatori approvati.');
+  if(![8,16].includes(all.length))throw Error('L’automatizzazione richiede 8 oppure 16 giocatori approvati.');
   const previous=(c.rotazione.giornate||[]).filter(x=>x!==g),partner={};
   previous.forEach(day=>(day.partite||[]).forEach(m=>{[m.coppiaA||[],m.coppiaB||[]].forEach(p=>{if(p.length===2){const a=String(p[0]),b=String(p[1]);partner[a]=partner[a]||{};partner[b]=partner[b]||{};partner[a][b]=(partner[a][b]||0)+1;partner[b][a]=(partner[b][a]||0)+1;}})}));
   const ids=all.map(key);let best=null,bestScore=Infinity;
@@ -239,20 +239,36 @@ function autoDaySquads(t,ps,g){
   return best.map((p,i)=>({id:'g'+g.numero+'-s'+(i+1),nome:'Squadra '+(i+1),giocatori:p}));
 }
 function validateDaySquads(squads,ps){
-  if(!Array.isArray(squads)||squads.length!==4)throw Error('La giornata deve avere esattamente 4 squadre.');
+  const expected=Math.floor(ps.length/2);
+  if(!Array.isArray(squads)||squads.length!==expected)throw Error('La giornata deve avere esattamente '+expected+' squadre.');
   const ids=new Set(ps.map(p=>key(p)));
   const used=[];
   squads.forEach((s,i)=>{
     if(!Array.isArray(s.giocatori)||s.giocatori.length!==2)throw Error('La Squadra '+(i+1)+' deve avere esattamente 2 giocatori.');
     s.giocatori.forEach(id=>{if(!ids.has(String(id)))throw Error('Giocatore non valido nella Squadra '+(i+1)+'.');used.push(String(id))});
   });
-  if(new Set(used).size!==8)throw Error('Nella giornata ogni giocatore deve comparire una sola volta nelle 4 squadre.');
+  if(new Set(used).size!==ps.length)throw Error('Nella giornata ogni giocatore deve comparire una sola volta nelle squadre.');
 }
 function rebuildDayMatches(g,squads,c){
   const old=g.partite||[],oldByKey={};
   old.forEach(m=>{oldByKey[matchKey(m.coppiaA||[],m.coppiaB||[])]=m});
+  const pairs=[];
+  if(squads.length===4){
+    for(let i=0;i<4;i++)for(let j=i+1;j<4;j++)pairs.push([i,j]);
+  }else{
+    const base=squads.map((_,i)=>i);
+    for(let round=0;round<3;round++){
+      const arr=base.slice();
+      const fixed=arr.shift();
+      const rotating=arr.slice();
+      const ordered=[fixed,...rotating];
+      for(let i=0;i<squads.length/2;i++)pairs.push([ordered[i],ordered[squads.length-1-i]]);
+      rotating.unshift(rotating.pop());
+      base.splice(0,base.length,fixed,...rotating);
+    }
+  }
   const partite=[];let n=1;
-  for(let i=0;i<squads.length;i++)for(let j=i+1;j<squads.length;j++){
+  pairs.forEach(([i,j])=>{
     const a=squads[i].giocatori.map(String),b=squads[j].giocatori.map(String),oldMatch=oldByKey[matchKey(a,b)];
     partite.push({
       id:'g'+g.numero+'-m'+(n++),
@@ -261,7 +277,7 @@ function rebuildDayMatches(g,squads,c){
       campo:oldMatch?.campo||((n%2===0)?'Campo 1':'Campo 2'),
       ora:oldMatch?.ora||c.rotazione.oraDefault
     });
-  }
+  });
   return partite;
 }
 function inputScore(v){return v===''?'':String(Math.max(0,Number(v)||0))}
@@ -288,7 +304,7 @@ function render(t,ps){
   const archived=r.giornate.filter(g=>g!==currentDay);
   const allPlayed=rank.map(x=>x.partite),maxPlayed=allPlayed.length?Math.max(...allPlayed):0,minPlayed=allPlayed.length?Math.min(...allPlayed):0;
   const pairCount=Object.values(h.partner).reduce((n,o)=>n+Object.values(o).reduce((a,v)=>a+v,0),0)/2;
-  const dayCard=(g,open=false)=>{const squads=daySquads(g);const squadEditor='<div class="king-squads-box"><div class="king-squads-head"><div><strong>👥 Squadre della giornata</strong><small>4 squadre · 2 giocatori per squadra · ogni giocatore una sola volta</small></div><button class="btn" data-auto-squads="'+g.numero+'">🤖 Automatizza squadre</button><button class="btn" data-save-squads="'+g.numero+'">💾 Salva squadre</button></div><div class="king-squads-grid">'+squads.map((s,si)=>'<div class="king-squad"><strong>Squadra '+(si+1)+'</strong><select data-squad="'+g.numero+'" data-si="'+si+'" data-pi="0">'+ps.map(p=>'<option value="'+esc(key(p))+'" '+(String(s.giocatori[0])===String(key(p))?'selected':'')+'>'+esc(name(p))+'</option>').join('')+'</select><select data-squad="'+g.numero+'" data-si="'+si+'" data-pi="1">'+ps.map(p=>'<option value="'+esc(key(p))+'" '+(String(s.giocatori[1])===String(key(p))?'selected':'')+'>'+esc(name(p))+'</option>').join('')+'</select></div>').join('')+'</div></div>';return '<details class="card king-day-card" style="margin:10px 0" '+(open?'open':'')+'><summary class="king-day-summary"><span>▼ Giornata '+g.numero+' — '+esc(g.data||'Data non impostata')+'</span><span class="notice">'+esc((g.partite||[]).length+' partite · '+squads.length+' squadre')+'</span></summary><div class="card-body"><div class="king-day-meta"><label>Data <input data-date="'+g.numero+'" type="date" value="'+esc(g.data||'')+'"></label><span class="notice">'+esc(g.riposo?.length?'Riposo: '+g.riposo.map(id=>pm[id]||'Giocatore').join(', '):'Nessun riposo')+'</span></div>'+squadEditor+(g.partite||[]).map((m,i)=>'<div class="list-item king-match"><div class="king-match-main"><strong>'+esc((m.coppiaA||[]).map(id=>pm[id]||'Giocatore').join(' / '))+' <span>VS</span> '+esc((m.coppiaB||[]).map(id=>pm[id]||'Giocatore').join(' / '))+'</strong><small>Campo <input data-meta="'+g.numero+'" data-mi="'+i+'" data-k="campo" value="'+esc(m.campo||'')+'" class="king-small-input"> · Ora <input data-meta="'+g.numero+'" data-mi="'+i+'" data-k="ora" type="time" value="'+esc(m.ora||'')+'" class="king-time-input"></small></div><div class="list-actions king-score"><input data-r="'+g.numero+'" data-m="'+i+'" data-s="a" type="number" min="0" value="'+esc(m.risA)+'" placeholder="0"><span>—</span><input data-r="'+g.numero+'" data-m="'+i+'" data-s="b" type="number" min="0" value="'+esc(m.risB)+'" placeholder="0"></div></div>').join('')+'</div></details>'}
+  const dayCard=(g,open=false)=>{const squads=daySquads(g);const squadEditor='<div class="king-squads-box"><div class="king-squads-head"><div><strong>👥 Squadre della giornata</strong><small>${squads.length} squadre · 2 giocatori per squadra · ogni giocatore una sola volta</small></div><button class="btn" data-auto-squads="'+g.numero+'">🤖 Automatizza squadre</button><button class="btn" data-save-squads="'+g.numero+'">💾 Salva squadre</button></div><div class="king-squads-grid">'+squads.map((s,si)=>'<div class="king-squad"><strong>Squadra '+(si+1)+'</strong><select data-squad="'+g.numero+'" data-si="'+si+'" data-pi="0">'+ps.map(p=>'<option value="'+esc(key(p))+'" '+(String(s.giocatori[0])===String(key(p))?'selected':'')+'>'+esc(name(p))+'</option>').join('')+'</select><select data-squad="'+g.numero+'" data-si="'+si+'" data-pi="1">'+ps.map(p=>'<option value="'+esc(key(p))+'" '+(String(s.giocatori[1])===String(key(p))?'selected':'')+'>'+esc(name(p))+'</option>').join('')+'</select></div>').join('')+'</div></div>';return '<details class="card king-day-card" style="margin:10px 0" '+(open?'open':'')+'><summary class="king-day-summary"><span>▼ Giornata '+g.numero+' — '+esc(g.data||'Data non impostata')+'</span><span class="notice">'+esc((g.partite||[]).length+' partite · '+squads.length+' squadre')+'</span></summary><div class="card-body"><div class="king-day-meta"><label>Data <input data-date="'+g.numero+'" type="date" value="'+esc(g.data||'')+'"></label><span class="notice">'+esc(g.riposo?.length?'Riposo: '+g.riposo.map(id=>pm[id]||'Giocatore').join(', '):'Nessun riposo')+'</span></div>'+squadEditor+(g.partite||[]).map((m,i)=>'<div class="list-item king-match"><div class="king-match-main"><strong>'+esc((m.coppiaA||[]).map(id=>pm[id]||'Giocatore').join(' / '))+' <span>VS</span> '+esc((m.coppiaB||[]).map(id=>pm[id]||'Giocatore').join(' / '))+'</strong><small>Campo <input data-meta="'+g.numero+'" data-mi="'+i+'" data-k="campo" value="'+esc(m.campo||'')+'" class="king-small-input"> · Ora <input data-meta="'+g.numero+'" data-mi="'+i+'" data-k="ora" type="time" value="'+esc(m.ora||'')+'" class="king-time-input"></small></div><div class="list-actions king-score"><input data-r="'+g.numero+'" data-m="'+i+'" data-s="a" type="number" min="0" value="'+esc(m.risA)+'" placeholder="0"><span>—</span><input data-r="'+g.numero+'" data-m="'+i+'" data-s="b" type="number" min="0" value="'+esc(m.risB)+'" placeholder="0"></div></div>').join('')+'</div></details>'}
 
   root.innerHTML=`<style id="kingLayoutStyle">  .king-shell{display:block;position:relative;isolation:isolate;z-index:1;width:100%;max-width:1180px;margin:0 auto;box-sizing:border-box;color:#17202a}.king-shell *{box-sizing:border-box}.king-hero{position:relative;z-index:1}  .king-hero{display:flex;align-items:center;justify-content:space-between;gap:18px;padding:22px 24px;margin-bottom:18px;border-radius:18px;background:rgba(17,24,39,.15);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);border:1px solid rgba(255,255,255,.4);box-shadow:none;color:#e5e7eb}.king-hero *{color:inherit}.king-hero h1{color:#101828}.king-hero p{color:#475569}.king-kicker{color:#fff !important}  .king-kicker{font-size:12px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;opacity:.6;margin-bottom:5px}  .king-hero h1{margin:0;font-size:25px;line-height:1.2}  .king-hero p{margin:7px 0 0;opacity:.7}  .king-actions{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end;position:relative;z-index:2}.king-actions .btn{position:relative;z-index:2}  .king-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(320px,360px);column-gap:28px;row-gap:28px;align-items:start;position:relative;z-index:1;width:100%}  .king-main,.king-side{display:grid;gap:24px;min-width:0;width:100%;align-content:start}.king-main>.card,.king-side>.card{position:relative;z-index:1;min-width:0;width:100%;}  .king-card-head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:18px 20px;border-bottom:1px solid rgba(30,41,59,.08)}  .king-card-head h2{margin:0;font-size:17px}  .king-card-head p{margin:4px 0 0;font-size:12px;opacity:.65}  .king-config-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}  .king-config-grid label{display:flex;flex-direction:column;gap:6px;font-size:12px;font-weight:700}  .king-config-grid input,.king-config-grid select{width:100%;box-sizing:border-box}  .king-actions-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}  .king-stat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}  .king-stat{padding:13px;border-radius:12px;background:rgba(15,23,42,.035);border:1px solid rgba(30,41,59,.06)}  .king-stat span{display:block;font-size:11px;opacity:.6}.king-stat b{display:block;font-size:20px;margin-top:3px}  .king-ranking-wrap{width:100%;overflow-x:auto}
   .king-ranking{width:100%;min-width:760px;border-collapse:collapse;table-layout:fixed;font-size:13px}
