@@ -182,7 +182,7 @@ function inject(){
 }
 window.apriGestioneIndividualeCoppieVariabili=open;
 window.apriGestioneRotazione=open;
-window.addEventListener('admin:rendered',()=>requestAnimationFrame(inject));
+window.addEventListener('admin:rendered',()=>requestAnimationFrame(()=>{inject();const t=current();if(t&&isRotation(t)&&$('appContent')?.querySelector('.management-grid'))open()}));
 window.addEventListener('admin:render',()=>requestAnimationFrame(inject));
 new MutationObserver(()=>requestAnimationFrame(inject)).observe(document.body,{childList:true,subtree:true});
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>setTimeout(inject,100));else setTimeout(inject,100);
