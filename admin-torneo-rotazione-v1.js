@@ -203,7 +203,7 @@ function inject(){
     const b=document.createElement('button');b.type='button';b.className='btn action-tile';b.id='adminRotationAction';b.innerHTML='🏆 <strong>Gestione torneo</strong><span>Giocatori · Giornate · Calendario · Risultati · Classifica</span>';b.onclick=null;b.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();open()});grid.insertBefore(b,grid.firstChild);
   }
   if(grid&&!root.querySelector('#adminRotationSimulation')){
-    const s=document.createElement('button');s.type='button';s.className='btn action-tile';s.id='adminRotationSimulation';s.innerHTML='🧪 <strong>Crea simulazione completa</strong><span>8 giocatori · 6 giornate · 12 risultati</span>';s.onclick=null;s.addEventListener('click',async e=>{e.preventDefault();e.stopPropagation();try{await simulate()}catch(e){alert(e.message||e)}});grid.insertBefore(s,grid.firstChild);
+    const s=document.createElement('button');s.type='button';s.className='btn action-tile';s.id='adminRotationSimulation';s.innerHTML='🧪 <strong>Crea simulazione completa</strong><span>8 giocatori · 6 giornate · 12 risultati</span>';s.addEventListener('click',async e=>{e.preventDefault();e.stopPropagation();if(s.dataset.busy==='1')return;s.dataset.busy='1';s.disabled=true;try{await simulate()}catch(e){alert(e.message||e)}finally{s.dataset.busy='0';s.disabled=false}});grid.insertBefore(s,grid.firstChild);
   }
   const sideTab=$('sideTabellone'),sideCal=$('sideCalendario');if(sideTab)sideTab.style.display='none';if(sideCal)sideCal.style.display='none';
   root.closest('.app')?.querySelectorAll('.sidebar .nav button[data-page="coppie"],.sidebar .nav button[data-page="dati"],.mobile-nav button[data-page="coppie"],.mobile-nav button[data-page="dati"]').forEach(b=>b.style.display='none');
