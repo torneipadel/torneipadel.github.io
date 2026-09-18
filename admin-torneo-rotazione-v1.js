@@ -83,14 +83,14 @@ function render(t,ps){
 async function open(){
   const t=current(); if(!t){alert('Seleziona prima un torneo');return}
   const formula=String(t.formula||t.configurazione?.rules?.formulaScelta||t.configurazione?.rules?.tipoTorneo||'').toLowerCase();
-  if(!['americano','rotazione'].includes(formula)){alert('La gestione a rotazione è disponibile per i tornei con formula Americano Padel.');return}
+  if(!['rotazione','rotazione'].includes(formula)){alert('La gestione a rotazione è disponibile per i tornei con formula A rotazione.');return}
   try{render(t,await players())}catch(e){alert(e.message||e)}
 }
 function inject(){
   const root=$('appContent'); if(!root)return;
   const t=current(); if(!t)return;
   const formula=String(t.formula||t.configurazione?.rules?.formulaScelta||t.configurazione?.rules?.tipoTorneo||'').toLowerCase();
-  if(!['americano','rotazione'].includes(formula))return;
+  if(!['rotazione','rotazione'].includes(formula))return;
   if(root.querySelector('#adminRotationAction'))return;
   const grid=root.querySelector('.management-grid .action-grid'); if(!grid)return;
   const b=document.createElement('button');b.type='button';b.className='btn action-tile';b.id='adminRotationAction';b.innerHTML='🔄 <strong>Gestione rotazione</strong><span>Giornate, coppie variabili e classifica individuale</span>';b.onclick=open;grid.insertBefore(b,grid.querySelector('#pairs')||null);
