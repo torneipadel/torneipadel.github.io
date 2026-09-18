@@ -260,7 +260,7 @@ async function simulate(){
   if(String(t.nome||'').trim()!=='TEST - Individuale Coppie Variabili - SIMULAZIONE')throw Error('Questa simulazione deve essere eseguita sul torneo TEST - Individuale Coppie Variabili - SIMULAZIONE.');
   const ps=await players(t);
   if(ps.length!==8)throw Error('La simulazione richiede esattamente 8 giocatori approvati; al momento sono '+ps.length+'.');
-  if(!confirm('Generare sul torneo già esistente 6 giornate complete, con 4 coppie, 6 partite e risultati già giocati per ogni giornata?'))return;
+  if(!confirm('Ripristinare sul torneo già esistente 12 giornate complete, con 4 coppie, 6 partite e 3 partite per ogni giocatore in ogni giornata?'))return;
 
   const byName=Object.fromEntries(ps.map(p=>[name(p),key(p)]));
   const required=['Marco Rossi','Luca Bianchi','Andrea Verdi','Paolo Neri','Stefano Galli','Matteo Conti','Davide Romano','Fabio Costa'];
@@ -269,54 +269,36 @@ async function simulate(){
 
   const idFor=n=>byName[n];
   const pair=(a,b)=>[idFor(a),idFor(b)];
-  const match=(a,b,c,d,ra,rb,campo,ora,numero,mi)=>({
-    id:'g'+numero+'-m'+mi,
-    coppiaA:pair(a,b),
-    coppiaB:pair(c,d),
-    risA:String(ra),
-    risB:String(rb),
-    campo:campo||'Campo 1',
-    ora:ora||'19:00'
-  });
   const plans=[
-    {
-      pairs:[['Fabio Costa','Marco Rossi'],['Luca Bianchi','Davide Romano'],['Andrea Verdi','Matteo Conti'],['Paolo Neri','Stefano Galli']],
-      results:[[6,4],[7,5],[5,7],[6,6],[4,6],[7,5]]
-    },
-    {
-      pairs:[['Fabio Costa','Davide Romano'],['Marco Rossi','Matteo Conti'],['Luca Bianchi','Stefano Galli'],['Andrea Verdi','Paolo Neri']],
-      results:[[7,5],[6,4],[5,7],[6,6],[7,5],[4,6]]
-    },
-    {
-      pairs:[['Fabio Costa','Matteo Conti'],['Davide Romano','Stefano Galli'],['Marco Rossi','Paolo Neri'],['Luca Bianchi','Andrea Verdi']],
-      results:[[4,6],[7,5],[6,6],[5,7],[6,4],[7,5]]
-    },
-    {
-      pairs:[['Fabio Costa','Stefano Galli'],['Matteo Conti','Paolo Neri'],['Davide Romano','Andrea Verdi'],['Marco Rossi','Luca Bianchi']],
-      results:[[6,6],[7,5],[5,7],[6,4],[7,5],[4,6]]
-    },
-    {
-      pairs:[['Fabio Costa','Paolo Neri'],['Stefano Galli','Andrea Verdi'],['Matteo Conti','Luca Bianchi'],['Davide Romano','Marco Rossi']],
-      results:[[7,5],[6,4],[5,7],[6,6],[4,6],[7,5]]
-    },
-    {
-      pairs:[['Fabio Costa','Andrea Verdi'],['Paolo Neri','Luca Bianchi'],['Stefano Galli','Marco Rossi'],['Matteo Conti','Davide Romano']],
-      results:[[5,7],[6,4],[7,5],[6,6],[5,7],[6,4]]
-    }
+    {pairs:[['Fabio Costa','Marco Rossi'],['Luca Bianchi','Davide Romano'],['Andrea Verdi','Matteo Conti'],['Paolo Neri','Stefano Galli']],results:[[6,4],[7,5],[5,7],[6,6],[4,6],[7,5]]},
+    {pairs:[['Fabio Costa','Davide Romano'],['Marco Rossi','Matteo Conti'],['Luca Bianchi','Stefano Galli'],['Andrea Verdi','Paolo Neri']],results:[[7,5],[6,4],[5,7],[6,6],[7,5],[4,6]]},
+    {pairs:[['Fabio Costa','Matteo Conti'],['Davide Romano','Stefano Galli'],['Marco Rossi','Paolo Neri'],['Luca Bianchi','Andrea Verdi']],results:[[4,6],[7,5],[6,6],[5,7],[6,4],[7,5]]},
+    {pairs:[['Fabio Costa','Stefano Galli'],['Matteo Conti','Paolo Neri'],['Davide Romano','Andrea Verdi'],['Marco Rossi','Luca Bianchi']],results:[[6,6],[7,5],[5,7],[6,4],[7,5],[4,6]]},
+    {pairs:[['Fabio Costa','Paolo Neri'],['Stefano Galli','Andrea Verdi'],['Matteo Conti','Luca Bianchi'],['Davide Romano','Marco Rossi']],results:[[7,5],[6,4],[5,7],[6,6],[4,6],[7,5]]},
+    {pairs:[['Fabio Costa','Andrea Verdi'],['Paolo Neri','Luca Bianchi'],['Stefano Galli','Marco Rossi'],['Matteo Conti','Davide Romano']],results:[[5,7],[6,4],[7,5],[6,6],[5,7],[6,4]]},
+    {pairs:[['Marco Rossi','Fabio Costa'],['Davide Romano','Luca Bianchi'],['Matteo Conti','Andrea Verdi'],['Stefano Galli','Paolo Neri']],results:[[7,5],[5,7],[6,4],[6,6],[7,5],[4,6]]},
+    {pairs:[['Davide Romano','Fabio Costa'],['Matteo Conti','Marco Rossi'],['Stefano Galli','Luca Bianchi'],['Paolo Neri','Andrea Verdi']],results:[[6,4],[7,5],[4,6],[7,7],[5,7],[6,4]]},
+    {pairs:[['Matteo Conti','Fabio Costa'],['Stefano Galli','Davide Romano'],['Paolo Neri','Marco Rossi'],['Andrea Verdi','Luca Bianchi']],results:[[5,7],[6,4],[7,5],[6,6],[4,6],[7,5]]},
+    {pairs:[['Stefano Galli','Fabio Costa'],['Paolo Neri','Matteo Conti'],['Andrea Verdi','Davide Romano'],['Luca Bianchi','Marco Rossi']],results:[[6,5],[5,7],[6,6],[7,5],[4,6],[6,4]]},
+    {pairs:[['Paolo Neri','Fabio Costa'],['Andrea Verdi','Stefano Galli'],['Luca Bianchi','Matteo Conti'],['Marco Rossi','Davide Romano']],results:[[7,5],[6,4],[5,7],[6,6],[7,5],[4,6]]},
+    {pairs:[['Andrea Verdi','Fabio Costa'],['Luca Bianchi','Paolo Neri'],['Marco Rossi','Stefano Galli'],['Davide Romano','Matteo Conti']],results:[[4,6],[7,5],[6,6],[5,7],[6,4],[7,5]]}
   ];
 
   const c=config(t);
   c.rotazione.version=2;
   c.rotazione.numeroGiocatori=8;
-  c.rotazione.numeroGiornate=6;
+  c.rotazione.numeroGiornate=12;
   c.rotazione.puntiVittoria=3;
   c.rotazione.puntiPareggio=1;
   c.rotazione.puntiSconfitta=0;
   c.rotazione.campoDefault=c.rotazione.campoDefault||'Campo 1';
   c.rotazione.oraDefault=c.rotazione.oraDefault||'19:00';
+
   const baseDate=new Date();
+  baseDate.setHours(0,0,0,0);
+
   c.rotazione.giornate=plans.map((plan,di)=>{
-    const data=new Date(baseDate.getTime()+di*86400000).toISOString().slice(0,10);
+    const data=new Date(baseDate.getTime()+di*7*86400000).toISOString().slice(0,10);
     const squadre=plan.pairs.map((p,i)=>({
       id:'g'+(di+1)+'-s'+(i+1),
       nome:'Squadra '+(i+1),
@@ -339,13 +321,7 @@ async function simulate(){
         mi++;
       }
     }
-    return {
-      numero:di+1,
-      data,
-      squadre,
-      partite,
-      riposo:[]
-    };
+    return {numero:di+1,data,squadre,partite,riposo:[]};
   });
 
   const saved=await save(t,c);
@@ -355,7 +331,7 @@ async function simulate(){
   window.adminState=s;
   try{localStorage.setItem('padel_admin_state',JSON.stringify(s))}catch(e){}
   render(saved,ps);
-  alert('Simulazione completata sul torneo esistente: 6 giornate, 4 coppie, 6 partite e risultati già giocati per ogni giornata.');
+  alert('Simulazione completata sul torneo esistente: 12 giornate, 4 coppie, 6 partite per giornata, 3 partite per ogni giocatore per giornata, 72 partite complessive.');
 }
 async function open(){
   let t=current();if(!t){alert('Seleziona prima un torneo.');return}if(!isRotation(t))return;
