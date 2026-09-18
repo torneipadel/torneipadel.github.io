@@ -172,10 +172,10 @@ function inject(){
   const root=$('appContent'),t=current();if(!root||!t||!isRotation(t))return;
   const grid=root.querySelector('.management-grid .action-grid');if(grid&&!root.querySelector('#adminRotationAction')){
     const classic=[...grid.querySelectorAll('button')];classic.forEach(b=>{if(!b.id||!['publish','closeReg'].includes(b.id))b.style.display='none'});
-    const b=document.createElement('button');b.type='button';b.className='btn action-tile';b.id='adminRotationAction';b.innerHTML='🏆 <strong>Gestione torneo</strong><span>Giocatori · Giornate · Calendario · Risultati · Classifica</span>';b.onclick=open;grid.insertBefore(b,grid.firstChild);
+    const b=document.createElement('button');b.type='button';b.className='btn action-tile';b.id='adminRotationAction';b.innerHTML='🏆 <strong>Gestione torneo</strong><span>Giocatori · Giornate · Calendario · Risultati · Classifica</span>';b.onclick=null;b.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();open()});grid.insertBefore(b,grid.firstChild);
   }
   if(grid&&!root.querySelector('#adminRotationSimulation')){
-    const s=document.createElement('button');s.type='button';s.className='btn action-tile';s.id='adminRotationSimulation';s.innerHTML='🧪 <strong>Crea simulazione completa</strong><span>8 giocatori · 6 giornate · 12 risultati</span>';s.onclick=async()=>{try{await simulate()}catch(e){alert(e.message||e)}};grid.insertBefore(s,grid.firstChild);
+    const s=document.createElement('button');s.type='button';s.className='btn action-tile';s.id='adminRotationSimulation';s.innerHTML='🧪 <strong>Crea simulazione completa</strong><span>8 giocatori · 6 giornate · 12 risultati</span>';s.onclick=null;s.addEventListener('click',async e=>{e.preventDefault();e.stopPropagation();try{await simulate()}catch(e){alert(e.message||e)}});grid.insertBefore(s,grid.firstChild);
   }
   const sideTab=$('sideTabellone'),sideCal=$('sideCalendario');if(sideTab)sideTab.style.display='none';if(sideCal)sideCal.style.display='none';
   root.closest('.app')?.querySelectorAll('.sidebar .nav button[data-page="coppie"],.sidebar .nav button[data-page="dati"],.mobile-nav button[data-page="coppie"],.mobile-nav button[data-page="dati"]').forEach(b=>b.style.display='none');
