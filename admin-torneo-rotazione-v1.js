@@ -215,7 +215,7 @@ async function open(){
   let t=current();if(!t){alert('Seleziona prima un torneo.');return}if(!isRotation(t))return;
   try{
     const client=sb();
-    if(client){const fresh=await client.from('tornei').select('*').eq('id',t.id).single();if(fresh.error)throw fresh.error;if(fresh.data){t=fresh.data;const s=state();s.tornei=(s.tornei||[]).map(x=>String(x.id)===String(t.id)?t:x);window.adminState=s;try{localStorage.setItem('padel_admin_state',JSON.stringify(s))}catch(e){}}}
+    if(client){const fresh=await client.from('tornei').select('*').eq('id',t.id).limit(1).maybeSingle();if(fresh.error)throw fresh.error;if(fresh.data){t=fresh.data;const s=state();s.tornei=(s.tornei||[]).map(x=>String(x.id)===String(t.id)?t:x);window.adminState=s;try{localStorage.setItem('padel_admin_state',JSON.stringify(s))}catch(e){}}}
     const normalized=config(t);
     const isSimulation=String(t.nome||'').trim()==='TEST - Individuale Coppie Variabili - SIMULAZIONE';
     const simulationNeedsDayLimit=isSimulation&&normalized.rotazione.numeroGiornate==='manuale';
