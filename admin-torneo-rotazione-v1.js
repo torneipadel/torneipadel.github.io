@@ -159,11 +159,15 @@ async function open(){
 function inject(){
   const root=$('appContent'),t=current();
   if(!root||!t||!isRotation(t))return;
-  const grid=root.querySelector('.management-grid .action-grid');if(!grid)return;
-  if(root.querySelector('#adminRotationAction'))return;
-  const classic=[...grid.querySelectorAll('button')];
-  classic.forEach(b=>{if(!b.id||!['publish','closeReg'].includes(b.id))b.style.display='none'});
-  const b=document.createElement('button');b.type='button';b.className='btn action-tile';b.id='adminRotationAction';b.innerHTML='🏆 <strong>Gestione torneo</strong><span>Giocatori · Giornate · Calendario · Risultati · Classifica</span>';b.onclick=open;grid.insertBefore(b,grid.firstChild);
+  const grid=root.querySelector('.management-grid .action-grid');if(grid&&!root.querySelector('#adminRotationAction')){
+    const classic=[...grid.querySelectorAll('button')];
+    classic.forEach(b=>{if(!b.id||!['publish','closeReg'].includes(b.id))b.style.display='none'});
+    const b=document.createElement('button');b.type='button';b.className='btn action-tile';b.id='adminRotationAction';b.innerHTML='🏆 <strong>Gestione torneo</strong><span>Giocatori · Giornate · Calendario · Risultati · Classifica</span>';b.onclick=open;grid.insertBefore(b,grid.firstChild);
+  }
+  const sideTab=$('sideTabellone'),sideCal=$('sideCalendario');
+  if(sideTab)sideTab.style.display='none';
+  if(sideCal)sideCal.style.display='none';
+  root.closest('.app')?.querySelectorAll('.sidebar .nav button[data-page="iscritti"],.sidebar .nav button[data-page="partecipanti"],.sidebar .nav button[data-page="coppie"],.sidebar .nav button[data-page="dati"]').forEach(b=>b.style.display='none');
 }
 window.apriGestioneIndividualeCoppieVariabili=open;
 window.apriGestioneRotazione=open;
