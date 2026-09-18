@@ -226,6 +226,8 @@ function inject(){
   const sideTab=$('sideTabellone'),sideCal=$('sideCalendario');if(sideTab)sideTab.style.display='none';if(sideCal)sideCal.style.display='none';
   root.closest('.app')?.querySelectorAll('.sidebar .nav button[data-page="coppie"],.sidebar .nav button[data-page="dati"],.mobile-nav button[data-page="coppie"],.mobile-nav button[data-page="dati"]').forEach(b=>b.style.display='none');
 }
+async function openSeparated(){const list=state().tornei||[],king=list.find(t=>String(t?.formula||t?.configurazione?.rules?.formulaScelta||'')==='individualeCoppieVariabili');if(!king){alert('Non esiste ancora un King Torneo Individuale a Coppie Variabili.');return}const st=state();st.torneoSelezionato=king.id;window.adminState=st;try{localStorage.setItem('padel_admin_state',JSON.stringify(st))}catch(e){}await open()}
+window.apriKingSeparato=openSeparated;
 window.apriGestioneIndividualeCoppieVariabili=open;
 window.apriGestioneRotazione=open;
 (function(){
