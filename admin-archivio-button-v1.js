@@ -77,7 +77,7 @@
     if (!panel) {
       panel = document.createElement('div');
       panel.id = 'adminArchivePanelV1';
-      panel.style.cssText = 'position:fixed;top:76px;right:18px;z-index:10000;display:none;width:min(760px,calc(100vw - 36px));max-height:82vh;overflow:auto;background:rgba(15,23,42,.98);border:1px solid rgba(255,255,255,.18);border-radius:14px;padding:16px;color:#fff;box-shadow:0 18px 50px rgba(0,0,0,.38)';
+      panel.style.cssText = 'position:fixed;top:76px;right:18px;z-index:10000;display:none;width:min(760px,calc(100vw - 36px));max-height:82vh;overflow:auto;scrollbar-width:none;-ms-overflow-style:none;background:rgba(15,23,42,.98);border:1px solid rgba(255,255,255,.18);border-radius:14px;padding:16px;color:#fff;box-shadow:0 18px 50px rgba(0,0,0,.38)';
       document.body.appendChild(panel);
     }
     return panel;
