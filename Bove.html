@@ -1421,7 +1421,7 @@ style="width:80px">
     </button>
 
 
-    <button onclick="window.print()">
+    <button onclick="stampaTabellone()">
         🖨️ Stampa
     </button>
 
@@ -10126,6 +10126,20 @@ function aggiornaDescrizioneTipoTorneo(){
 
 
 }
+function stampaTabellone(){
+
+    chiudiMenu();
+
+    setTimeout(()=>{
+
+        window.print();
+
+    },100);
+
+}
+
+
+
 function toggleMenu(){
 
     let menu = document.getElementById("menuComandi");
