@@ -6,7 +6,7 @@
 'use strict';
 const $=id=>document.getElementById(id);
 const state=()=>window.adminState||{};
-const current=()=> (state().tornei||[]).find(t=>String(t.id)===String(state().torneoSelezionato))||null;
+const current()=> (state().tornei||[]).find(t=>String(t.id)===String(state().torneoSelezionato))||null;
 const sb=()=>window.supabaseClient||window.sb;
 const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const approved=g=>g?.stato==='approvato'||g?.approvato===true;
@@ -77,47 +77,30 @@ function generateRound(t,ps){
   if(ps.length<4)throw Error('Servono almeno 4 giocatori approvati.');
   const c=config(t),h=history(c),rank=standings(t,ps);
   const played=Object.fromEntries(rank.map(x=>[x.id,x.partite]));
-  const matches=Math.floor(ps.length/4);
-  const activeCount=matches*4;
+  const matches=Math.floor(ps.length/4),activeCount=matches*4;
   let best=null,bestScore=Infinity;
   for(let attempt=0;attempt<700;attempt++){
     const shuffled=ps.slice().sort((a,b)=>(played[key(a)]-played[key(b)])+(Math.random()-.5)*0.9);
-    const active=shuffled.slice(0,activeCount);
-    let score=0;
-    const groups=[];
+    const active=shuffled.slice(0,activeCount);let score=0;const groups=[];
     for(let i=0;i<active.length;i+=4){
-      const g=active.slice(i,i+4).map(key);
-      const variants=[
-        [[g[0],g[1]],[g[2],g[3]]],
-        [[g[0],g[2]],[g[1],g[3]]],
-        [[g[0],g[3]],[g[1],g[2]]]
-      ];
+      const g=active.slice(i,i+4).map(key),variants=[[[g[0],g[1]],[g[2],g[3]]],[[g[0],g[2]],[g[1],g[3]]],[[g[0],g[3]],[g[1],g[2]]]];
       let localBest=null,localScore=Infinity;
       variants.forEach(v=>{
         const [A,B]=v;
-        const partnerPenalty=A.concat(B).reduce((s,x,j,arr)=>{
-          const y=arr[j%2===0?j+1:j-1];return s+(h.partner[x]?.[y]||0)*140
-        },0);
+        const partnerPenalty=A.concat(B).reduce((s,x,j,arr)=>{const y=arr[j%2===0?j+1:j-1];return s+(h.partner[x]?.[y]||0)*140},0);
         const opponentPenalty=A.reduce((s,x)=>s+B.reduce((z,y)=>z+(h.opp[x]?.[y]||0)*35,0),0);
-        const groupKey=[...g].sort().join('|');
-        const groupPenalty=(h.groups[groupKey]||0)*20;
-        const vscore=partnerPenalty+opponentPenalty+groupPenalty;
+        const groupKey=[...g].sort().join('|'),groupPenalty=(h.groups[groupKey]||0)*20,vscore=partnerPenalty+opponentPenalty+groupPenalty;
         if(vscore<localScore){localScore=vscore;localBest=v}
       });
-      score+=localScore;
-      groups.push(localBest);
+      score+=localScore;groups.push(localBest);
     }
-    const vals=active.map(p=>played[key(p)]||0);
-    score+=Math.max(...vals)-Math.min(...vals);
+    const vals=active.map(p=>played[key(p)]||0);score+=Math.max(...vals)-Math.min(...vals);
     if(score<bestScore){bestScore=score;best={active,groups}}
   }
-  const activeKeys=new Set(best.active.map(key));
-  const resting=ps.filter(p=>!activeKeys.has(key(p))).map(key);
-  const numero=c.rotazione.giornate.length+1;
-  const data=new Date().toISOString().slice(0,10);
+  const activeKeys=new Set(best.active.map(key)),resting=ps.filter(p=>!activeKeys.has(key(p))).map(key);
+  const numero=c.rotazione.giornate.length+1,data=new Date().toISOString().slice(0,10);
   const partite=best.groups.map((v,i)=>({id:'g'+numero+'-m'+(i+1),coppiaA:v[0],coppiaB:v[1],risA:'',risB:'',campo:c.rotazione.campoDefault,ora:c.rotazione.oraDefault}));
-  c.rotazione.giornate.push({numero,data,partite,riposo:resting});
-  return c;
+  c.rotazione.giornate.push({numero,data,partite,riposo:resting});return c;
 }
 function playerMap(ps){return Object.fromEntries(ps.map(p=>[key(p),name(p)]))}
 function inputScore(v){return v===''?'':String(Math.max(0,Number(v)||0))}
@@ -125,24 +108,13 @@ function render(t,ps){
   const root=$('appContent');if(!root)return;
   const c=config(t),r=c.rotazione,pm=playerMap(ps),rank=standings(t,ps),h=history(c);
   const allPlayed=rank.map(x=>x.partite),maxPlayed=allPlayed.length?Math.max(...allPlayed):0,minPlayed=allPlayed.length?Math.min(...allPlayed):0;
-  root.innerHTML=
-  '<div class="page-head"><div><h1>🏆 Torneo Individuale a Coppie Variabili</h1><p>'+esc(t.nome)+' · gestione autonoma · classifica individuale</p></div><button class="btn" id="rotBack">← Torna ai tornei</button></div>'+
+  root.innerHTML='<div class="page-head"><div><h1>🏆 Torneo Individuale a Coppie Variabili</h1><p>'+esc(t.nome)+' · gestione autonoma · classifica individuale</p></div><button class="btn" id="rotBack">← Torna ai tornei</button></div>'+
   '<div class="card"><div class="card-head"><div><h2>Gestione torneo</h2><span class="notice">Le coppie, il calendario e i risultati appartengono esclusivamente a questo torneo.</span></div></div><div class="card-body"><div class="section-grid">'+
-  '<div><label>Numero giocatori</label><input id="rotN" type="number" min="4" value="'+r.numeroGiocatori+'"></div>'+
-  '<div><label>Punti vittoria</label><input id="rotPV" type="number" min="0" value="'+r.puntiVittoria+'"></div>'+
-  '<div><label>Punti pareggio</label><input id="rotPP" type="number" min="0" value="'+r.puntiPareggio+'"></div>'+
-  '<div><label>Punti sconfitta</label><input id="rotPS" type="number" min="0" value="'+r.puntiSconfitta+'"></div>'+
-  '<div><label>Campo predefinito</label><input id="rotCampo" value="'+esc(r.campoDefault)+'"></div>'+
-  '<div><label>Ora predefinita</label><input id="rotOra" type="time" value="'+esc(r.oraDefault)+'"></div>'+
+  '<div><label>Numero giocatori</label><input id="rotN" type="number" min="4" value="'+r.numeroGiocatori+'"></div><div><label>Punti vittoria</label><input id="rotPV" type="number" min="0" value="'+r.puntiVittoria+'"></div><div><label>Punti pareggio</label><input id="rotPP" type="number" min="0" value="'+r.puntiPareggio+'"></div><div><label>Punti sconfitta</label><input id="rotPS" type="number" min="0" value="'+r.puntiSconfitta+'"></div><div><label>Campo predefinito</label><input id="rotCampo" value="'+esc(r.campoDefault)+'"></div><div><label>Ora predefinita</label><input id="rotOra" type="time" value="'+esc(r.oraDefault)+'"></div>'+
   '</div><button class="btn primary" id="rotSaveRules">💾 Salva impostazioni</button></div></div>'+
-  '<div class="card"><div class="card-head"><div><h2>👥 Giocatori</h2><span class="notice">'+ps.length+' iscritti approvati</span></div><div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn" id="rotSimulate">🧪 Crea simulazione completa</button><button class="btn primary" id="rotNewRound">＋ Genera nuova giornata</button></div></div><div class="card-body">'+
-  '<div class="list">'+ps.map((p,i)=>{const s=rank.find(x=>x.id===key(p));return '<div class="list-item"><div><strong>'+esc(name(p))+'</strong><small>'+((s?.partite)||0)+' partite · '+((s?.punti)||0)+' punti · differenza '+((s?.differenza)||0)+'</small></div></div>'}).join('')+'</div></div></div>'+
-  '<div class="card"><div class="card-head"><h2>📅 Calendario e giornate</h2><span class="notice">'+r.giornate.length+' giornate</span></div><div class="card-body">'+
-  (r.giornate.length?r.giornate.map(g=>'<div class="card" style="margin:10px 0"><div class="card-head"><h3>Giornata '+g.numero+'</h3><span class="notice">'+esc(g.data||'-')+(g.riposo?.length?' · Riposo: '+esc(g.riposo.map(id=>pm[id]||'Giocatore').join(', ')):'')+'</span></div><div class="card-body">'+
-  (g.partite||[]).map((m,i)=>'<div class="list-item"><div><strong>'+esc((m.coppiaA||[]).map(id=>pm[id]||'Giocatore').join(' / '))+' <span>VS</span> '+esc((m.coppiaB||[]).map(id=>pm[id]||'Giocatore').join(' / '))+'</strong><small>Campo <input data-meta="'+g.numero+'" data-mi="'+i+'" data-k="campo" value="'+esc(m.campo||'')+'" style="width:90px"> · Ora <input data-meta="'+g.numero+'" data-mi="'+i+'" data-k="ora" type="time" value="'+esc(m.ora||'')+'" style="width:105px"></small></div><div class="list-actions"><input data-r="'+g.numero+'" data-m="'+i+'" data-s="a" type="number" min="0" value="'+esc(m.risA)+'" placeholder="0"><span>—</span><input data-r="'+g.numero+'" data-m="'+i+'" data-s="b" type="number" min="0" value="'+esc(m.risB)+'" placeholder="0"></div></div>').join('')+'</div></div>').join(''):'<div class="empty">Nessuna giornata ancora creata.</div>')+
-  '</div></div>'+
-  '<div class="card"><div class="card-head"><h2>📊 Classifica individuale</h2><span class="notice">Spareggi: punti classifica → differenza → punti fatti → vittorie → partite giocate</span></div><div class="card-body"><div style="overflow:auto"><table style="width:100%"><thead><tr><th>#</th><th>Giocatore</th><th>Pt</th><th>PG</th><th>V</th><th>P</th><th>S</th><th>PF</th><th>PS</th><th>Diff.</th></tr></thead><tbody>'+
-  rank.map((x,i)=>'<tr><td>'+ (i+1) +'</td><td><b>'+esc(x.nome)+'</b></td><td>'+x.punti+'</td><td>'+x.partite+'</td><td>'+x.vittorie+'</td><td>'+x.pareggi+'</td><td>'+x.sconfitte+'</td><td>'+x.puntiFatti+'</td><td>'+x.puntiSubiti+'</td><td><b>'+x.differenza+'</b></td></tr>').join('')+'</tbody></table></div></div></div>'+
+  '<div class="card"><div class="card-head"><div><h2>👥 Giocatori</h2><span class="notice">'+ps.length+' iscritti approvati</span></div><div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn" id="rotSimulate">🧪 Crea simulazione completa</button><button class="btn primary" id="rotNewRound">＋ Genera nuova giornata</button></div></div><div class="card-body"><div class="list">'+ps.map(p=>{const s=rank.find(x=>x.id===key(p));return '<div class="list-item"><div><strong>'+esc(name(p))+'</strong><small>'+((s?.partite)||0)+' partite · '+((s?.punti)||0)+' punti · differenza '+((s?.differenza)||0)+'</small></div></div>'}).join('')+'</div></div></div>'+
+  '<div class="card"><div class="card-head"><h2>📅 Calendario e giornate</h2><span class="notice">'+r.giornate.length+' giornate</span></div><div class="card-body">'+(r.giornate.length?r.giornate.map(g=>'<div class="card" style="margin:10px 0"><div class="card-head"><h3>Giornata '+g.numero+'</h3><span class="notice">'+esc(g.data||'-')+(g.riposo?.length?' · Riposo: '+esc(g.riposo.map(id=>pm[id]||'Giocatore').join(', ')):'')+'</span></div><div class="card-body">'+(g.partite||[]).map((m,i)=>'<div class="list-item"><div><strong>'+esc((m.coppiaA||[]).map(id=>pm[id]||'Giocatore').join(' / '))+' <span>VS</span> '+esc((m.coppiaB||[]).map(id=>pm[id]||'Giocatore').join(' / '))+'</strong><small>Campo <input data-meta="'+g.numero+'" data-mi="'+i+'" data-k="campo" value="'+esc(m.campo||'')+'" style="width:90px"> · Ora <input data-meta="'+g.numero+'" data-mi="'+i+'" data-k="ora" type="time" value="'+esc(m.ora||'')+'" style="width:105px"></small></div><div class="list-actions"><input data-r="'+g.numero+'" data-m="'+i+'" data-s="a" type="number" min="0" value="'+esc(m.risA)+'" placeholder="0"><span>—</span><input data-r="'+g.numero+'" data-m="'+i+'" data-s="b" type="number" min="0" value="'+esc(m.risB)+'" placeholder="0"></div></div>').join('')+'</div></div>').join(''):'<div class="empty">Nessuna giornata ancora creata.</div>')+'</div></div>'+
+  '<div class="card"><div class="card-head"><h2>📊 Classifica individuale</h2><span class="notice">Spareggi: punti classifica → differenza → punti fatti → vittorie → partite giocate</span></div><div class="card-body"><div style="overflow:auto"><table style="width:100%"><thead><tr><th>#</th><th>Giocatore</th><th>Pt</th><th>PG</th><th>V</th><th>P</th><th>S</th><th>PF</th><th>PS</th><th>Diff.</th></tr></thead><tbody>'+rank.map((x,i)=>'<tr><td>'+(i+1)+'</td><td><b>'+esc(x.nome)+'</b></td><td>'+x.punti+'</td><td>'+x.partite+'</td><td>'+x.vittorie+'</td><td>'+x.pareggi+'</td><td>'+x.sconfitte+'</td><td>'+x.puntiFatti+'</td><td>'+x.puntiSubiti+'</td><td><b>'+x.differenza+'</b></td></tr>').join('')+'</tbody></table></div></div></div>'+
   '<div class="card"><div class="card-head"><h2>🔄 Controllo rotazioni</h2><span class="notice">Lo storico viene usato per evitare ripetizioni e riequilibrare le presenze.</span></div><div class="card-body"><div class="info-row"><span>Partite per giocatore</span><b>'+minPlayed+' – '+maxPlayed+'</b></div><div class="info-row"><span>Coppie già registrate</span><b>'+Object.values(h.partner).reduce((n,o)=>n+Object.values(o).reduce((a,v)=>a+v,0),0)/2+'</b></div><div class="info-row"><span>Giornate completate</span><b>'+r.giornate.filter(g=>(g.partite||[]).length&&g.partite.every(m=>m.risA!==''&&m.risB!=='')).length+' / '+r.giornate.length+'</b></div></div></div>';
   $('rotBack').onclick=()=>window.openAdminPage?.('torneo');
   $('rotSaveRules').onclick=async()=>{try{const nc=config(t);nc.rotazione.numeroGiocatori=Math.max(4,Number($('rotN').value)||ps.length);nc.rotazione.puntiVittoria=Math.max(0,Number($('rotPV').value)||0);nc.rotazione.puntiPareggio=Math.max(0,Number($('rotPP').value)||0);nc.rotazione.puntiSconfitta=Math.max(0,Number($('rotPS').value)||0);nc.rotazione.campoDefault=$('rotCampo').value.trim();nc.rotazione.oraDefault=$('rotOra').value;await save(t,nc);render(t,ps)}catch(e){alert(e.message||e)}};
@@ -152,50 +124,20 @@ function render(t,ps){
   root.querySelectorAll('[data-meta]').forEach(inp=>inp.addEventListener('change',async()=>{try{const nc=config(t),g=nc.rotazione.giornate.find(x=>String(x.numero)===String(inp.dataset.meta));if(!g)return;const m=g.partite[Number(inp.dataset.mi)];if(!m)return;m[inp.dataset.k]=inp.value;await save(t,nc)}catch(e){alert(e.message||e)}}));
 }
 async function simulate(){
-  const client=sb();
-  if(!client)throw Error('Connessione Supabase non disponibile.');
+  const client=sb();if(!client)throw Error('Connessione Supabase non disponibile.');
   const nomeTorneo='TEST - Individuale Coppie Variabili - SIMULAZIONE';
   if(!confirm('Creare una simulazione completa con 8 giocatori e 6 giornate? Il test precedente con lo stesso nome verrà sostituito.'))return;
-  const old=await client.from('tornei').select('id').eq('nome',nomeTorneo);
-  if(old.error)throw old.error;
-  for(const row of (old.data||[])){
-    const d=await client.from('iscrizioni').delete().eq('torneo_id',row.id);
-    if(d.error)throw d.error;
-    const x=await client.from('tornei').delete().eq('id',row.id);
-    if(x.error)throw x.error;
-  }
-  const now=new Date();
-  const id=Date.now();
-  const giocatori=[
-    ['Marco','Rossi'],['Luca','Bianchi'],['Andrea','Verdi'],['Paolo','Neri'],
-    ['Stefano','Galli'],['Matteo','Conti'],['Davide','Romano'],['Fabio','Costa']
-  ];
-  const baseConfigurazione={
-    coppie:[],partecipanti:[],
-    rules:{locked:true,tipoTorneo:'individualeCoppieVariabili',formulaScelta:'individualeCoppieVariabili',numeroSquadre:0,numeroGiocatori:8,numeroGironi:0},
-    rotazione:{version:2,numeroGiocatori:8,puntiVittoria:3,puntiPareggio:1,puntiSconfitta:0,campoDefault:'',oraDefault:'',giornate:[]}
-  };
-  const tr=await client.from('tornei').insert({
-    id,nome:nomeTorneo,data:now.toISOString().slice(0,10),data_torneo:now.toISOString().slice(0,10),
-    descrizione:'SIMULAZIONE AUTOMATICA: 8 giocatori, 6 giornate, risultati realistici.',
-    posti:8,stato:'attivo',pubblicato:false,iscrizioni_chiuse:true,formula:'individualeCoppieVariabili',configurazione:baseConfigurazione
-  }).select('*').single();
+  const old=await client.from('tornei').select('id').eq('nome',nomeTorneo);if(old.error)throw old.error;
+  for(const row of (old.data||[])){const d=await client.from('iscrizioni').delete().eq('torneo_id',row.id);if(d.error)throw d.error;const x=await client.from('tornei').delete().eq('id',row.id);if(x.error)throw x.error;}
+  const now=new Date(),id=Date.now();
+  const giocatori=[['Marco','Rossi'],['Luca','Bianchi'],['Andrea','Verdi'],['Paolo','Neri'],['Stefano','Galli'],['Matteo','Conti'],['Davide','Romano'],['Fabio','Costa']];
+  const baseConfigurazione={coppie:[],partecipanti:[],rules:{locked:true,tipoTorneo:'individualeCoppieVariabili',formulaScelta:'individualeCoppieVariabili',numeroSquadre:0,numeroGiocatori:8,numeroGironi:0},rotazione:{version:2,numeroGiocatori:8,puntiVittoria:3,puntiPareggio:1,puntiSconfitta:0,campoDefault:'',oraDefault:'',giornate:[]}};
+  const tr=await client.from('tornei').insert({id,nome:nomeTorneo,data:now.toISOString().slice(0,10),data_torneo:now.toISOString().slice(0,10),descrizione:'SIMULAZIONE AUTOMATICA: 8 giocatori, 6 giornate, risultati realistici.',posti:8,stato:'attivo',pubblicato:false,iscrizioni_chiuse:true,formula:'individualeCoppieVariabili',configurazione:baseConfigurazione}).select('*').single();
   if(tr.error)throw tr.error;
-  const rows=giocatori.map(p=>({
-    torneo_id:id,nome_giocatore:p[0]+' '+p[1],nome:p[0],cognome:p[1],
-    stato:'approvato',approvato:true,categoria:'Individuale Coppie Variabili'
-  }));
+  const rows=giocatori.map(p=>({torneo_id:id,nome_giocatore:p[0]+' '+p[1],nome:p[0],cognome:p[1],stato:'approvato',approvato:true,categoria:'Individuale Coppie Variabili'}));
   const ir=await client.from('iscrizioni').insert(rows).select('*');
-  if(ir.error){
-    await client.from('tornei').delete().eq('id',id);
-    throw ir.error;
-  }
-  const byName=Object.fromEntries((ir.data||rows).map(p=>[name(p),key(p)]));
-  const idFor=(n,c)=>byName[n+' '+c];
-  const D=(numero,offset,partite)=>({numero,data:new Date(now.getTime()+offset*86400000).toISOString().slice(0,10),partite,riposo:[]});
-  const K=(a,b)=>[idFor(a[0],a[1]),idFor(a[2],a[3])];
-  const m=(idn,a,b,ra,rb,campo,ora)=>({id:idn,coppiaA:K(a),coppiaB:K(b),risA:String(ra),risB:String(rb),campo,ora});
-  const G=(numero,offset,partite)=>D(numero,offset,partite);
+  if(ir.error){await client.from('tornei').delete().eq('id',id);throw ir.error;}
+  const byName=Object.fromEntries((ir.data||rows).map(p=>[name(p),key(p)])),idFor=(n,c)=>byName[n+' '+c],D=(numero,offset,partite)=>({numero,data:new Date(now.getTime()+offset*86400000).toISOString().slice(0,10),partite,riposo:[]}),K=(a,b)=>[idFor(a[0],a[1]),idFor(a[2],a[3])],m=(idn,a,b,ra,rb,campo,ora)=>({id:idn,coppiaA:K(a),coppiaB:K(b),risA:String(ra),risB:String(rb),campo,ora}),G=(numero,offset,partite)=>D(numero,offset,partite);
   const giornate=[
     G(1,0,[m('g1-m1',['Marco','Rossi','Luca','Bianchi'],['Andrea','Verdi','Paolo','Neri'],6,4,'Campo 1','19:00'),m('g1-m2',['Stefano','Galli','Matteo','Conti'],['Davide','Romano','Fabio','Costa'],5,7,'Campo 2','19:00')]),
     G(2,1,[m('g2-m1',['Marco','Rossi','Andrea','Verdi'],['Stefano','Galli','Davide','Romano'],7,5,'Campo 1','19:00'),m('g2-m2',['Luca','Bianchi','Paolo','Neri'],['Matteo','Conti','Fabio','Costa'],6,6,'Campo 2','19:00')]),
@@ -206,39 +148,24 @@ async function simulate(){
   ];
   const configurazione={...baseConfigurazione,rotazione:{...baseConfigurazione.rotazione,giornate}};
   const up=await client.from('tornei').update({configurazione}).eq('id',id).select('*').single();
-  if(up.error){
-    await client.from('iscrizioni').delete().eq('torneo_id',id);
-    await client.from('tornei').delete().eq('id',id);
-    throw up.error;
-  }
-  const s=state();
-  s.tornei=(s.tornei||[]).filter(t=>String(t.id)!==String(id));
-  s.tornei.push(up.data||tr.data);
-  s.torneoSelezionato=id;
-  window.adminState=s;
+  if(up.error){await client.from('iscrizioni').delete().eq('torneo_id',id);await client.from('tornei').delete().eq('id',id);throw up.error;}
+  const s=state();s.tornei=(s.tornei||[]).filter(t=>String(t.id)!==String(id));s.tornei.push(up.data||tr.data);s.torneoSelezionato=id;window.adminState=s;
   try{localStorage.setItem('padel_admin_state',JSON.stringify(s))}catch(e){}
-  window.iscrizioniTorneo=ir.data||rows;
-  render(up.data||tr.data,window.iscrizioniTorneo);
+  window.iscrizioniTorneo=ir.data||rows;render(up.data||tr.data,window.iscrizioniTorneo);
   alert('Simulazione creata: 8 giocatori, 6 giornate, 12 partite e risultati già inseriti.');
 }
 async function open(){
-  const t=current();
-  if(!t){alert('Seleziona prima un torneo.');return}
-  if(!isRotation(t))return;
+  const t=current();if(!t){alert('Seleziona prima un torneo.');return}if(!isRotation(t))return;
   try{render(t,await players())}catch(e){alert(e.message||e)}
 }
 function inject(){
-  const root=$('appContent'),t=current();
-  if(!root||!t||!isRotation(t))return;
+  const root=$('appContent'),t=current();if(!root||!t||!isRotation(t))return;
   const grid=root.querySelector('.management-grid .action-grid');if(grid&&!root.querySelector('#adminRotationAction')){
-    const classic=[...grid.querySelectorAll('button')];
-    classic.forEach(b=>{if(!b.id||!['publish','closeReg'].includes(b.id))b.style.display='none'});
+    const classic=[...grid.querySelectorAll('button')];classic.forEach(b=>{if(!b.id||!['publish','closeReg'].includes(b.id))b.style.display='none'});
     const b=document.createElement('button');b.type='button';b.className='btn action-tile';b.id='adminRotationAction';b.innerHTML='🏆 <strong>Gestione torneo</strong><span>Giocatori · Giornate · Calendario · Risultati · Classifica</span>';b.onclick=open;grid.insertBefore(b,grid.firstChild);
   }
-  const sideTab=$('sideTabellone'),sideCal=$('sideCalendario');
-  if(sideTab)sideTab.style.display='none';
-  if(sideCal)sideCal.style.display='none';
-  root.closest('.app')?.querySelectorAll('.sidebar .nav button[data-page="iscritti"],.sidebar .nav button[data-page="partecipanti"],.sidebar .nav button[data-page="coppie"],.sidebar .nav button[data-page="dati"],.mobile-nav button[data-page="iscritti"],.mobile-nav button[data-page="partecipanti"],.mobile-nav button[data-page="coppie"],.mobile-nav button[data-page="dati"]').forEach(b=>b.style.display='none');
+  const sideTab=$('sideTabellone'),sideCal=$('sideCalendario');if(sideTab)sideTab.style.display='none';if(sideCal)sideCal.style.display='none';
+  root.closest('.app')?.querySelectorAll('.sidebar .nav button[data-page="coppie"],.sidebar .nav button[data-page="dati"],.mobile-nav button[data-page="coppie"],.mobile-nav button[data-page="dati"]').forEach(b=>b.style.display='none');
 }
 window.apriGestioneIndividualeCoppieVariabili=open;
 window.apriGestioneRotazione=open;
