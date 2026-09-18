@@ -35,6 +35,12 @@ function config(t){
       if(!r.oraDefault&&first.ora)r.oraDefault=String(first.ora);
     }
   }
+  if(!r.campoDefault)r.campoDefault='Campo 1';
+  if(!r.oraDefault)r.oraDefault='19:00';
+  (r.giornate||[]).forEach(g=>(g.partite||[]).forEach((m,i)=>{
+    if(!m.campo)m.campo=i%2===0?'Campo 1':'Campo 2';
+    if(!m.ora)m.ora=r.oraDefault;
+  }));
   return c;
 }
 async function save(t,c){
@@ -175,7 +181,10 @@ async function open(){
     const normalized=config(t);
     const raw=t.configurazione&&typeof t.configurazione==='object'?t.configurazione:{};
     const rawRot=raw.rotazione&&typeof raw.rotazione==='object'?raw.rotazione:{};
-    if((!rawRot.campoDefault&&normalized.rotazione.campoDefault)||(!rawRot.oraDefault&&normalized.rotazione.oraDefault)){
+    const rawGames=Array.isArray(rawRot.giornate)?rawRot.giornate:[];
+    const rawMissingDefaults=!rawRot.campoDefault||!rawRot.oraDefault;
+    const rawMissingMeta=rawGames.some(g=>(g.partite||[]).some(m=>!m.campo||!m.ora));
+    if(rawMissingDefaults||rawMissingMeta){
       t=await save(t,normalized);
     }
     render(t,await players(t));
