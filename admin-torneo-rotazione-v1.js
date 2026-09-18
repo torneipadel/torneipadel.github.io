@@ -106,7 +106,7 @@ function generateRound(t,ps){
       let localBest=null,localScore=Infinity;
       variants.forEach(v=>{
         const [A,B]=v;
-        const partnerPenalty=A.concat(B).reduce((s,x,j,arr)=>{const y=arr[j%2===0?j+1:j-1];return s+(h.partner[x]?.[y]||0)*140},0);
+        const partnerPenalty=A.concat(B).reduce((s,x,j,arr)=>{const y=arr[j%2===0?j+1:j-1];return s+(h.partner[x]?.[y]||0)*10000},0);
         const opponentPenalty=A.reduce((s,x)=>s+B.reduce((z,y)=>z+(h.opp[x]?.[y]||0)*35,0),0);
         const groupKey=[...g].sort().join('|'),groupPenalty=(h.groups[groupKey]||0)*20,vscore=partnerPenalty+opponentPenalty+groupPenalty;
         if(vscore<localScore){localScore=vscore;localBest=v}
