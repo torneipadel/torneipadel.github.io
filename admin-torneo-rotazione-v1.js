@@ -39,9 +39,15 @@ async function save(t,c){
   try{localStorage.setItem('padel_admin_state',JSON.stringify(state()))}catch(e){}
   return t;
 }
-async function players(){
-  if(typeof window.caricaRichiesteIscrizione==='function')await window.caricaRichiesteIscrizione();
-  return (window.iscrizioniTorneo||[]).filter(approved);
+async function players(t){
+  const client=sb();
+  const id=Number(t?.id||current()?.id);
+  if(!client||!Number.isFinite(id)||id<=0)return [];
+  const r=await client.from('iscrizioni').select('*').eq('torneo_id',id);
+  if(r.error)throw r.error;
+  const rows=Array.isArray(r.data)?r.data:[];
+  window.iscrizioniTorneo=rows;
+  return rows.filter(approved);
 }
 function emptyStats(p){return {id:key(p),nome:name(p),partite:0,vittorie:0,pareggi:0,sconfitte:0,punti:0,puntiFatti:0,puntiSubiti:0,differenza:0}}
 function history(c){
@@ -155,8 +161,12 @@ async function simulate(){
   alert('Simulazione creata: 8 giocatori, 6 giornate, 12 partite e risultati già inseriti.');
 }
 async function open(){
-  const t=current();if(!t){alert('Seleziona prima un torneo.');return}if(!isRotation(t))return;
-  try{render(t,await players())}catch(e){alert(e.message||e)}
+  let t=current();if(!t){alert('Seleziona prima un torneo.');return}if(!isRotation(t))return;
+  try{
+    const client=sb();
+    if(client){const fresh=await client.from('tornei').select('*').eq('id',t.id).single();if(fresh.error)throw fresh.error;if(fresh.data){t=fresh.data;const s=state();s.tornei=(s.tornei||[]).map(x=>String(x.id)===String(t.id)?t:x);window.adminState=s;try{localStorage.setItem('padel_admin_state',JSON.stringify(s))}catch(e){}}}
+    render(t,await players(t));
+  }catch(e){alert(e.message||e)}
 }
 function inject(){
   const root=$('appContent'),t=current();if(!root||!t||!isRotation(t))return;
