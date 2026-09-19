@@ -10892,17 +10892,26 @@ function renderMatchCard(titolo, match, type, index, risultato) {
         ? (state[timeKey][index] || "")
         : "";
 
-    const team1 = match && match[0] ? String(match[0]) : "Da determinare";
-    const team2 = match && match[1] ? String(match[1]) : "Da determinare";
+    /*
+     * NON convertire qui le squadre in String().
+     * Le squadre provenienti da classifica/gironi possono essere
+     * oggetti {nome, ...}: String(oggetto) produce "[object Object]"
+     * e impedisce a formatCoppiaDisplay() di mostrarle correttamente.
+     */
+    const rawTeam1 = match && match[0] != null ? match[0] : "Da determinare";
+    const rawTeam2 = match && match[1] != null ? match[1] : "Da determinare";
+
+    const displayTeam1 = formatCoppiaDisplay(rawTeam1) || "Da determinare";
+    const displayTeam2 = formatCoppiaDisplay(rawTeam2) || "Da determinare";
+
     const placeholder =
         /^(da determinare|vincente |qualificat[ao] |[0-9]+[ªa°]? qualificat[ao])/i;
 
     const isPlaceholder =
-        placeholder.test(team1.trim()) ||
-        placeholder.test(team2.trim());
+        placeholder.test(displayTeam1.trim()) ||
+        placeholder.test(displayTeam2.trim());
 
     const winner = isPlaceholder ? null : getWinner(match, risultato);
-    const stato = winner ? "Terminata" : "Da giocare";
 
     return `
 <tr>
@@ -10926,7 +10935,7 @@ function renderMatchCard(titolo, match, type, index, risultato) {
     <td class="match-cell">
 
         <div class="team-line">
-            ${isPlaceholder ? team1 : formatCoppiaDisplay(team1)}
+            ${displayTeam1}
         </div>
 
         <div class="vs-line">
@@ -10934,7 +10943,7 @@ function renderMatchCard(titolo, match, type, index, risultato) {
         </div>
 
         <div class="team-line">
-            ${isPlaceholder ? team2 : formatCoppiaDisplay(team2)}
+            ${displayTeam2}
         </div>
 
     </td>
@@ -10957,8 +10966,6 @@ function renderMatchCard(titolo, match, type, index, risultato) {
 
 </tr>`;
 }
-
-
 
 function applicaModelloTorneo(){
 
