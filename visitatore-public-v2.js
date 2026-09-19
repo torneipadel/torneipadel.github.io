@@ -44,8 +44,8 @@ function news(){
 
   const all=[];
   tournaments.forEach(t=>{
-    if(!(t.pubblicato===true||String(t.stato||'').toLowerCase()==='attivo'))return;
-    (Array.isArray(t.configurazione?.news)?t.configurazione.news:[]).forEach(n=>all.push({
+    if(t.pubblicato!==true)return;
+    (Array.isArray(t.configurazione?.news)?t.configurazione.news:[]).filter(n=>n?.pubblicataVisitatore===true).forEach(n=>all.push({
       ...n,
       __torneo:t.nome,
       __torneoId:t.id,
