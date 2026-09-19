@@ -10783,7 +10783,6 @@ function renderKO(){
         const vincitori=[];
 
         quarti.forEach((match,index)=>{
-
             q.innerHTML+=renderMatchCard(
                 "QUARTO "+(index+1),
                 match,
@@ -10792,34 +10791,36 @@ function renderKO(){
                 state.qRes[index]
             );
 
-            const vincitore=getWinner(
-                match,
-                state.qRes[index]
-            );
-
+            const vincitore=getWinner(match,state.qRes[index]);
             if(vincitore) vincitori.push(vincitore);
         });
 
+        /*
+         * La struttura delle semifinali deve essere visibile
+         * contemporaneamente ai quarti. Prima dei risultati dei
+         * quarti vengono mostrati i relativi slot "Vincitore Qx".
+         * Dopo ogni risultato, lo slot viene sostituito dal vincitore reale.
+         */
         if(vincitori.length===4){
             semifinali=[
                 [vincitori[0],vincitori[1]],
                 [vincitori[2],vincitori[3]]
             ];
+        }else{
+            semifinali=[
+                [vincitori[0] || "Vincitore Q1", vincitori[1] || "Vincitore Q2"],
+                [vincitori[2] || "Vincitore Q3", vincitori[3] || "Vincitore Q4"]
+            ];
         }
 
     }else{
-
         if(teams.length>=4){
-
             semifinali=[
                 [teams[0],teams[3]],
                 [teams[1],teams[2]]
             ];
-
         }else if(teams.length===2){
-
             semifinali=[teams];
-
         }
     }
 
@@ -10828,7 +10829,6 @@ function renderKO(){
     if(state.rules.usaSemifinali===true && semifinali.length>0){
 
         semifinali.forEach((match,index)=>{
-
             s.innerHTML+=renderMatchCard(
                 "SEMIFINALE "+(index+1),
                 match,
@@ -10837,18 +10837,16 @@ function renderKO(){
                 state.sTopRes[index]
             );
 
-            const vincitore=getWinner(
-                match,
-                state.sTopRes[index]
-            );
+            const reale = match[0] && match[1] &&
+                !String(match[0]).startsWith("Vincitore Q") &&
+                !String(match[1]).startsWith("Vincitore Q");
 
+            const vincitore=reale ? getWinner(match,state.sTopRes[index]) : null;
             if(vincitore) finalisti.push(vincitore);
         });
 
     }else{
-
         finalisti=semifinali.flat();
-
     }
 
     if(finalisti.length===2){
@@ -10866,9 +10864,8 @@ function renderKO(){
         state.fTopRes
     );
 
-    /* --- GESTIONE CAMPIONE E POSIZIONAMENTO SICURO SOTTO LA FINALE --- */
     let campione = getWinner(finalisti, state.fTopRes);
-    
+
     if (!campione && finalisti.length === 2) {
         const resSplit = String(state.fTopRes || "").split("-");
         if(resSplit.length === 2) {
@@ -10883,20 +10880,17 @@ function renderKO(){
 
     let winnerCard = document.getElementById("winnerCardKO");
 
-    // Se non esiste, lo creiamo e lo posizioniamo subito sotto la finale (f)
     if (!winnerCard && f.parentNode) {
         winnerCard = document.createElement("div");
         winnerCard.id = "winnerCardKO";
         winnerCard.className = "card winner-card-ko";
         f.parentNode.insertBefore(winnerCard, f.nextSibling);
     } else if (winnerCard && f.parentNode && winnerCard.previousElementSibling !== f) {
-        // Se esiste già ma è altrove, lo spostiamo nel posto giusto
         f.parentNode.insertBefore(winnerCard, f.nextSibling);
     }
 
     if(campione){
         state.campioneTop=campione;
-
         if(winnerCard){
             winnerCard.style.cssText = "display: block !important; margin-top: 15px;";
             winnerCard.innerHTML=`
@@ -10906,17 +10900,16 @@ function renderKO(){
                 </div>
             `;
         }
-
     }else{
         state.campioneTop=null;
-
         if(winnerCard){
             winnerCard.style.cssText = "display: none !important;";
             winnerCard.innerHTML="";
         }
     }
 }
-                   
+
+
 function renderMatchCard(titolo, match, type, index, risultato) {
     const res = String(risultato || "-").split("-");
 
