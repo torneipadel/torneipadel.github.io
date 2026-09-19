@@ -2558,17 +2558,7 @@ style="width:80px">
 
      ============================ -->
 
-<div class="card" id="svizzeroBox" style="display:none;margin-top:20px;">
 
-    <h2 style="text-align:center;">
-
-        🇨🇭 Torneo Svizzero
-
-    </h2>
-
-    <div id="svizzeroContenuto"></div>
-
-</div>
 
 <div class="card" id="americanoBox" style="display:none;margin-top:20px;">
 
@@ -3931,30 +3921,6 @@ async function apriArchivioTornei(){
         html
     );
 
-
-}
-function chiudiMenuAutomatico(){
-
-    let menu =
-        document.getElementById("menuComandi");
-
-
-    if(!menu)
-        return;
-
-
-    menu.addEventListener(
-        "click",
-        function(){
-
-            setTimeout(()=>{
-
-                menu.classList.remove("show");
-
-            },100);
-
-        }
-    );
 
 }
 async function caricaTorneoArchivio(id){
