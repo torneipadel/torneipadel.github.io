@@ -6948,24 +6948,35 @@ try{
                     ...(configurazione.rules||{})
                 };
 
-                if(configurazione.configurazione){
+                if(
+                    configurazione.configurazione &&
+                    typeof configurazione.configurazione === "object"
+                ){
 
                     const cfg =
                         configurazione.configurazione;
 
-                    if(cfg.rules)
-                        state.rules={
+                    /*
+                    Compatibilità con i vecchi salvataggi:
+                    alcune versioni hanno inserito l'intero stato
+                    dentro configurazione.configurazione.
+                    In quel caso bisogna recuperare TUTTO lo stato,
+                    non soltanto regole/coppie/partecipanti.
+                    */
+
+                    configurazione = {
+                        ...configurazione,
+                        ...cfg
+                    };
+
+                    state = {
+                        ...state,
+                        ...cfg,
+                        rules:{
                             ...state.rules,
-                            ...cfg.rules
-                        };
-
-                    if(Array.isArray(cfg.coppie))
-                        configurazione.coppie =
-                            cfg.coppie;
-
-                    if(Array.isArray(cfg.partecipanti))
-                        configurazione.partecipanti =
-                            cfg.partecipanti;
+                            ...(cfg.rules || {})
+                        }
+                    };
                 }
 
                 state.coppie =
