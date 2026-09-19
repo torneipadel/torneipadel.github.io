@@ -238,6 +238,15 @@ function generateRound(t,ps,scheduledSlot){
     bestRounds.forEach(round=>round.forEach(pair=>matchPairs.push(pair)));
   }
 
+  const matchCountByPair=Object.fromEntries(best.map((_,i)=>[i,0]));
+  matchPairs.forEach(([i,j])=>{
+    matchCountByPair[i]=(matchCountByPair[i]||0)+1;
+    matchCountByPair[j]=(matchCountByPair[j]||0)+1;
+  });
+  if(best.some((_,i)=>(matchCountByPair[i]||0)!==3)){
+    throw Error('La generazione della giornata non rispetta il vincolo: ogni squadra deve giocare esattamente 3 partite.');
+  }
+
   matchPairs.forEach(([i,j])=>{
     partite.push({
       id:'g'+numero+'-m'+(matchNumero++),
