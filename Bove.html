@@ -754,45 +754,29 @@ window.toggleMenu = function(){
     const menu = document.getElementById("menuComandi");
     if(!menu) return;
 
-    const isUserMode = document.body.classList.contains("user-mode");
-
-    if(isUserMode){
+    if(document.body.classList.contains("user-mode")){
         const buttons = [...menu.querySelectorAll("button")];
-
         buttons.forEach(function(button, index){
             const text = (button.textContent || "").trim();
             const print = /stampa/i.test(text);
-            const exit = button.classList.contains("user-exit") ||
-                         index === buttons.length - 1 ||
-                         /uscita/i.test(text);
+            const exit = button.classList.contains("user-exit") || index === buttons.length - 1 || /uscita/i.test(text);
             const allowed = print || exit;
 
             button.classList.toggle("user-print", print);
             button.classList.toggle("user-exit", exit && !print);
             button.disabled = !allowed;
-
             button.style.setProperty("display", allowed ? "block" : "none", "important");
             button.style.setProperty("visibility", allowed ? "visible" : "hidden", "important");
             button.style.setProperty("pointer-events", allowed ? "auto" : "none", "important");
 
             if(exit && !print){
                 button.textContent = "🚪 Uscita";
-                button.onclick = function(){
-                    window.location.href = "index.html";
-                };
+                button.onclick = function(){ window.location.href = "index.html"; };
             }
         });
     }
 
-    const aperto = !menu.classList.contains("show");
-    menu.classList.toggle("show", aperto);
-
-    if(isUserMode){
-        menu.style.setProperty("display", aperto ? "flex" : "none", "important");
-        menu.style.setProperty("visibility", aperto ? "visible" : "hidden", "important");
-        menu.style.setProperty("opacity", aperto ? "1" : "0", "important");
-        menu.style.setProperty("pointer-events", aperto ? "auto" : "none", "important");
-    }
+    menu.classList.toggle("show");
 };
 </script>
 </head>
@@ -6787,7 +6771,6 @@ let configurazione = null;
 
 window.__BOVE_LOADING__ = true;
 window.__BOVE_REMOTE_NOT_FOUND__ = false;
-window.__BOVE_REMOTE_LOAD_ERROR__ = false;
 
 try{
 
@@ -6906,12 +6889,9 @@ try{
                     error
                 );
 
-                window.__BOVE_REMOTE_LOAD_ERROR__ = true;
-
             }
 
             const torneo =
-                !error &&
                 Array.isArray(tornei) &&
                 tornei.length > 0
                     ? tornei[0]
@@ -6921,18 +6901,6 @@ try{
 
                 configurazione =
                     torneo.configurazione || {};
-
-                if(typeof configurazione === "string"){
-                    try{
-                        configurazione = JSON.parse(configurazione);
-                    }catch(parseErr){
-                        console.error(
-                            "Configurazione torneo non interpretabile:",
-                            parseErr
-                        );
-                        configurazione = {};
-                    }
-                }
 
                 state.idTorneo =
                     torneo.id;
@@ -6948,35 +6916,24 @@ try{
                     ...(configurazione.rules||{})
                 };
 
-                if(
-                    configurazione.configurazione &&
-                    typeof configurazione.configurazione === "object"
-                ){
+                if(configurazione.configurazione){
 
                     const cfg =
                         configurazione.configurazione;
 
-                    /*
-                    Compatibilità con i vecchi salvataggi:
-                    alcune versioni hanno inserito l'intero stato
-                    dentro configurazione.configurazione.
-                    In quel caso bisogna recuperare TUTTO lo stato,
-                    non soltanto regole/coppie/partecipanti.
-                    */
-
-                    configurazione = {
-                        ...configurazione,
-                        ...cfg
-                    };
-
-                    state = {
-                        ...state,
-                        ...cfg,
-                        rules:{
+                    if(cfg.rules)
+                        state.rules={
                             ...state.rules,
-                            ...(cfg.rules || {})
-                        }
-                    };
+                            ...cfg.rules
+                        };
+
+                    if(Array.isArray(cfg.coppie))
+                        configurazione.coppie =
+                            cfg.coppie;
+
+                    if(Array.isArray(cfg.partecipanti))
+                        configurazione.partecipanti =
+                            cfg.partecipanti;
                 }
 
                 state.coppie =
@@ -6990,7 +6947,7 @@ try{
                         : [];
 
             }
-            else if(!error){
+            else{
 
                 state.idTorneo=null;
                 state.nomeTorneo="";
