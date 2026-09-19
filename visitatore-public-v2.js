@@ -13,7 +13,7 @@ function formula(t){return t?.formula||t?.configurazione?.rules?.tipoTorneo||'Pa
 function poster(t){const a=Array.isArray(t?.configurazione?.news)?t.configurazione.news:[];const p=a.find(n=>n?.immagine&&(n.inEvidenza===true||n.tipo==='Locandina'))||a.find(n=>n?.immagine);return p?.immagine||''}
 function openT(t){return t.pubblicato===true&&t.iscrizioni_chiuse!==true&&!['chiuso','concluso','archiviato'].includes(String(t.stato||'').toLowerCase())}
 function closedT(t){return t.pubblicato===true&&(t.iscrizioni_chiuse===true||['chiuso','concluso','archiviato'].includes(String(t.stato||'').toLowerCase()))}
-function capacity(t){const current=counts[t.id]||0;const max=(Number(t.posti)||Number(t.configurazione?.rules?.numeroSquadre)||8)*2;return{current,max,remaining:Math.max(0,max-current)}}
+function capacity(t){const current=counts[t.id]||0;const formula=String(t?.formula||t?.configurazione?.rules?.formulaScelta||t?.configurazione?.rules?.tipoTorneo||"");const max=formula==="individualeCoppieVariabili"?Math.max(1,Number(t.posti)||Number(t.configurazione?.rotazione?.numeroGiocatori)||8):Math.max(1,(Number(t.posti)||Number(t.configurazione?.rules?.numeroSquadre)||8)*2);return{current,max,remaining:Math.max(0,max-current)}}
 function vaiIscrizione(v){if(!v){alert('Torneo non valido');return}location.href='iscrizione.html?torneo='+encodeURIComponent(v)}
 function apriTorneoPubblico(v){if(!v){alert('Torneo non valido');return}location.href='Bove.html?idTorneo='+encodeURIComponent(v)}
 window.vaiIscrizione=vaiIscrizione;window.apriTorneoPubblico=apriTorneoPubblico;
