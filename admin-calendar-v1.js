@@ -6,7 +6,7 @@ const state=()=>window.adminState||{};
 const parseDate=v=>{if(!v)return null;const s=String(v).slice(0,10);const d=new Date(s+'T00:00:00');return Number.isNaN(d.getTime())?null:d};
 const iso=d=>`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
 const tournamentDate=t=>t?.data||t?.data_torneo||null;
-const allTournaments=()=>Array.isArray(state().tornei)?state().tornei:[];
+const allTournaments=()=>Array.isArray(state().tornei)?state().tornei.filter(t=>String(t?.stato||'').trim().toLowerCase()!=='archiviato'):[ ];
 const style=document.createElement('style');
 style.textContent=`
 .agenda-shell{background:rgba(17,24,39,.15)!important;backdrop-filter:blur(6px)!important;-webkit-backdrop-filter:blur(6px)!important;border:1px solid rgba(255,255,255,.4)!important;border-radius:18px;padding:18px;box-shadow:none!important}
