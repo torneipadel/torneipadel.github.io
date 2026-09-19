@@ -11939,13 +11939,34 @@ function aggiornaDescrizioneTipoTorneo(){
 }
 function stampaTabellone(){
 
-    chiudiMenu();
+    const menu =
+        document.getElementById("menuComandi");
 
-    document.body.classList.add("bove-printing");
+    if(menu){
+
+        menu.classList.remove("show");
+
+        menu.style.setProperty(
+            "display",
+            "none",
+            "important"
+        );
+
+        menu.style.setProperty(
+            "visibility",
+            "hidden",
+            "important"
+        );
+
+    }
 
     requestAnimationFrame(()=>{
 
-        window.print();
+        requestAnimationFrame(()=>{
+
+            window.print();
+
+        });
 
     });
 
@@ -11953,9 +11974,21 @@ function stampaTabellone(){
 
 window.addEventListener("afterprint",()=>{
 
-    document.body.classList.remove("bove-printing");
+    const menu =
+        document.getElementById("menuComandi");
+
+    if(menu){
+
+        menu.style.removeProperty("display");
+
+        menu.style.removeProperty("visibility");
+
+        menu.classList.remove("show");
+
+    }
 
 });
+
 
 
 function toggleMenu(){
