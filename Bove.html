@@ -4634,19 +4634,17 @@ function generateTestTournament(){
 }
 function aggiornaPannelloRegole(){
 
-    const tipo=document.getElementById("tipoTorneo")?.value;
     const fase=document.getElementById("faseEliminazioneBox");
     if(!fase) return;
 
-    const noKO=[];
+    /*
+     * I controlli della fase finale sono sempre disponibili.
+     * La formula selezionata imposta solo i valori iniziali:
+     * l'organizzatore può poi modificarli.
+     */
     fase.style.display="block";
-
-    const q=document.getElementById("usaQuarti");
-    const semi=document.getElementById("usaSemifinali");
-    const finale=document.getElementById("usaFinale");
-
-    if(false){}
 }
+
 
 function ensureRules(){
 
@@ -10673,33 +10671,42 @@ function renderKO(){
     if(!Array.isArray(state.finalTop)) state.finalTop=[];
     if(state.campioneTop===undefined) state.campioneTop=null;
 
-    q.style.display=state.rules.usaQuarti===true ? "table-row-group" : "none";
-    s.style.display=state.rules.usaSemifinali===true ? "table-row-group" : "none";
+    const usaQ=state.rules.usaQuarti===true;
+    const usaS=state.rules.usaSemifinali===true;
+    const usaF=state.rules.usaFinale===true;
 
+    q.style.display=usaQ ? "table-row-group" : "none";
+    s.style.display=usaS ? "table-row-group" : "none";
+
+    /*
+     * La struttura della fase finale viene mostrata subito.
+     * Le squadre reali sostituiscono i segnaposto quando le
+     * qualificazioni/risultati diventano disponibili.
+     */
     const teams=getFinalQualified();
-    if(!Array.isArray(teams) || teams.length<2) return;
+    const validTeams=Array.isArray(teams) ? teams : [];
 
     let semifinali=[];
     let finalisti=[];
 
-    if(state.rules.usaQuarti===true){
-
-        if(teams.length<8){
-            q.innerHTML=`<tr><td colspan="5">Servono 8 squadre qualificate per i Quarti di Finale.</td></tr>`;
-            return;
-        }
-
-        const quarti=[
-            [teams[0],teams[7]],
-            [teams[3],teams[4]],
-            [teams[1],teams[6]],
-            [teams[2],teams[5]]
-        ];
+    if(usaQ){
+        const quarti = validTeams.length>=8
+            ? [
+                [validTeams[0],validTeams[7]],
+                [validTeams[3],validTeams[4]],
+                [validTeams[1],validTeams[6]],
+                [validTeams[2],validTeams[5]]
+              ]
+            : [
+                ["1ª qualificata","8ª qualificata"],
+                ["4ª qualificata","5ª qualificata"],
+                ["2ª qualificata","7ª qualificata"],
+                ["3ª qualificata","6ª qualificata"]
+              ];
 
         const vincitori=[];
 
         quarti.forEach((match,index)=>{
-
             q.innerHTML+=renderMatchCard(
                 "QUARTO "+(index+1),
                 match,
@@ -10708,49 +10715,50 @@ function renderKO(){
                 state.qRes[index]
             );
 
-            const vincitore=getWinner(
-                match,
-                state.qRes[index]
-            );
+            const reale =
+                validTeams.length>=8 &&
+                !/qualificat/i.test(String(match[0])) &&
+                !/qualificat/i.test(String(match[1]));
+
+            const vincitore=reale
+                ? getWinner(match,state.qRes[index])
+                : null;
 
             if(vincitore) vincitori.push(vincitore);
         });
 
-        if(vincitori.length===4){
-            semifinali=[
-                [vincitori[0],vincitori[1]],
-                [vincitori[2],vincitori[3]]
-            ];
+        if(usaS){
+            semifinali = vincitori.length===4
+                ? [
+                    [vincitori[0],vincitori[1]],
+                    [vincitori[2],vincitori[3]]
+                  ]
+                : [
+                    ["Vincente Quarto 1","Vincente Quarto 2"],
+                    ["Vincente Quarto 3","Vincente Quarto 4"]
+                  ];
+        }else if(vincitori.length===4 && usaF){
+            finalisti=vincitori.slice(0,2);
         }
 
-    }else if(state.rules.usaSemifinali===true){
-
-        if(teams.length<4){
-            if(teams.length===2 && state.rules.usaFinale===true){
-                finalisti=teams.slice(0,2);
-            }else{
-                return;
-            }
-        }else{
-            semifinali=[
-                [teams[0],teams[3]],
-                [teams[1],teams[2]]
-            ];
-        }
-
-    }else if(state.rules.usaFinale===true){
-
-        finalisti=teams.slice(0,2);
-
-    }else{
-        return;
+    }else if(usaS){
+        semifinali = validTeams.length>=4
+            ? [
+                [validTeams[0],validTeams[3]],
+                [validTeams[1],validTeams[2]]
+              ]
+            : [
+                ["1ª qualificata","4ª qualificata"],
+                ["2ª qualificata","3ª qualificata"]
+              ];
+    }else if(usaF){
+        finalisti = validTeams.length>=2
+            ? validTeams.slice(0,2)
+            : ["1ª qualificata","2ª qualificata"];
     }
 
-
-    if(state.rules.usaSemifinali===true && semifinali.length>0){
-
+    if(usaS){
         semifinali.forEach((match,index)=>{
-
             s.innerHTML+=renderMatchCard(
                 "SEMIFINALE "+(index+1),
                 match,
@@ -10759,78 +10767,101 @@ function renderKO(){
                 state.sTopRes[index]
             );
 
-            const vincitore=getWinner(
-                match,
-                state.sTopRes[index]
-            );
+            const isPlaceholder =
+                /qualificat|vincente/i.test(String(match[0])) ||
+                /qualificat|vincente/i.test(String(match[1]));
+
+            const vincitore=isPlaceholder
+                ? null
+                : getWinner(match,state.sTopRes[index]);
 
             if(vincitore) finalisti.push(vincitore);
         });
-
     }
 
-    if(finalisti.length===2){
-        state.finalTop=[...finalisti];
-    }
-
-    if(state.rules.usaFinale!==true || finalisti.length!==2)
-        return;
-
-    f.innerHTML=renderMatchCard(
-        "🏆 FINALE",
-        finalisti,
-        "F",
-        0,
-        state.fTopRes
-    );
-
-    /* --- GESTIONE CAMPIONE E POSIZIONAMENTO SICURO SOTTO LA FINALE --- */
-    let campione = getWinner(finalisti, state.fTopRes);
-    
-    if (!campione && finalisti.length === 2) {
-        const resSplit = String(state.fTopRes || "").split("-");
-        if(resSplit.length === 2) {
-            const g1 = parseInt(resSplit[0]);
-            const g2 = parseInt(resSplit[1]);
-            if(!isNaN(g1) && !isNaN(g2)) {
-                if(g1 > g2) campione = finalisti[0];
-                else if(g2 > g1) campione = finalisti[1];
+    if(usaF){
+        if(finalisti.length!==2){
+            if(usaS){
+                finalisti=[
+                    "Vincente Semifinale 1",
+                    "Vincente Semifinale 2"
+                ];
+            }else if(usaQ){
+                finalisti=[
+                    "Vincente Quarto 1",
+                    "Vincente Quarto 2"
+                ];
+            }else if(validTeams.length>=2){
+                finalisti=validTeams.slice(0,2);
+            }else{
+                finalisti=[
+                    "1ª qualificata",
+                    "2ª qualificata"
+                ];
             }
         }
-    }
 
-    let winnerCard = document.getElementById("winnerCardKO");
+        state.finalTop=[...finalisti];
 
-    // Se non esiste, lo creiamo e lo posizioniamo subito sotto la finale (f)
-    if (!winnerCard && f.parentNode) {
-        winnerCard = document.createElement("div");
-        winnerCard.id = "winnerCardKO";
-        winnerCard.className = "card winner-card-ko";
-        f.parentNode.insertBefore(winnerCard, f.nextSibling);
-    } else if (winnerCard && f.parentNode && winnerCard.previousElementSibling !== f) {
-        // Se esiste già ma è altrove, lo spostiamo nel posto giusto
-        f.parentNode.insertBefore(winnerCard, f.nextSibling);
-    }
+        f.innerHTML=renderMatchCard(
+            "🏆 FINALE",
+            finalisti,
+            "F",
+            0,
+            state.fTopRes
+        );
 
-    if(campione){
-        state.campioneTop=campione;
+        const finalPlaceholder =
+            /qualificat|vincente/i.test(String(finalisti[0])) ||
+            /qualificat|vincente/i.test(String(finalisti[1]));
 
-        if(winnerCard){
-            winnerCard.style.cssText = "display: block !important; margin-top: 15px;";
-            winnerCard.innerHTML=`
-                <div class="winner-box top-win" style="background: rgba(251,191,36,.2); color: #fbbf24; padding: 15px; border-radius: 8px; text-align: center; font-weight: bold; font-size: 1.3em;">
-                    🏆 CAMPIONE TORNEO:<br>
-                    <span style="font-size: 1.1em; font-weight: normal; color: #e2e8f0;">${formatCoppiaDisplay(campione)}</span>
-                </div>
-            `;
+        let campione =
+            finalPlaceholder
+            ? null
+            : getWinner(finalisti,state.fTopRes);
+
+        if(!campione){
+            const resSplit=String(state.fTopRes || "").split("-");
+            if(!finalPlaceholder && resSplit.length===2){
+                const g1=parseInt(resSplit[0]);
+                const g2=parseInt(resSplit[1]);
+                if(!isNaN(g1) && !isNaN(g2)){
+                    if(g1>g2) campione=finalisti[0];
+                    else if(g2>g1) campione=finalisti[1];
+                }
+            }
         }
 
-    }else{
-        state.campioneTop=null;
+        let winnerCard=document.getElementById("winnerCardKO");
 
-        if(winnerCard){
-            winnerCard.style.cssText = "display: none !important;";
-            winnerCard.innerHTML="";
+        if(!winnerCard && f.parentNode){
+            winnerCard=document.createElement("div");
+            winnerCard.id="winnerCardKO";
+            winnerCard.className="card winner-card-ko";
+            f.parentNode.insertBefore(winnerCard,f.nextSibling);
+        }else if(winnerCard && f.parentNode && winnerCard.previousElementSibling!==f){
+            f.parentNode.insertBefore(winnerCard,f.nextSibling);
+        }
+
+        if(campione){
+            state.campioneTop=campione;
+
+            if(winnerCard){
+                winnerCard.style.cssText="display: block !important; margin-top: 15px;";
+                winnerCard.innerHTML=`
+                    <div class="winner-box top-win" style="background: rgba(251,191,36,.2); color: #fbbf24; padding: 15px; border-radius: 8px; text-align: center; font-weight: bold; font-size: 1.3em;">
+                        🏆 CAMPIONE TORNEO:<br>
+                        <span style="font-size: 1.1em; font-weight: normal; color: #e2e8f0;">${formatCoppiaDisplay(campione)}</span>
+                    </div>
+                `;
+            }
+        }else{
+            state.campioneTop=null;
+
+            if(winnerCard){
+                winnerCard.style.cssText="display: none !important;";
+                winnerCard.innerHTML="";
+            }
         }
     }
 }
@@ -10861,13 +10892,21 @@ function renderMatchCard(titolo, match, type, index, risultato) {
         ? (state[timeKey][index] || "")
         : "";
 
-    const winner = getWinner(match, risultato);
+    const team1 = match && match[0] ? String(match[0]) : "Da determinare";
+    const team2 = match && match[1] ? String(match[1]) : "Da determinare";
+    const placeholder =
+        /^(da determinare|vincente |qualificat[ao] |[0-9]+[ªa°]? qualificat[ao])/i;
+
+    const isPlaceholder =
+        placeholder.test(team1.trim()) ||
+        placeholder.test(team2.trim());
+
+    const winner = isPlaceholder ? null : getWinner(match, risultato);
     const stato = winner ? "Terminata" : "Da giocare";
 
     return `
 <tr>
 
-    <!-- COLONNA CAMPO -->
     <td class="campo-cell">
         <input
             value="${camp}"
@@ -10876,7 +10915,6 @@ function renderMatchCard(titolo, match, type, index, risultato) {
         >
     </td>
 
-    <!-- COLONNA ORA / MINUTI -->
     <td class="orario-cell">
         <input
             type="time"
@@ -10885,11 +10923,10 @@ function renderMatchCard(titolo, match, type, index, risultato) {
         >
     </td>
 
-    <!-- COLONNA MATCHES -->
     <td class="match-cell">
 
         <div class="team-line">
-            ${formatCoppiaDisplay(match[0])}
+            ${isPlaceholder ? team1 : formatCoppiaDisplay(team1)}
         </div>
 
         <div class="vs-line">
@@ -10897,24 +10934,24 @@ function renderMatchCard(titolo, match, type, index, risultato) {
         </div>
 
         <div class="team-line">
-            ${formatCoppiaDisplay(match[1])}
+            ${isPlaceholder ? team2 : formatCoppiaDisplay(team2)}
         </div>
 
     </td>
 
-    <!-- RISULTATO SQUADRA 1 -->
     <td class="score-cell">
         <input
             value="${risultato1}"
             oninput="updateKOResult('${type}', ${index}, this.value, 0)"
+            ${isPlaceholder ? "disabled" : ""}
         >
     </td>
 
-    <!-- RISULTATO SQUADRA 2 -->
     <td class="score-cell">
         <input
             value="${risultato2}"
             oninput="updateKOResult('${type}', ${index}, this.value, 1)"
+            ${isPlaceholder ? "disabled" : ""}
         >
     </td>
 
