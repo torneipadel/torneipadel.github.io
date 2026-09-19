@@ -20,7 +20,7 @@ style.textContent=`
 let cursor=new Date();
 let selectedDay=null;
 function monthName(d){return d.toLocaleDateString('it-IT',{month:'long',year:'numeric'}).replace(/^./,c=>c.toUpperCase())}
-function tournamentsByDay(){const m=new Map();for(const t of allTournaments()){const d=parseDate(tournamentDate(t));if(!d)continue;const k=iso(d);if(!m.has(k))m.set(k,[]);m.get(k).push(t)}return m}
+function tournamentsByDay(){const m=new Map();for(const t of allTournaments()){const base=parseDate(tournamentDate(t));if(base){const k=iso(base);if(!m.has(k))m.set(k,[]);m.get(k).push({t,g:null})}const days=t?.configurazione?.rotazione?.giornate;if(Array.isArray(days))days.forEach(g=>{const d=parseDate(g?.data);if(!d)return;const k=iso(d);if(!m.has(k))m.set(k,[]);m.get(k).push({t,g})});}return m}
 function openTournament(id){const s=state();s.torneoSelezionato=id;try{localStorage.setItem('padel_admin_state',JSON.stringify(s))}catch(e){};window.openAdminPage?.('torneo')}
 function renderCalendar(){
  const root=$('appContent');if(!root)return;
@@ -49,8 +49,8 @@ function bind(){
  $('calendarPrev')?.addEventListener('click',()=>{cursor=new Date(cursor.getFullYear(),cursor.getMonth()-1,1);selectedDay=null;renderCalendar()});
  $('calendarNext')?.addEventListener('click',()=>{cursor=new Date(cursor.getFullYear(),cursor.getMonth()+1,1);selectedDay=null;renderCalendar()});
  $('calendarToday')?.addEventListener('click',()=>{const d=new Date();cursor=new Date(d.getFullYear(),d.getMonth(),1);selectedDay=iso(d);renderCalendar()});
- document.querySelectorAll('[data-calendar-day]').forEach(b=>b.addEventListener('click',()=>{const key=b.dataset.calendarDay;const list=tournamentsByDay().get(key)||[];if(list.length){openTournament(list[0].id);return}selectedDay=key;renderCalendar()}));
- document.querySelectorAll('[data-calendar-open]').forEach(b=>b.addEventListener('click',()=>openTournament(b.dataset.calendarOpen)));
+ document.querySelectorAll('[data-calendar-day]').forEach(b=>b.addEventListener('click',()=>{selectedDay=b.dataset.calendarDay;renderCalendar()}));
+ document.querySelectorAll('[data-calendar-open]').forEach(b=>b.addEventListener('click',e=>{e.stopPropagation();openTournament(b.dataset.calendarOpen)}));
 }
 window.openAdminCalendar=()=>{const t=allTournaments().find(x=>String(x.id)===String(state().torneoSelezionato));const d=t?parseDate(tournamentDate(t)):new Date();cursor=new Date((d||new Date()).getFullYear(),(d||new Date()).getMonth(),1);selectedDay=t&&d?iso(d):null;renderCalendar()};
 document.addEventListener('click',e=>{const b=e.target.closest('#calendar');if(b){e.preventDefault();window.openAdminCalendar?.()}});
