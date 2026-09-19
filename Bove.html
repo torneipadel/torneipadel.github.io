@@ -5043,6 +5043,41 @@ function ensureRules(){
 
     /*
         ============================
+        VALIDAZIONE FASE FINALE
+        ============================
+    */
+
+    const numeroQualificatiFinali =
+        Number(
+            state.rules.numeroQualificateFinali
+        ) || 0;
+
+    /*
+        I Quarti richiedono 8 qualificate.
+        Se il numero configurato è inferiore,
+        i Quarti vengono disattivati.
+    */
+    if(numeroQualificatiFinali < 8){
+
+        state.rules.usaQuarti = false;
+        state.rules.mostraQuarti = false;
+        state.mostraQuarti = false;
+
+        const checkboxQuarti =
+            document.getElementById("usaQuarti");
+
+        if(checkboxQuarti)
+            checkboxQuarti.checked = false;
+
+        const mostraQuarti =
+            document.getElementById("mostraQuartiSelect");
+
+        if(mostraQuarti)
+            mostraQuarti.value = "false";
+    }
+
+    /*
+        ============================
         REGOLE KO
         ============================
     */
