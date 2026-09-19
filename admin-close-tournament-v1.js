@@ -68,35 +68,6 @@ async function riapriIscrizioniTorneo(){
 }
 window.riapriIscrizioniTorneo=riapriIscrizioniTorneo;
 
-async function riapriTorneoArchiviato(id){
-  const t=(window.adminState?.tornei||[]).find(x=>String(x.id)===String(id));
-  if(!t){alert('Torneo non trovato.');return false}
-  if(String(t.stato||'').toLowerCase()!=='archiviato'){alert('Il torneo selezionato non è archiviato.');return false}
-  if(!confirm('Riaprire il torneo "'+(t.nome||'Torneo')+'"?\n\nIl torneo tornerà in BOZZA, con iscrizioni aperte ma NON pubblicato. Potrai pubblicarlo nuovamente dall’area Admin.'))return false;
-  const client=getClient();
-  if(!client){alert('Connessione Supabase non disponibile.');return false}
-  try{
-    const {data,error}=await client.from('tornei').update({stato:'bozza',iscrizioni_chiuse:false,pubblicato:false}).eq('id',t.id).select('*').single();
-    if(error)throw error;
-    const arr=window.adminState?.tornei;
-    if(Array.isArray(arr)){
-      const i=arr.findIndex(x=>String(x.id)===String(t.id));
-      if(i>=0)arr[i]=data||{...t,stato:'bozza',iscrizioni_chiuse:false,pubblicato:false};
-    }
-    window.adminState.torneoSelezionato=t.id;
-    try{localStorage.setItem('padel_admin_state',JSON.stringify(window.adminState||{}))}catch(e){}
-    if(typeof window.caricaTorneiSupabase==='function')await window.caricaTorneiSupabase();
-    else if(typeof window.renderCleanAdmin==='function')window.renderCleanAdmin();
-    alert('Torneo riaperto correttamente. Stato: BOZZA. Pubblicazione ancora disattivata.');
-    return true;
-  }catch(e){
-    console.error('Errore riapertura torneo archiviato:',e);
-    alert('Riapertura torneo non riuscita: '+(e?.message||e));
-    return false;
-  }
-}
-window.riapriTorneoArchiviato=riapriTorneoArchiviato;
-
 function install(){
   const render=window.renderCleanAdmin;
   if(typeof render!=='function')return false;

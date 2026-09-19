@@ -18,14 +18,14 @@ const num=v=>Number(v)||0;
 function isOpen(t){
  const stato=String(t.stato||'').toLowerCase();
 
- return t.pubblicato===true
+ return (t.pubblicato===true||stato==='attivo')
   &&t.iscrizioni_chiuse!==true
   &&!['chiuso','concluso','archiviato'].includes(stato)
 }
 
 function isVisible(t){
  const stato=String(t.stato||'').toLowerCase();
- return t.pubblicato===true
+ return t.pubblicato===true||stato==='attivo'
 }
 
 function formula(t){
