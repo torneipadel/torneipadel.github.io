@@ -4630,20 +4630,68 @@ function aggiornaPannelloRegole(){
 
     const tipo=document.getElementById("tipoTorneo")?.value;
     const fase=document.getElementById("faseEliminazioneBox");
-    if(!fase) return;
-
-    const noKO=["svizzero","americano","mexicano","king"];
-    fase.style.display=noKO.includes(tipo) ? "none" : "block";
 
     const q=document.getElementById("usaQuarti");
     const semi=document.getElementById("usaSemifinali");
     const finale=document.getElementById("usaFinale");
 
-    if(noKO.includes(tipo)){
+    const noKO=[
+        "svizzero",
+        "americano",
+        "mexicano",
+        "king"
+    ];
+
+    const isNoKO=noKO.includes(tipo);
+    const isEliminazione=tipo==="eliminazione";
+
+    if(fase)
+        fase.style.display=isNoKO ? "none" : "block";
+
+    if(isNoKO){
+
         if(q) q.checked=false;
         if(semi) semi.checked=false;
         if(finale) finale.checked=false;
+
+        state.rules.usaQuarti=false;
+        state.rules.usaSemifinali=false;
+        state.rules.usaFinale=false;
+        state.rules.ripescaggio=false;
+        state.rules.numeroRipescate=0;
+
+        return;
     }
+
+    if(isEliminazione){
+
+        if(q) q.checked=false;
+        if(semi) semi.checked=true;
+        if(finale) finale.checked=true;
+
+        state.rules.usaQuarti=false;
+        state.rules.usaSemifinali=true;
+        state.rules.usaFinale=true;
+        state.rules.ripescaggio=false;
+        state.rules.numeroRipescate=0;
+
+        return;
+    }
+
+    /*
+     * Nei formati a gironi i quarti richiedono
+     * necessariamente le semifinali.
+     */
+    if(q?.checked===true && semi?.checked!==true){
+
+        q.checked=false;
+        state.rules.usaQuarti=false;
+
+    }
+
+    state.rules.usaQuarti=q?.checked===true;
+    state.rules.usaSemifinali=semi?.checked===true;
+    state.rules.usaFinale=finale?.checked===true;
 }
 
 function ensureRules(){
@@ -11459,8 +11507,8 @@ function applicaModelloTorneo(){
             state.rules.qualificatePerGirone=0;
             state.rules.numeroQualificateFinali=4;
             state.rules.usaQuarti=false;
-            state.rules.usaSemifinali=true;
-            state.rules.usaFinale=true;
+            state.rules.usaSemifinali=false;
+            state.rules.usaFinale=false;
             if(!state.svizzero){
                 state.svizzero={
                     turno:1,
