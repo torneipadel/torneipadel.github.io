@@ -12578,8 +12578,8 @@ function stampaTabellone(){
 
             body.bove-printing #bovePrintBoard{
                 display:block !important;
-                width:280mm !important;
-                max-width:280mm !important;
+                width:287mm !important;
+                max-width:287mm !important;
                 height:190mm !important;
                 min-height:0 !important;
                 margin:0 auto !important;
@@ -12587,52 +12587,49 @@ function stampaTabellone(){
                 background:#fff !important;
                 color:#111827 !important;
                 font-family:Arial,Helvetica,sans-serif;
-                padding:1mm 2mm 0;
+                padding:0 1mm;
                 overflow:hidden !important;
             }
 
             .print-header{
-                height:23mm;
+                height:25mm;
                 box-sizing:border-box;
                 text-align:center;
                 border-bottom:2px solid #111827;
                 padding:0 2mm 2.5mm;
-                margin-bottom:3.5mm;
+                margin:0 0 4mm;
             }
 
             .print-brand{
-                font-size:9px;
+                font-size:10px;
                 font-weight:800;
-                letter-spacing:2px;
-                margin-bottom:1.2mm;
+                letter-spacing:2.4px;
+                margin-bottom:1.5mm;
                 color:#475569;
             }
 
             .print-title{
-                font-size:25px;
+                font-size:30px;
                 font-weight:900;
                 line-height:1.05;
-                margin-bottom:1.5mm;
+                margin-bottom:1.8mm;
             }
 
             .print-subtitle{
-                font-size:11px;
+                font-size:12px;
                 color:#334155;
                 font-weight:800;
                 text-transform:uppercase;
-                letter-spacing:.7px;
+                letter-spacing:.8px;
             }
 
             .print-columns{
                 position:relative;
                 display:grid;
-                grid-template-columns:
-                    minmax(0,1fr)
-                    minmax(0,1fr)
-                    minmax(0,1fr);
-                gap:5mm;
+                grid-template-columns:repeat(3,minmax(0,1fr));
+                gap:7mm;
                 width:100%;
-                height:130mm;
+                height:155mm;
                 align-items:stretch;
                 margin:0 auto;
             }
@@ -12644,22 +12641,22 @@ function stampaTabellone(){
             }
 
             .print-phase h2{
-                height:11mm;
-                width:106% !important;
+                height:13mm;
+                width:108% !important;
                 box-sizing:border-box;
-                font-size:13px;
+                font-size:15px;
                 font-weight:900;
-                letter-spacing:1.2px;
+                letter-spacing:1.4px;
                 text-align:center;
-                margin:0 -3% 3mm;
-                padding:2.5mm 1mm;
+                margin:0 -4% 3mm;
+                padding:3mm 1mm;
                 border:2px solid #334155;
                 background:#e2e8f0;
-                border-radius:6px;
+                border-radius:7px;
             }
 
             .print-phase-list{
-                height:119mm;
+                height:139mm;
                 min-height:0;
                 display:flex;
                 flex-direction:column;
@@ -12668,29 +12665,29 @@ function stampaTabellone(){
 
             .print-phase-q .print-phase-list{
                 justify-content:flex-start;
-                padding:3mm 0;
-                gap:9mm;
+                padding:2mm 0;
+                gap:5mm;
             }
 
             .print-phase-s .print-phase-list{
                 justify-content:flex-start;
-                padding:15mm 0;
-                gap:31mm;
+                padding:13mm 0;
+                gap:58mm;
             }
 
             .print-phase-f .print-phase-list{
                 justify-content:flex-start;
-                padding:39mm 0 0;
+                padding:46mm 0 0;
             }
 
             .print-match{
                 position:relative;
                 width:100%;
-                height:25mm;
-                min-height:25mm;
-                max-height:25mm;
-                border:1.8px solid #111827;
-                border-radius:6px;
+                height:34mm;
+                min-height:34mm;
+                max-height:34mm;
+                border:2px solid #111827;
+                border-radius:7px;
                 background:#fff;
                 overflow:visible;
                 box-sizing:border-box;
@@ -12700,26 +12697,26 @@ function stampaTabellone(){
             .print-match-title{
                 background:#111827;
                 color:#fff;
-                font-size:10px;
+                font-size:11.5px;
                 font-weight:900;
                 text-transform:uppercase;
-                letter-spacing:.55px;
-                line-height:1;
-                padding:1.3mm 1.6mm;
+                letter-spacing:.65px;
+                line-height:1.05;
+                padding:1.8mm 2mm;
                 text-align:left;
-                border-radius:4px 4px 0 0;
+                border-radius:5px 5px 0 0;
             }
 
             .print-team-row{
-                min-height:4.8mm;
-                height:4.8mm;
+                min-height:8mm;
+                height:8mm;
                 display:flex;
                 align-items:center;
-                padding:.55mm 12mm .55mm 1.5mm;
-                font-size:12.5px;
+                padding:1mm 15mm 1mm 2mm;
+                font-size:16px;
                 font-weight:900;
-                line-height:1;
-                border-bottom:1px solid #e2e8f0;
+                line-height:1.05;
+                border-bottom:1px solid #cbd5e1;
                 text-align:center;
                 justify-content:center;
                 overflow:hidden;
@@ -12730,17 +12727,17 @@ function stampaTabellone(){
 
             .print-score{
                 position:absolute;
-                right:1.5mm;
-                top:8.5mm;
-                font-size:10.5px;
+                right:2mm;
+                top:12mm;
+                font-size:14px;
                 font-weight:900;
-                min-width:10mm;
-                height:6mm;
+                min-width:13mm;
+                height:9mm;
                 box-sizing:border-box;
                 text-align:center;
-                padding:.8mm .6mm;
-                border:1.8px solid #334155;
-                border-radius:3px;
+                padding:1.2mm .8mm;
+                border:2px solid #334155;
+                border-radius:4px;
                 background:#f8fafc;
                 z-index:3;
                 line-height:1;
@@ -12749,14 +12746,15 @@ function stampaTabellone(){
             .print-match-info{
                 display:flex;
                 justify-content:space-between;
-                gap:1.5mm;
-                padding:.7mm 1.5mm;
-                font-size:8.5px;
+                align-items:center;
+                gap:2mm;
+                padding:1.2mm 2mm;
+                font-size:10px;
                 line-height:1.05;
                 color:#334155;
                 font-weight:800;
                 background:#f8fafc;
-                border-radius:0 0 4px 4px;
+                border-radius:0 0 5px 5px;
                 white-space:nowrap;
                 overflow:hidden;
             }
@@ -12766,8 +12764,8 @@ function stampaTabellone(){
                 left:0;
                 right:0;
                 bottom:0;
-                padding:.7mm 1mm;
-                font-size:7.5px;
+                padding:1mm 1.5mm;
+                font-size:9px;
                 font-weight:800;
                 text-align:center;
                 background:#ecfdf5;
@@ -12776,7 +12774,7 @@ function stampaTabellone(){
                 overflow:hidden;
                 white-space:nowrap;
                 text-overflow:ellipsis;
-                border-radius:0 0 4px 4px;
+                border-radius:0 0 5px 5px;
             }
 
             /*
