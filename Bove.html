@@ -11306,7 +11306,7 @@ function applicaModelloTorneo(){
             state.rules.qualificatePerGirone=2;
             state.rules.numeroQualificateFinali=
                 state.rules.numeroGironi*state.rules.qualificatePerGirone;
-            state.rules.usaQuarti=state.rules.numeroQualificateFinali>=8;
+            state.rules.usaQuarti=true;
             state.rules.usaSemifinali=true;
             state.rules.usaFinale=true;
         break;
@@ -11319,7 +11319,7 @@ function applicaModelloTorneo(){
             state.rules.qualificatePerGirone=2;
             state.rules.numeroQualificateFinali=
                 state.rules.numeroGironi*state.rules.qualificatePerGirone;
-            state.rules.usaQuarti=state.rules.numeroQualificateFinali>=8;
+            state.rules.usaQuarti=true;
             state.rules.usaSemifinali=true;
             state.rules.usaFinale=true;
         break;
@@ -11331,7 +11331,7 @@ function applicaModelloTorneo(){
             state.rules.formulaFinale="eliminazioneDiretta";
             state.rules.qualificatePerGirone=0;
             state.rules.numeroQualificateFinali=n;
-            state.rules.usaQuarti=false;
+            state.rules.usaQuarti=true;
             state.rules.usaSemifinali=true;
             state.rules.usaFinale=true;
         break;
