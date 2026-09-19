@@ -4669,10 +4669,22 @@ function ensureRules(){
         state.rules.tipoTorneo="gironi";
 
 
-    if(state.rules.formatoTorneo===undefined)
+    const formatoSalvato =
+        Number(state.rules.formatoTorneo);
+
+    if(
+        ![8,12,16,20,24].includes(formatoSalvato)
+    ){
 
         state.rules.formatoTorneo =
-            state.rules.tipoTorneo;
+            Number(state.rules.numeroSquadre) || 8;
+
+    }else{
+
+        state.rules.formatoTorneo =
+            formatoSalvato;
+
+    }
 
 
 
@@ -5339,7 +5351,8 @@ function applyRules(){
 
     state.rules.numeroSquadre=n;
     state.rules.tipoTorneo=tipo;
-    state.rules.formatoTorneo=tipo;
+    state.rules.formatoTorneo=n;
+    state.rules.numeroSquadre=n;
 
     const struttura={
         8:{gironi:2,perGirone:4},
@@ -11269,7 +11282,22 @@ function applicaModelloTorneo(){
     const tipo=select.value;
     if(!tipo) return;
 
-    const n=Number(state.rules.numeroSquadre)||8;
+    const formatoInput=document.getElementById("formatoTorneo");
+
+    const nSelezionato =
+        formatoInput
+        ? Number(formatoInput.value)
+        : Number(state.rules.formatoTorneo);
+
+    const n =
+        [8,12,16,20,24].includes(nSelezionato)
+        ? nSelezionato
+        : (Number(state.rules.numeroSquadre) || 8);
+
+    state.rules.numeroSquadre=n;
+    state.rules.formatoTorneo=n;
+    state.formato=n;
+
     const struttura={
         8:{gironi:2,perGirone:4},
         12:{gironi:3,perGirone:4},
