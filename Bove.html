@@ -1767,7 +1767,9 @@ Seleziona formato torneo
 
           type="checkbox" 
 
-          checked>
+          checked
+
+          onchange="aggiornaFaseFinaleDaUI()">
 
         Usa Quarti di Finale
 
@@ -1783,7 +1785,9 @@ Seleziona formato torneo
 
           type="checkbox" 
 
-          checked>
+          checked
+
+          onchange="aggiornaFaseFinaleDaUI()">
 
         Usa Semifinali
 
@@ -1799,7 +1803,9 @@ Seleziona formato torneo
 
           type="checkbox" 
 
-          checked>
+          checked
+
+          onchange="aggiornaFaseFinaleDaUI()">
 
         Usa Finale
 
@@ -4628,6 +4634,24 @@ function generateTestTournament(){
 
 
 }
+function aggiornaFaseFinaleDaUI(){
+
+    ensureRules();
+
+    ["usaQuarti","usaSemifinali","usaFinale"].forEach(id=>{
+
+        const el=document.getElementById(id);
+
+        if(el)
+            state.rules[id]=el.checked===true;
+
+    });
+
+    if(typeof renderKO==="function")
+        renderKO();
+
+}
+
 function aggiornaPannelloRegole(){
 
     let tipo =
@@ -11251,6 +11275,7 @@ function renderKO(){
 
     q.style.display=state.rules.usaQuarti===true ? "table-row-group" : "none";
     s.style.display=state.rules.usaSemifinali===true ? "table-row-group" : "none";
+    f.style.display=state.rules.usaFinale===true ? "" : "none";
 
     const teams=getFinalQualified();
     if(!Array.isArray(teams) || teams.length<2) return;
