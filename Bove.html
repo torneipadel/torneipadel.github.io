@@ -5430,23 +5430,12 @@ function applyRules(){
             Number(document.getElementById("numeroQualificateFinali")?.value)||0;
     }
 
-    if(groupTypes.includes(tipo)){
-        state.rules.usaQuarti=document.getElementById("usaQuarti")?.checked===true;
-        state.rules.usaSemifinali=document.getElementById("usaSemifinali")?.checked===true;
-        state.rules.usaFinale=document.getElementById("usaFinale")?.checked===true;
-    }else if(tipo==="eliminazione"){
-        state.rules.usaQuarti=false;
-        state.rules.usaSemifinali=true;
-        state.rules.usaFinale=true;
-    }else if(noKO.includes(tipo)){
-        state.rules.usaQuarti=false;
-        state.rules.usaSemifinali=false;
-        state.rules.usaFinale=false;
-    }else{
-        state.rules.usaQuarti=document.getElementById("usaQuarti")?.checked===true;
-        state.rules.usaSemifinali=document.getElementById("usaSemifinali")?.checked===true;
-        state.rules.usaFinale=document.getElementById("usaFinale")?.checked===true;
-    }
+    state.rules.usaQuarti=document.getElementById("usaQuarti")?.checked===true;
+    state.rules.usaSemifinali=document.getElementById("usaSemifinali")?.checked===true;
+    state.rules.usaFinale=document.getElementById("usaFinale")?.checked===true;
+
+    if(state.rules.usaQuarti) state.rules.usaSemifinali=true;
+    if(state.rules.usaSemifinali) state.rules.usaFinale=true;
 
     state.rules.ripescaggio=document.getElementById("ripescaggio")?.checked===true;
     state.rules.numeroRipescate=
@@ -10093,10 +10082,12 @@ function renderItaliana(){
                 <b>Fase finale:</b><br>
                 ${
                     state.rules.usaQuarti
-                    ?
-                    "Quarti → Semifinali → Finale"
-                    :
-                    "Accesso diretto alla fase successiva"
+                    ? "Quarti → Semifinali → Finale"
+                    : state.rules.usaSemifinali
+                    ? "Semifinali → Finale"
+                    : state.rules.usaFinale
+                    ? "Finale"
+                    : "Solo classifica"
                 }
             </p>
 
@@ -10604,395 +10595,61 @@ oninput="updateRes('${tag}',${i},1,this.value)">
 
    
 function getFinalQualified(){
-
     ensureRules();
-
-    const qualificate = [];
-    const lettereGironi = ["A","B","C","D","E","F","G"];
-
-    lettereGironi.forEach(tag => {
-
-        const squadre = state[tag];
-
-        if(!Array.isArray(squadre) || squadre.length === 0)
-            return;
-
-        const risultati =
-            Array.isArray(state[tag+"res"])
-                ? state[tag+"res"]
-                : [];
-
-        /*
-         * NON qualificare nessuno finché non sono stati
-         * inseriti tutti i risultati del girone.
-         */
-        const numeroPartite =
-            squadre.length * (squadre.length - 1) / 2;
-
-        if(
-            risultati.length < numeroPartite ||
-            risultati.slice(0, numeroPartite).some(r => 
-                r === "-" ||
-                r === "" ||
-                r == null
-            )
-        ){
-            console.log(
-                "Girone", tag,
-                "non ancora completato: nessuna qualificata."
-            );
-            return;
-        }
-
-        const classifica = calc(
-            squadre,
-            risultati
-        );
-
-        if(!Array.isArray(classifica) || classifica.length === 0)
-            return;
-
-        let q = Number(state.rules.qualificatePerGirone);
-
-        if(!Number.isFinite(q) || q < 1)
-            q = 1;
-
-        /*
-         * Con i quarti attivi e girone da 4,
-         * tutte le 4 squadre vengono considerate
-         * SOLO DOPO che il girone è completo.
-         */
-        if(
-            state.rules.usaQuarti === true &&
-            squadre.length === 4
-        ){
-            q = 4;
-        }
-
-        classifica.forEach((x,i) => {
-
-            if(i < q){
-
-                qualificate.push({
-                    nome:x.n,
-                    pt:x.pt,
-                    gf:x.gf,
-                    gs:x.gs,
-                    df:x.df,
-                    girone:tag,
-                    posizione:i+1
-                });
-
-            }
-
-        });
-
+    const qualificati=[];
+    const lettereGironi=["A","B","C","D","E","F","G"];
+    lettereGironi.forEach(tag=>{
+        const squadre=state[tag];
+        if(!Array.isArray(squadre)||squadre.length===0) return;
+        const risultati=Array.isArray(state[tag+"res"])?state[tag+"res"]:[];
+        const numeroPartite=squadre.length*(squadre.length-1)/2;
+        if(risultati.length<numeroPartite||risultati.slice(0,numeroPartite).some(r=>r==="-"||r===""||r==null)) return;
+        const classifica=calc(squadre,risultati);
+        if(!Array.isArray(classifica)||!classifica.length) return;
+        let q=Number(state.rules.qualificatePerGirone);
+        if(!Number.isFinite(q)||q<1) q=1;
+        if(state.rules.usaQuarti===true&&squadre.length===4) q=4;
+        classifica.slice(0,q).forEach((x,i)=>qualificati.push({nome:x.n,posizione:i+1,girone:tag,pt:x.pt,gf:x.gf,gs:x.gs,df:x.df}));
     });
-
-    let limite =
-        Number(state.rules.numeroQualificateFinali);
-
-    if(
-        state.rules.usaQuarti === true &&
-        qualificate.length >= 8
-    ){
-        limite = 8;
+    if(qualificati.length===0&&Array.isArray(state.coppie)&&state.coppie.length){
+        state.coppie.forEach((x,i)=>qualificati.push({nome:x,posizione:i+1}));
     }
-
-    if(!limite || limite < 1)
-        limite = qualificate.length;
-
-    return qualificate
-        .slice(0,limite)
-        .map(x => x.nome);
+    if(!qualificati.length) return [];
+    let richiesti=0;
+    if(state.rules.usaQuarti===true) richiesti=8;
+    else if(state.rules.usaSemifinali===true) richiesti=4;
+    else if(state.rules.usaFinale===true) richiesti=2;
+    return richiesti>0?qualificati.slice(0,richiesti).map(x=>x.nome):[];
 }
-
-
 function sincronizzaFaseFinale(){
-
     ensureRules();
-
-    /*
-    ==================================================
-    FASE FINALE: RICOSTRUZIONE COERENTE
-    ==================================================
-    */
-
-    const qualificati = getFinalQualified();
-
-    /*
-     * Se i gironi non sono completati,
-     * NON devono esistere quarti, semifinali o finale.
-     */
-
-    if(!Array.isArray(qualificati) || qualificati.length < 2){
-
-        state.quarti = [];
-        state.semiTop = [];
-        state.finalTop = [];
-
-        state.qRes = Array(4).fill("-");
-        state.qCamp = [];
-        state.qTime = [];
-
-        state.sTopRes = Array(2).fill("-");
-        state.sTopCamp = [];
-        state.sTopTime = [];
-
-        state.fTopRes = "-";
-        state.fTopCamp = "";
-        state.fTopTime = "";
-
-        state.campioneTop = null;
-
-        console.log(
-            "FASE FINALE AZZERATA: gironi non completati."
-        );
-
-        return;
+    const qualificati=getFinalQualified();
+    state.quarti=[]; state.semiTop=[]; state.finalTop=[];
+    if(!Array.isArray(qualificati)||qualificati.length<2){
+        state.qRes=Array(4).fill("-"); state.qCamp=[]; state.qTime=[];
+        state.sTopRes=Array(2).fill("-"); state.sTopCamp=[]; state.sTopTime=[];
+        state.fTopRes="-"; state.fTopCamp=""; state.fTopTime=""; state.campioneTop=null; return;
     }
-
-
-    /*
-    ==================================================
-    QUARTI
-    ==================================================
-    */
-
-    if(
-        state.rules.usaQuarti === true &&
-        qualificati.length >= 8
-    ){
-
-        /*
-         * Abbinamento standard:
-         *
-         * 1A vs 4B
-         * 2A vs 3B
-         * 1B vs 4A
-         * 2B vs 3A
-         *
-         * Se i qualificati arrivano già ordinati
-         * da getFinalQualified(), utilizziamo comunque
-         * blocchi da 4.
-         */
-
-        const q = [];
-
-        for(let i=0; i<8; i+=2){
-
-            if(
-                qualificati[i] &&
-                qualificati[i+1]
-            ){
-
-                q.push([
-                    qualificati[i],
-                    qualificati[i+1]
-                ]);
-
-            }
-
-        }
-
-        state.quarti = q;
-
-        /*
-         * Mantiene i risultati esistenti SOLO se
-         * esiste realmente la partita corrispondente.
-         */
-
-        if(!Array.isArray(state.qRes))
-            state.qRes = Array(4).fill("-");
-
-        while(state.qRes.length < 4)
-            state.qRes.push("-");
-
-        state.qRes = state.qRes.slice(0,4);
-
+    if(state.rules.usaQuarti===true){
+        if(qualificati.length<8) return;
+        state.quarti=[[qualificati[0],qualificati[7]],[qualificati[3],qualificati[4]],[qualificati[1],qualificati[6]],[qualificati[2],qualificati[5]]];
+        if(!Array.isArray(state.qRes)) state.qRes=Array(4).fill("-");
+        const v=[]; state.quarti.forEach((m,i)=>{const w=getWinner(m,state.qRes[i]); if(w)v.push(w);});
+        if(v.length<4) return;
+        if(state.rules.usaSemifinali===true) state.semiTop=[[v[0],v[1]],[v[2],v[3]]];
+        else state.finalTop=v.slice(0,2);
+    }else if(state.rules.usaSemifinali===true){
+        if(qualificati.length<4) return;
+        state.semiTop=[[qualificati[0],qualificati[3]],[qualificati[1],qualificati[2]]];
+    }else if(state.rules.usaFinale===true){
+        state.finalTop=qualificati.slice(0,2);
+    }else return;
+    if(state.rules.usaSemifinali===true){
+        const v=[]; state.semiTop.forEach((m,i)=>{const w=getWinner(m,Array.isArray(state.sTopRes)?state.sTopRes[i]:"-"); if(w)v.push(w);});
+        if(v.length===2) state.finalTop=v; else if(state.rules.usaFinale===true) return;
     }
-    else{
-
-        state.quarti = [];
-        state.qRes = Array(4).fill("-");
-        state.qCamp = [];
-        state.qTime = [];
-
-    }
-
-
-    /*
-    ==================================================
-    VINCITORI QUARTI
-    ==================================================
-    */
-
-    const vincitoriQuarti = [];
-
-    if(Array.isArray(state.quarti)){
-
-        state.quarti.forEach((match,index)=>{
-
-            const risultato =
-                Array.isArray(state.qRes)
-                    ? state.qRes[index]
-                    : "-";
-
-            const vincitore =
-                getWinner(match,risultato);
-
-            if(vincitore)
-                vincitoriQuarti.push(vincitore);
-
-        });
-
-    }
-
-
-    /*
-    ==================================================
-    SEMIFINALI
-    ==================================================
-    */
-
-    if(vincitoriQuarti.length === 4){
-
-        state.semiTop = [
-
-            [
-                vincitoriQuarti[0],
-                vincitoriQuarti[1]
-            ],
-
-            [
-                vincitoriQuarti[2],
-                vincitoriQuarti[3]
-            ]
-
-        ];
-
-    }
-    else{
-
-        state.semiTop = [];
-
-        /*
-         * Se non esistono quattro vincitori dei quarti,
-         * i risultati delle semifinali non possono essere
-         * considerati validi.
-         */
-
-        state.sTopRes = Array(2).fill("-");
-        state.sTopCamp = [];
-        state.sTopTime = [];
-
-        state.finalTop = [];
-
-        state.fTopRes = "-";
-        state.fTopCamp = "";
-        state.fTopTime = "";
-
-        state.campioneTop = null;
-
-        console.log(
-            "SEMIFINALI NON RICOSTRUITE: quarti incompleti."
-        );
-
-        return;
-    }
-
-
-    /*
-    ==================================================
-    VINCITORI SEMIFINALI
-    ==================================================
-    */
-
-    const vincitoriSemi = [];
-
-    state.semiTop.forEach((match,index)=>{
-
-        const risultato =
-            Array.isArray(state.sTopRes)
-                ? state.sTopRes[index]
-                : "-";
-
-        const vincitore =
-            getWinner(match,risultato);
-
-        if(vincitore)
-            vincitoriSemi.push(vincitore);
-
-    });
-
-
-    /*
-    ==================================================
-    FINALE
-    ==================================================
-    */
-
-    if(vincitoriSemi.length === 2){
-
-        state.finalTop = [
-
-            vincitoriSemi[0],
-            vincitoriSemi[1]
-
-        ];
-
-    }
-    else{
-
-        state.finalTop = [];
-
-        state.fTopRes = "-";
-        state.fTopCamp = "";
-        state.fTopTime = "";
-
-        state.campioneTop = null;
-
-        console.log(
-            "FINALE NON RICOSTRUITA: semifinali incomplete."
-        );
-
-        return;
-    }
-
-
-    /*
-    ==================================================
-    CAMPIONE
-    ==================================================
-    */
-
-    const campione =
-        getWinner(
-            state.finalTop,
-            state.fTopRes
-        );
-
-    state.campioneTop =
-        campione || null;
-
-
-    console.log(
-        "FASE FINALE SINCRONIZZATA:",
-        {
-            qualificati: qualificati,
-            quarti: state.quarti,
-            qRes: state.qRes,
-            semiTop: state.semiTop,
-            sTopRes: state.sTopRes,
-            finalTop: state.finalTop,
-            fTopRes: state.fTopRes,
-            campioneTop: state.campioneTop
-        }
-    );
+    state.campioneTop=(state.rules.usaFinale===true&&Array.isArray(state.finalTop)&&state.finalTop.length===2)?(getWinner(state.finalTop,state.fTopRes)||null):null;
 }
-
-
-
 function renderKO(){
     ensureRules();
 
@@ -11069,23 +10726,30 @@ function renderKO(){
             ];
         }
 
-    }else{
+    }else if(state.rules.usaSemifinali===true){
 
-        if(teams.length>=4){
-
+        if(teams.length<4){
+            if(teams.length===2 && state.rules.usaFinale===true){
+                finalisti=teams.slice(0,2);
+            }else{
+                return;
+            }
+        }else{
             semifinali=[
                 [teams[0],teams[3]],
                 [teams[1],teams[2]]
             ];
-
-        }else if(teams.length===2){
-
-            semifinali=[teams];
-
         }
+
+    }else if(state.rules.usaFinale===true){
+
+        finalisti=teams.slice(0,2);
+
+    }else{
+        return;
     }
 
-    let finalisti=[];
+    let finalisti=Array.isArray(finalisti)?finalisti:[];
 
     if(state.rules.usaSemifinali===true && semifinali.length>0){
 
@@ -11330,9 +10994,9 @@ function applicaModelloTorneo(){
             state.rules.qualificatePerGirone=2;
             state.rules.numeroQualificateFinali=
                 state.rules.numeroGironi*state.rules.qualificatePerGirone;
-            state.rules.usaQuarti=true;
-            state.rules.usaSemifinali=true;
-            state.rules.usaFinale=true;
+            state.rules.usaQuarti=false;
+            state.rules.usaSemifinali=false;
+            state.rules.usaFinale=false;
         break;
 
         case "gironiFinale":
@@ -11368,8 +11032,8 @@ function applicaModelloTorneo(){
             state.rules.qualificatePerGirone=0;
             state.rules.numeroQualificateFinali=4;
             state.rules.usaQuarti=false;
-            state.rules.usaSemifinali=true;
-            state.rules.usaFinale=true;
+            state.rules.usaSemifinali=false;
+            state.rules.usaFinale=false;
             if(!state.svizzero){
                 state.svizzero={
                     turno:1,
