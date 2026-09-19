@@ -11194,6 +11194,13 @@ function applicaModelloTorneo(){
     const squadrePerGironeInput=document.getElementById("squadrePerGirone");
     if(squadrePerGironeInput) squadrePerGironeInput.value=String(state.rules.squadrePerGirone);
 
+    /* Sincronizza immediatamente i tre interruttori della fase finale.
+       Il modello e la schermata devono mostrare lo stesso stato. */
+    ["usaQuarti","usaSemifinali","usaFinale"].forEach(id=>{
+        const el=document.getElementById(id);
+        if(el) el.checked=state.rules[id]===true;
+    });
+
     aggiornaPannelloRegole();
     aggiornaDescrizioneTipoTorneo();
 
