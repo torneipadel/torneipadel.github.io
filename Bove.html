@@ -4781,21 +4781,30 @@ function ensureRules(){
 
 
 
-    if(
+    const tipiSenzaGironi = [
+        "eliminazione",
+        "svizzero",
+        "americano",
+        "mexicano",
+        "king"
+    ];
 
+    if(tipiSenzaGironi.includes(state.rules.tipoTorneo)){
+
+        state.rules.numeroGironi=0;
+        state.rules.squadrePerGirone=0;
+
+    }else if(
         !gironi ||
         !perGirone ||
         gironi * perGirone !== formato
-
     ){
 
-        state.rules.numeroGironi =
+        state.rules.numeroGironi=
             strutturaCorretta.gironi;
 
-
-        state.rules.squadrePerGirone =
+        state.rules.squadrePerGirone=
             strutturaCorretta.perGirone;
-
 
     }
 
@@ -5334,7 +5343,7 @@ function applyRules(){
         return;
 
     const tipo=document.getElementById("tipoTorneo")?.value || state.rules.tipoTorneo;
-    const n=Number(document.getElementById("numeroSquadre")?.value)||8;
+    const n=Number(document.getElementById("formatoTorneo")?.value)||Number(state.rules.numeroSquadre)||8;
 
     if(![8,12,16,20,24].includes(n)){
         alert("Numero squadre non valido.");
