@@ -10843,287 +10843,137 @@ function sincronizzaFaseFinale(){
 
     ensureRules();
 
-    /*
-    ==================================================
-    FASE FINALE: RICOSTRUZIONE COERENTE
-    ==================================================
-    */
-
     const qualificati = getFinalQualified();
 
-    /*
-     * Se i gironi non sono completati,
-     * NON devono esistere quarti, semifinali o finale.
-     */
+    state.quarti = [];
+    state.semiTop = [];
+    state.finalTop = [];
+    state.campioneTop = null;
 
-    if(!Array.isArray(qualificati) || qualificati.length < 2){
-
-        state.quarti = [];
-        state.semiTop = [];
-        state.finalTop = [];
-
+    if(!Array.isArray(state.qRes))
         state.qRes = Array(4).fill("-");
-        state.qCamp = [];
-        state.qTime = [];
 
+    if(!Array.isArray(state.sTopRes))
         state.sTopRes = Array(2).fill("-");
-        state.sCamp = [];
-        state.sTime = [];
 
+    if(state.fTopRes === undefined)
         state.fTopRes = "-";
-        state.fCamp = "";
-        state.fTime = "";
 
-        state.campioneTop = null;
-
-        console.log(
-            "FASE FINALE AZZERATA: gironi non completati."
-        );
-
+    if(!Array.isArray(qualificati) || qualificati.length < 2)
         return;
-    }
-
 
     /*
-    ==================================================
-    QUARTI
-    ==================================================
-    */
+     * La fase finale deve usare esattamente gli stessi
+     * abbinamenti mostrati da renderKO().
+     */
+    let semifinali = [];
 
-    if(
-        state.rules.usaQuarti === true &&
-        qualificati.length >= 8
-    ){
+    if(state.rules.usaQuarti === true){
 
-        /*
-         * Abbinamento standard:
-         *
-         * 1A vs 4B
-         * 2A vs 3B
-         * 1B vs 4A
-         * 2B vs 3A
-         *
-         * Se i qualificati arrivano già ordinati
-         * da getFinalQualified(), utilizziamo comunque
-         * blocchi da 4.
-         */
+        if(qualificati.length < 8)
+            return;
 
-        const q = [];
+        state.quarti = [
+            [qualificati[0], qualificati[7]],
+            [qualificati[3], qualificati[4]],
+            [qualificati[1], qualificati[6]],
+            [qualificati[2], qualificati[5]]
+        ];
 
-        for(let i=0; i<8; i+=2){
-
-            if(
-                qualificati[i] &&
-                qualificati[i+1]
-            ){
-
-                q.push([
-                    qualificati[i],
-                    qualificati[i+1]
-                ]);
-
-            }
-
-        }
-
-        state.quarti = q;
-
-        /*
-         * Mantiene i risultati esistenti SOLO se
-         * esiste realmente la partita corrispondente.
-         */
-
-        if(!Array.isArray(state.qRes))
-            state.qRes = Array(4).fill("-");
-
-        while(state.qRes.length < 4)
-            state.qRes.push("-");
-
-        state.qRes = state.qRes.slice(0,4);
-
-    }
-    else{
-
-        state.quarti = [];
-        state.qRes = Array(4).fill("-");
-        state.qCamp = [];
-        state.qTime = [];
-
-    }
-
-
-    /*
-    ==================================================
-    VINCITORI QUARTI
-    ==================================================
-    */
-
-    const vincitoriQuarti = [];
-
-    if(Array.isArray(state.quarti)){
+        const vincitoriQuarti = [];
 
         state.quarti.forEach((match,index)=>{
 
-            const risultato =
-                Array.isArray(state.qRes)
-                    ? state.qRes[index]
-                    : "-";
-
             const vincitore =
-                getWinner(match,risultato);
+                getWinner(
+                    match,
+                    state.qRes[index]
+                );
 
             if(vincitore)
                 vincitoriQuarti.push(vincitore);
 
         });
 
-    }
+        if(vincitoriQuarti.length !== 4)
+            return;
 
-
-    /*
-    ==================================================
-    SEMIFINALI
-    ==================================================
-    */
-
-    if(vincitoriQuarti.length === 4){
-
-        state.semiTop = [
-
-            [
-                vincitoriQuarti[0],
-                vincitoriQuarti[1]
-            ],
-
-            [
-                vincitoriQuarti[2],
-                vincitoriQuarti[3]
-            ]
-
+        semifinali = [
+            [vincitoriQuarti[0], vincitoriQuarti[1]],
+            [vincitoriQuarti[2], vincitoriQuarti[3]]
         ];
 
-    }
-    else{
+    }else{
 
-        state.semiTop = [];
+        if(qualificati.length >= 4){
 
-        /*
-         * Se non esistono quattro vincitori dei quarti,
-         * i risultati delle semifinali non possono essere
-         * considerati validi.
-         */
+            semifinali = [
+                [qualificati[0], qualificati[3]],
+                [qualificati[1], qualificati[2]]
+            ];
 
-        state.sTopRes = Array(2).fill("-");
-        state.sCamp = [];
-        state.sTime = [];
+        }else if(qualificati.length === 2){
 
-        state.finalTop = [];
+            semifinali = [
+                [qualificati[0], qualificati[1]]
+            ];
 
-        state.fTopRes = "-";
-        state.fCamp = "";
-        state.fTime = "";
+        }
 
-        state.campioneTop = null;
-
-        console.log(
-            "SEMIFINALI NON RICOSTRUITE: quarti incompleti."
-        );
-
-        return;
     }
 
+    if(state.rules.usaSemifinali === true){
 
-    /*
-    ==================================================
-    VINCITORI SEMIFINALI
-    ==================================================
-    */
+        if(semifinali.length !== 2)
+            return;
 
-    const vincitoriSemi = [];
+        state.semiTop = semifinali;
 
-    state.semiTop.forEach((match,index)=>{
+        const vincitoriSemi = [];
 
-        const risultato =
-            Array.isArray(state.sTopRes)
-                ? state.sTopRes[index]
-                : "-";
+        state.semiTop.forEach((match,index)=>{
 
-        const vincitore =
-            getWinner(match,risultato);
+            const vincitore =
+                getWinner(
+                    match,
+                    state.sTopRes[index]
+                );
 
-        if(vincitore)
-            vincitoriSemi.push(vincitore);
+            if(vincitore)
+                vincitoriSemi.push(vincitore);
 
-    });
+        });
 
-
-    /*
-    ==================================================
-    FINALE
-    ==================================================
-    */
-
-    if(vincitoriSemi.length === 2){
+        if(vincitoriSemi.length !== 2)
+            return;
 
         state.finalTop = [
-
             vincitoriSemi[0],
             vincitoriSemi[1]
-
         ];
 
-    }
-    else{
+    }else{
 
-        state.finalTop = [];
+        const finalisti = semifinali.flat();
 
-        state.fTopRes = "-";
-        state.fCamp = "";
-        state.fTime = "";
+        if(finalisti.length !== 2)
+            return;
 
-        state.campioneTop = null;
+        state.finalTop = finalisti;
 
-        console.log(
-            "FINALE NON RICOSTRUITA: semifinali incomplete."
-        );
-
-        return;
     }
 
+    if(state.rules.usaFinale === true){
 
-    /*
-    ==================================================
-    CAMPIONE
-    ==================================================
-    */
+        state.campioneTop =
+            getWinner(
+                state.finalTop,
+                state.fTopRes
+            ) || null;
 
-    const campione =
-        getWinner(
-            state.finalTop,
-            state.fTopRes
-        );
+    }
 
-    state.campioneTop =
-        campione || null;
-
-
-    console.log(
-        "FASE FINALE SINCRONIZZATA:",
-        {
-            qualificati: qualificati,
-            quarti: state.quarti,
-            qRes: state.qRes,
-            semiTop: state.semiTop,
-            sTopRes: state.sTopRes,
-            finalTop: state.finalTop,
-            fTopRes: state.fTopRes,
-            campioneTop: state.campioneTop
-        }
-    );
 }
-
-
-
 function renderKO(){
     ensureRules();
 
