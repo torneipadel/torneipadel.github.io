@@ -731,6 +731,24 @@ body.user-mode #menuComandi button.user-exit {
     box-sizing: border-box !important;
 }
 </style>
+<style id="bove-print-fix">
+@media print {
+
+    .menu-container,
+    .modal {
+        display:none !important;
+        visibility:hidden !important;
+    }
+
+}
+
+body.bove-printing .menu-container,
+body.bove-printing .modal {
+    display:none !important;
+    visibility:hidden !important;
+}
+
+</style>
 <script id="bove-user-menu-toggle">
 window.toggleMenu = function(){
     const menu = document.getElementById("menuComandi");
@@ -1609,6 +1627,20 @@ Seleziona formato torneo
 
     </div>
 
+    <div style="margin-top:10px;">
+
+      <label>Punti Sconfitta</label>
+
+      <input 
+
+        id="lP" 
+
+        type="number" 
+
+        value="0">
+
+    </div>
+
 
 
     <hr style="margin:15px 0;">
@@ -2447,7 +2479,7 @@ style="width:80px">
 
 </div>
 
-<div class="menu-container"> <button class="menu-button" onclick="toggleMenu()"> ☰ </button> <div id="menuComandi" class="menu-dropdown"> <button onclick="document.getElementById('formatModal').style.display='block'"> ⚙️ Formato </button> <button onclick="openRules()"> 📖 Regole </button> <button onclick="document.getElementById('teamModal').style.display='block'"> 📝 Squadre </button> <button onclick="window.print()"> 🖨️ Stampa </button> <!-- SALVA TORNEO --> <button type="button" onclick="updateAndSync()"> 💾 Salva </button> <!-- RESET COMPLETO --> <button type="button" onclick="reset()"> 🗑️ Reset completo </button> <button onclick="window.location.href='admin.html'"> ⬅️ Torna ad Admin </button> </div> </div> <div class="groups"> <div class="card" id="cardA">
+<div class="menu-container"> <button class="menu-button" onclick="toggleMenu()"> ☰ </button> <div id="menuComandi" class="menu-dropdown"> <button onclick="document.getElementById('formatModal').style.display='block'"> ⚙️ Formato </button> <button onclick="openRules()"> 📖 Regole </button> <button onclick="document.getElementById('teamModal').style.display='block'"> 📝 Squadre </button> <button onclick="stampaTabellone()"> 🖨️ Stampa </button> <!-- SALVA TORNEO --> <button type="button" onclick="updateAndSync()"> 💾 Salva </button> <!-- RESET COMPLETO --> <button type="button" onclick="reset()"> 🗑️ Reset completo </button> <button onclick="window.location.href='admin.html'"> ⬅️ Torna ad Admin </button> </div> </div> <div class="groups"> <div class="card" id="cardA">
    
 
       <table id="A"><thead><tr><th>Campo</th><th>Ora</th><th>Match</th><th>Ris</th></tr></thead><tbody id="Arows"></tbody></table>
@@ -11905,6 +11937,27 @@ function aggiornaDescrizioneTipoTorneo(){
 
 
 }
+function stampaTabellone(){
+
+    chiudiMenu();
+
+    document.body.classList.add("bove-printing");
+
+    requestAnimationFrame(()=>{
+
+        window.print();
+
+    });
+
+}
+
+window.addEventListener("afterprint",()=>{
+
+    document.body.classList.remove("bove-printing");
+
+});
+
+
 function toggleMenu(){
 
     let menu = document.getElementById("menuComandi");
