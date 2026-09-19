@@ -11307,7 +11307,8 @@ function applicaModelloTorneo(){
     }[n] || {gironi:2,perGirone:4};
 
     state.rules.tipoTorneo=tipo;
-    state.rules.formatoTorneo=tipo;
+    state.rules.formatoTorneo=n;
+    state.rules.numeroSquadre=n;
 
     state.qRes=Array(4).fill("-");
     state.sTopRes=Array(2).fill("-");
@@ -11477,7 +11478,6 @@ function applicaModelloTorneo(){
         break;
     }
 
-    const formatoInput=document.getElementById("formatoTorneo");
     if(formatoInput) formatoInput.value=String(n);
 
     const numeroGironiInput=document.getElementById("numeroGironi");
