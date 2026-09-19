@@ -90,4 +90,26 @@ window.addEventListener('admin:rendered',()=>requestAnimationFrame(inject));
 const controlsObserver=new MutationObserver(()=>requestAnimationFrame(inject));
 function watchControls(){const app=document.getElementById('appContent');if(app)controlsObserver.observe(app,{childList:true,subtree:true});}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',watchControls,{once:true});else watchControls();
+
+/* USCITA ADMIN — funzione globale usata dai pulsanti "Esci" */
+window.logoutAdmin = async function(){
+  try{
+    const client = window.sb || window.supabaseClient;
+    if(client && client.auth && typeof client.auth.signOut === "function"){
+      const {error} = await client.auth.signOut();
+      if(error) console.error("Errore logout admin:", error);
+    }
+  }catch(e){
+    console.error("Errore logout admin:", e);
+  }
+  try{ localStorage.removeItem("padel_admin_state"); }catch(e){}
+  try{
+    if(window.adminState){
+      window.adminState.adminLoggato=false;
+      window.adminState.adminEmail="";
+    }
+  }catch(e){}
+  window.location.href="index.html";
+};
+
 })();
