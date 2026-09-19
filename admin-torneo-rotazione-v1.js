@@ -115,49 +115,94 @@ function generateRound(t,ps,scheduledSlot){
   if(ps.length<configured)throw Error('Servono '+configured+' giocatori approvati; al momento sono '+ps.length+'.');
   ps=ps.slice(0,configured);
   const played=Object.fromEntries(rank.map(x=>[x.id,x.partite]));
-  const coppieCount=configured/2;
-  let best=null,bestScore=Infinity;
-  for(let attempt=0;attempt<1200;attempt++){
-    const shuffled=ps.slice().sort((a,b)=>(played[key(a)]||0)-(played[key(b)]||0)+(Math.random()-.5)*1.5);
-    const pairs=[];
-    const remaining=shuffled.slice();
-    while(remaining.length){
-      let pair=null,pairScore=Infinity;
-      for(let i=0;i<remaining.length;i++){
-        for(let j=i+1;j<remaining.length;j++){
-          const a=key(remaining[i]),b=key(remaining[j]);
-          const repeat=(h.partner[a]?.[b]||0)+(h.partner[b]?.[a]||0);
-          const playedPenalty=Math.abs((played[a]||0)-(played[b]||0))*3;
-          const score=repeat*100000+playedPenalty+Math.random()*0.01;
-          if(score<pairScore){pairScore=score;pair=[remaining[i],remaining[j]]}
+  let best=null;
+
+  if(configured===8){
+    /* Con 8 giocatori esistono esattamente 7 turni di abbinamento perfetti.
+       Ogni turno usa ogni giocatore una sola volta e, nei 7 turni,
+       ogni possibile coppia compare esattamente una volta.
+       Scegliamo il turno successivo privilegiando prima la distribuzione
+       dei compagni e poi quella degli avversari. */
+    const ids=ps.map(key);
+    const rounds=[];
+    let rotating=ids.slice(0,7);
+    const fixed=ids[7];
+    for(let turno=0;turno<7;turno++){
+      const ordered=[fixed,...rotating];
+      const pairs=[];
+      for(let i=0;i<4;i++)pairs.push([ordered[i],ordered[ordered.length-1-i]]);
+      rounds.push(pairs);
+      rotating=[rotating[rotating.length-1],...rotating.slice(0,-1)];
+    }
+
+    const partnerCount=(a,b)=>(h.partner[a]?.[b]||0)+(h.partner[b]?.[a]||0);
+    const opponentCount=(a,b)=>(h.opp[a]?.[b]||0);
+
+    const scoreRound=round=>{
+      const partnerCounts=round.map(([a,b])=>partnerCount(a,b));
+      const opponentCounts=[];
+      for(let i=0;i<round.length;i++){
+        for(let j=i+1;j<round.length;j++){
+          for(const a of round[i])for(const b of round[j])opponentCounts.push(opponentCount(a,b));
         }
       }
-      pairs.push(pair.map(key));
-      const used=new Set(pair.map(key));
-      for(let i=remaining.length-1;i>=0;i--)if(used.has(key(remaining[i])))remaining.splice(i,1);
-    }
-    let score=0;
-    for(let i=0;i<pairs.length;i++){
-      const a=pairs[i][0],b=pairs[i][1];
-      score+=(h.partner[a]?.[b]||0)*100000;
-      score+=Math.abs((played[a]||0)-(played[b]||0))*10;
-      for(let j=i+1;j<pairs.length;j++){
-        const c1=pairs[j][0],c2=pairs[j][1];
-        score+=(h.opp[a]?.[c1]||0)+(h.opp[a]?.[c2]||0)+(h.opp[b]?.[c1]||0)+(h.opp[b]?.[c2]||0);
+      const maxPartner=Math.max(...partnerCounts);
+      const sumPartner=partnerCounts.reduce((s,v)=>s+v*v,0);
+      const maxOpponent=Math.max(...opponentCounts);
+      const sumOpponent=opponentCounts.reduce((s,v)=>s+v*v,0);
+      const loadPenalty=round.reduce((s,[a,b])=>s+Math.abs((played[a]||0)-(played[b]||0)),0);
+      return [maxPartner,sumPartner,maxOpponent,sumOpponent,loadPenalty];
+    };
+
+    rounds.sort((a,b)=>{
+      const sa=scoreRound(a),sb=scoreRound(b);
+      for(let i=0;i<sa.length;i++)if(sa[i]!==sb[i])return sa[i]-sb[i];
+      return Math.random()-.5;
+    });
+    best=rounds[0];
+  }else{
+    let bestScore=Infinity;
+    for(let attempt=0;attempt<1200;attempt++){
+      const shuffled=ps.slice().sort((a,b)=>(played[key(a)]||0)-(played[key(b)]||0)+(Math.random()-.5)*1.5);
+      const pairs=[];
+      const remaining=shuffled.slice();
+      while(remaining.length){
+        let pair=null,pairScore=Infinity;
+        for(let i=0;i<remaining.length;i++){
+          for(let j=i+1;j<remaining.length;j++){
+            const a=key(remaining[i]),b=key(remaining[j]);
+            const repeat=(h.partner[a]?.[b]||0)+(h.partner[b]?.[a]||0);
+            const playedPenalty=Math.abs((played[a]||0)-(played[b]||0))*3;
+            const score=repeat*100000+playedPenalty+Math.random()*0.01;
+            if(score<pairScore){pairScore=score;pair=[remaining[i],remaining[j]]}
+          }
+        }
+        pairs.push(pair.map(key));
+        const used=new Set(pair.map(key));
+        for(let i=remaining.length-1;i>=0;i--)if(used.has(key(remaining[i])))remaining.splice(i,1);
       }
+      let score=0;
+      for(let i=0;i<pairs.length;i++){
+        const a=pairs[i][0],b=pairs[i][1];
+        score+=(h.partner[a]?.[b]||0)*100000;
+        score+=Math.abs((played[a]||0)-(played[b]||0))*10;
+        for(let j=i+1;j<pairs.length;j++){
+          const c1=pairs[j][0],c2=pairs[j][1];
+          score+=(h.opp[a]?.[c1]||0)+(h.opp[a]?.[c2]||0)+(h.opp[b]?.[c1]||0)+(h.opp[b]?.[c2]||0);
+        }
+      }
+      const vals=pairs.flatMap(p=>p).map(id=>played[id]||0);
+      score+=(Math.max(...vals)-Math.min(...vals))*20;
+      if(score<bestScore){bestScore=score;best=pairs}
     }
-    const vals=pairs.flatMap(p=>p).map(id=>played[id]||0);
-    score+=(Math.max(...vals)-Math.min(...vals))*20;
-    if(score<bestScore){bestScore=score;best=pairs}
   }
+
   const numero=c.rotazione.giornate.length+1,slot=scheduledSlot||nextCalendarSlot(t),data=slot.data,ora=slot.ora||c.rotazione.oraDefault;
   const partite=[];
   let matchNumero=1;
   const matchPairs=[];
   if(best.length===4){
-    for(let i=0;i<best.length;i++){
-      for(let j=i+1;j<best.length;j++) matchPairs.push([i,j]);
-    }
+    for(let i=0;i<best.length;i++)for(let j=i+1;j<best.length;j++)matchPairs.push([i,j]);
   }else{
     /* Con 8 coppie ogni coppia deve giocare ESATTAMENTE 3 match.
        Generiamo le 7 giornate di un round-robin tra le 8 coppie
@@ -170,19 +215,17 @@ function generateRound(t,ps,scheduledSlot){
       for(let r=0;r<7;r++){
         const arr=[fixed,...rotating];
         const round=[];
-        for(let i=0;i<4;i++) round.push([arr[i],arr[7-i]]);
+        for(let i=0;i<4;i++)round.push([arr[i],arr[7-i]]);
         rounds.push(round);
         rotating.unshift(rotating.pop());
       }
       const roundScore=combo=>{
         let score=0;
-        combo.forEach(round=>{
-          round.forEach(([i,j])=>{
-            const a=best[i],b=best[j];
-            score+=(h.opp[a[0]]?.[b[0]]||0)+(h.opp[a[0]]?.[b[1]]||0)
-                  +(h.opp[a[1]]?.[b[0]]||0)+(h.opp[a[1]]?.[b[1]]||0);
-          });
-        });
+        combo.forEach(round=>round.forEach(([i,j])=>{
+          const a=best[i],b=best[j];
+          score+=(h.opp[a[0]]?.[b[0]]||0)+(h.opp[a[0]]?.[b[1]]||0)
+                +(h.opp[a[1]]?.[b[0]]||0)+(h.opp[a[1]]?.[b[1]]||0);
+        }));
         return score;
       };
       for(let a=0;a<7;a++)for(let b=a+1;b<7;b++)for(let d=b+1;d<7;d++){
@@ -194,6 +237,7 @@ function generateRound(t,ps,scheduledSlot){
     if(!bestRounds)throw Error('Impossibile costruire la rotazione della giornata.');
     bestRounds.forEach(round=>round.forEach(pair=>matchPairs.push(pair)));
   }
+
   matchPairs.forEach(([i,j])=>{
     partite.push({
       id:'g'+numero+'-m'+(matchNumero++),
@@ -208,8 +252,10 @@ function generateRound(t,ps,scheduledSlot){
   const activeKeys=new Set(best.flat());
   const resting=ps.filter(p=>!activeKeys.has(key(p))).map(key);
   const squadre=best.map((pair,i)=>({id:'g'+numero+'-s'+(i+1),nome:'Squadra '+(i+1),giocatori:pair.map(String)}));
-  c.rotazione.giornate.push({numero,data,partite,riposo:resting,squadre});return c;
+  c.rotazione.giornate.push({numero,data,partite,riposo:resting,squadre});
+  return c;
 }
+
 function playerMap(ps){return Object.fromEntries(ps.map(p=>[key(p),name(p)]))}
 function pairKey(pair){return (pair||[]).map(String).sort().join('|')}
 function matchKey(a,b){return [pairKey(a),pairKey(b)].sort().join('::')}
