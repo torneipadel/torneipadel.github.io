@@ -349,7 +349,7 @@ function rebuildDayMatches(g,squads,c){
   });
   return partite;
 }
-function inputScore(v){return v===''?'':String(Math.max(0,Number(v)||0))}
+function inputScore(v){if(v==='')return '';const n=Number(v);if(!Number.isFinite(n))throw Error('Risultato non valido. Inserisci un numero intero.');return String(Math.max(0,Math.floor(n)))}
 function auditDay(g,ps){const expected=Math.floor(ps.length/2),partite=Array.isArray(g?.partite)?g.partite:[],squads=daySquads(g),expectedMatches=expected===4?6:expected===8?12:0;let validSquads=true;try{validateDaySquads(squads,ps)}catch(e){validSquads=false}const appearances={};partite.forEach(m=>[...(m.coppiaA||[]),...(m.coppiaB||[])].forEach(id=>{const k=String(id);appearances[k]=(appearances[k]||0)+1}));const validMatches=expectedMatches>0&&partite.length===expectedMatches,validThree=ps.length>0&&ps.every(p=>(appearances[String(key(p))]||0)===3),results=partite.filter(m=>m.risA!==''&&m.risA!=null&&m.risB!==''&&m.risB!=null).length;return{valid:validSquads&&validMatches&&validThree,results,partite:partite.length};}
 function isolateKingUi(){
   const controls=$('adminTournamentControls');
