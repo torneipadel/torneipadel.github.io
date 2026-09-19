@@ -4638,18 +4638,14 @@ function aggiornaPannelloRegole(){
     const fase=document.getElementById("faseEliminazioneBox");
     if(!fase) return;
 
-    const noKO=["svizzero","americano","mexicano","king"];
-    fase.style.display=noKO.includes(tipo) ? "none" : "block";
+    const noKO=[];
+    fase.style.display="block";
 
     const q=document.getElementById("usaQuarti");
     const semi=document.getElementById("usaSemifinali");
     const finale=document.getElementById("usaFinale");
 
-    if(noKO.includes(tipo)){
-        if(q) q.checked=false;
-        if(semi) semi.checked=false;
-        if(finale) finale.checked=false;
-    }
+    if(false){}
 }
 
 function ensureRules(){
@@ -10684,6 +10680,7 @@ function renderKO(){
     if(!Array.isArray(teams) || teams.length<2) return;
 
     let semifinali=[];
+    let finalisti=[];
 
     if(state.rules.usaQuarti===true){
 
@@ -10749,7 +10746,6 @@ function renderKO(){
         return;
     }
 
-    let finalisti=Array.isArray(finalisti)?finalisti:[];
 
     if(state.rules.usaSemifinali===true && semifinali.length>0){
 
@@ -10770,10 +10766,6 @@ function renderKO(){
 
             if(vincitore) finalisti.push(vincitore);
         });
-
-    }else{
-
-        finalisti=semifinali.flat();
 
     }
 
