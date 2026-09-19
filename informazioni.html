@@ -24,7 +24,7 @@ body:before{content:"";position:fixed;inset:0;pointer-events:none;background:rad
 @media(max-width:390px){h1{font-size:26px}.hero-text{font-size:12px}.values{grid-template-columns:1fr}}
 </style>
 </head>
-<body><a class="np-visitor-back" href="2Page.html" aria-label="Torna al sito">← Torna al sito</a><style>.np-visitor-back{position:fixed;left:14px;bottom:14px;z-index:999;border:1px solid rgba(255,255,255,.45);background:rgba(255,255,255,.88);color:#073b72;padding:9px 13px;border-radius:999px;font:800 11px 'Open Sans',Arial,sans-serif;text-decoration:none;box-shadow:0 12px 28px rgba(0,0,0,.24)}</style>
+<body><a class="np-visitor-back" href="2Page.html" aria-label="Torna al sito">← Torna al sito</a><style>.np-visitor-back{position:fixed;left:14px;bottom:14px;z-index:999;border:1px solid rgba(255,255,255,.45);background:rgba(255,255,255,.88);color:#073b72;padding:9px 13px;border-radius:999px;font:800 11px 'Open Sans',Arial,sans-serif;text-decoration:none;box-shadow:0 12px 28px rgba(0,0,0,.24)}</style><style>.np-site-footer{margin:28px 0 4px;padding:16px 8px;text-align:center;color:rgba(255,255,255,.45);font:500 9px/1.6 'Open Sans',Arial,sans-serif;letter-spacing:.7px}.np-site-footer a{color:rgba(255,255,255,.68);text-decoration:none}.np-site-footer a:hover{color:#fff}</style>
 <div class="menu-button" onclick="toggleMenu()" aria-label="Apri menu">☰</div>
 <div class="menu-panel" id="menuPanel">
 <div class="menu-item" onclick="location.href='2Page.html'">⌂ Home</div>
@@ -104,5 +104,6 @@ const button=document.querySelector('.menu-button');
 if(panel.classList.contains('open')&&!panel.contains(e.target)&&!button.contains(e.target))panel.classList.remove('open')
 });
 </script>
+<footer class="np-site-footer">NEXT POINT PADEL · <a href="mailto:info@nextpointpadel.it">info@nextpointpadel.it</a> · <a href="tel:+39333444556">+39 333444556</a></footer>
 </body>
 </html>
