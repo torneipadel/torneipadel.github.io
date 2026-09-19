@@ -754,29 +754,45 @@ window.toggleMenu = function(){
     const menu = document.getElementById("menuComandi");
     if(!menu) return;
 
-    if(document.body.classList.contains("user-mode")){
+    const isUserMode = document.body.classList.contains("user-mode");
+
+    if(isUserMode){
         const buttons = [...menu.querySelectorAll("button")];
+
         buttons.forEach(function(button, index){
             const text = (button.textContent || "").trim();
             const print = /stampa/i.test(text);
-            const exit = button.classList.contains("user-exit") || index === buttons.length - 1 || /uscita/i.test(text);
+            const exit = button.classList.contains("user-exit") ||
+                         index === buttons.length - 1 ||
+                         /uscita/i.test(text);
             const allowed = print || exit;
 
             button.classList.toggle("user-print", print);
             button.classList.toggle("user-exit", exit && !print);
             button.disabled = !allowed;
+
             button.style.setProperty("display", allowed ? "block" : "none", "important");
             button.style.setProperty("visibility", allowed ? "visible" : "hidden", "important");
             button.style.setProperty("pointer-events", allowed ? "auto" : "none", "important");
 
             if(exit && !print){
                 button.textContent = "🚪 Uscita";
-                button.onclick = function(){ window.location.href = "index.html"; };
+                button.onclick = function(){
+                    window.location.href = "index.html";
+                };
             }
         });
     }
 
-    menu.classList.toggle("show");
+    const aperto = !menu.classList.contains("show");
+    menu.classList.toggle("show", aperto);
+
+    if(isUserMode){
+        menu.style.setProperty("display", aperto ? "flex" : "none", "important");
+        menu.style.setProperty("visibility", aperto ? "visible" : "hidden", "important");
+        menu.style.setProperty("opacity", aperto ? "1" : "0", "important");
+        menu.style.setProperty("pointer-events", aperto ? "auto" : "none", "important");
+    }
 };
 </script>
 </head>
