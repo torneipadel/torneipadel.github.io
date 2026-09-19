@@ -299,20 +299,34 @@ function rebuildDayMatches(g,squads,c){
   const old=g.partite||[],oldByKey={};
   old.forEach(m=>{oldByKey[matchKey(m.coppiaA||[],m.coppiaB||[])]=m});
   const pairs=[];
+
   if(squads.length===4){
     for(let i=0;i<4;i++)for(let j=i+1;j<4;j++)pairs.push([i,j]);
-  }else{
-    const base=squads.map((_,i)=>i);
-    for(let round=0;round<3;round++){
-      const arr=base.slice();
-      const fixed=arr.shift();
-      const rotating=arr.slice();
+  }else if(squads.length===8){
+    /* 8 squadre: la giornata deve avere 12 partite,
+       3 partite esatte per ogni squadra/giocatore.
+       Usiamo 3 turni distinti del round-robin a 8 squadre. */
+    const ids=squads.map((_,i)=>i);
+    const fixed=ids[0];
+    let rotating=ids.slice(1);
+    const rounds=[];
+
+    for(let round=0;round<7;round++){
       const ordered=[fixed,...rotating];
-      for(let i=0;i<squads.length/2;i++)pairs.push([ordered[i],ordered[squads.length-1-i]]);
-      rotating.unshift(rotating.pop());
-      base.splice(0,base.length,fixed,...rotating);
+      const matches=[];
+      for(let i=0;i<4;i++)matches.push([ordered[i],ordered[ordered.length-1-i]]);
+      rounds.push(matches);
+      rotating=[rotating[rotating.length-1],...rotating.slice(0,-1)];
     }
+
+    /* Ogni round assegna una sola partita a ciascuna squadra.
+       I primi 3 round garantiscono quindi esattamente 3 partite
+       per ciascuna delle 8 squadre. */
+    rounds.slice(0,3).forEach(round=>round.forEach(pair=>pairs.push(pair)));
+  }else{
+    throw Error('La giornata deve contenere 4 oppure 8 squadre.');
   }
+
   const partite=[];let n=1;
   pairs.forEach(([i,j])=>{
     const a=squads[i].giocatori.map(String),b=squads[j].giocatori.map(String),oldMatch=oldByKey[matchKey(a,b)];
