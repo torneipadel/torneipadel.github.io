@@ -6865,6 +6865,28 @@ try{
                         ? configurazione.partecipanti
                         : [];
 
+                /*
+                 * La configurazione creata dal Wizard Admin salva
+                 * campo/ora della fase finale con le chiavi storiche
+                 * sCamp, sTime, fCamp, fTime.
+                 *
+                 * Il motore KO di Bove utilizza invece
+                 * sTopCamp, sTopTime, fTopCamp, fTopTime.
+                 * Riallineiamo qui i dati in ingresso, senza modificare
+                 * il formato della configurazione salvata da Admin.
+                 */
+                if(Array.isArray(configurazione.sCamp))
+                    state.sTopCamp = [...configurazione.sCamp];
+
+                if(Array.isArray(configurazione.sTime))
+                    state.sTopTime = [...configurazione.sTime];
+
+                if(configurazione.fCamp !== undefined)
+                    state.fTopCamp = [String(configurazione.fCamp ?? "")];
+
+                if(configurazione.fTime !== undefined)
+                    state.fTopTime = [String(configurazione.fTime ?? "")];
+
             }
             else{
 
