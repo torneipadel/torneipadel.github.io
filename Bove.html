@@ -12429,61 +12429,89 @@ async function initDefaults(){
                     Array.isArray(state.coppie)
                 ){
 
+                    const nomeGiocatore = giocatore => {
+
+                        if(
+                            typeof giocatore === "string"
+                        ){
+                            return giocatore;
+                        }
+
+                        if(
+                            giocatore &&
+                            typeof giocatore === "object"
+                        ){
+                            return String(
+                                giocatore.nome_giocatore ||
+                                giocatore.cognome ||
+                                giocatore.nome ||
+                                ""
+                            ).trim();
+                        }
+
+                        return "";
+                    };
+
                     squadre =
                         state.coppie.map(c=>{
-
 
                             if(
                                 typeof c === "string"
                             ){
-
                                 return c;
-
                             }
 
-
                             if(
-                                c.nome
+                                c &&
+                                typeof c === "object" &&
+                                c.nome &&
+                                !c.giocatore1 &&
+                                !c.giocatore2 &&
+                                !c.g1 &&
+                                !c.g2
                             ){
-
-                                return c.nome;
-
+                                return String(c.nome);
                             }
 
-
                             if(
-                                c.g1 &&
-                                c.g2
-                            ){
-
-                                return c.g1 +
-                                " / " +
-                                c.g2;
-
-                            }
-
-
-                            if(
+                                c &&
+                                typeof c === "object" &&
                                 c.giocatore1 &&
                                 c.giocatore2
                             ){
+                                const g1 =
+                                    nomeGiocatore(c.giocatore1);
 
-                                return c.giocatore1 +
-                                " / " +
-                                c.giocatore2;
+                                const g2 =
+                                    nomeGiocatore(c.giocatore2);
 
+                                return [g1,g2]
+                                    .filter(Boolean)
+                                    .join(" / ");
                             }
 
+                            if(
+                                c &&
+                                typeof c === "object" &&
+                                c.g1 &&
+                                c.g2
+                            ){
+                                const g1 =
+                                    nomeGiocatore(c.g1);
+
+                                const g2 =
+                                    nomeGiocatore(c.g2);
+
+                                return [g1,g2]
+                                    .filter(Boolean)
+                                    .join(" / ");
+                            }
 
                             return JSON.stringify(c);
-
 
                         });
 
                 }
-
-
-
 
 
                 let perGirone =
