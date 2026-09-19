@@ -4114,12 +4114,28 @@ function setFormat(n){
 
     state.formato=n;
 
+    state.rules.formatoTorneo=n;
+
     state.rules.numeroSquadre=n;
 
     state.rules.squadrePerGirone=4;
 
     state.rules.numeroGironi =
         n / 4;
+
+    const numeroGironiInput =
+        document.getElementById("numeroGironi");
+
+    if(numeroGironiInput)
+        numeroGironiInput.value =
+            String(state.rules.numeroGironi);
+
+    const squadrePerGironeInput =
+        document.getElementById("squadrePerGirone");
+
+    if(squadrePerGironeInput)
+        squadrePerGironeInput.value =
+            String(state.rules.squadrePerGirone);
 
 
 
