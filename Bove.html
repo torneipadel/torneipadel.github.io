@@ -6787,6 +6787,7 @@ let configurazione = null;
 
 window.__BOVE_LOADING__ = true;
 window.__BOVE_REMOTE_NOT_FOUND__ = false;
+window.__BOVE_REMOTE_LOAD_ERROR__ = false;
 
 try{
 
@@ -6905,9 +6906,12 @@ try{
                     error
                 );
 
+                window.__BOVE_REMOTE_LOAD_ERROR__ = true;
+
             }
 
             const torneo =
+                !error &&
                 Array.isArray(tornei) &&
                 tornei.length > 0
                     ? tornei[0]
@@ -6917,6 +6921,18 @@ try{
 
                 configurazione =
                     torneo.configurazione || {};
+
+                if(typeof configurazione === "string"){
+                    try{
+                        configurazione = JSON.parse(configurazione);
+                    }catch(parseErr){
+                        console.error(
+                            "Configurazione torneo non interpretabile:",
+                            parseErr
+                        );
+                        configurazione = {};
+                    }
+                }
 
                 state.idTorneo =
                     torneo.id;
@@ -6963,7 +6979,7 @@ try{
                         : [];
 
             }
-            else{
+            else if(!error){
 
                 state.idTorneo=null;
                 state.nomeTorneo="";
