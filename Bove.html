@@ -11939,6 +11939,660 @@ function aggiornaDescrizioneTipoTorneo(){
 }
 function stampaTabellone(){
 
+    /*
+    ============================================================
+    STAMPA PROFESSIONALE DEL TABELLONE
+    - Non modifica il tabellone operativo
+    - Costruisce una versione dedicata alla stampa
+    - A4 orizzontale
+    - Quarti / semifinali / finale
+    - Campo, ora, risultati e campione
+    ============================================================
+    */
+
+    const vecchio = document.getElementById("bovePrintBoard");
+    if(vecchio) vecchio.remove();
+
+    const vecchioStyle = document.getElementById("bovePrintBoardStyle");
+    if(vecchioStyle) vecchioStyle.remove();
+
+    const esc = valore =>
+        String(valore ?? "")
+            .replace(/&/g,"&amp;")
+            .replace(/</g,"&lt;")
+            .replace(/>/g,"&gt;")
+            .replace(/"/g,"&quot;")
+            .replace(/'/g,"&#039;");
+
+    const displayTeam = squadra => {
+
+        if(!squadra)
+            return "Da determinare";
+
+        try{
+            if(typeof formatCoppiaDisplay === "function")
+                return formatCoppiaDisplay(squadra);
+        }catch(e){}
+
+        return String(squadra);
+    };
+
+    const getField = (type,index) => {
+
+        const map = {
+            Q:"qCamp",
+            S:"sTopCamp",
+            F:"fTopCamp"
+        };
+
+        const arr = state[map[type]];
+
+        return Array.isArray(arr)
+            ? String(arr[index] || "")
+            : "";
+    };
+
+    const getTime = (type,index) => {
+
+        const map = {
+            Q:"qTime",
+            S:"sTopTime",
+            F:"fTopTime"
+        };
+
+        const arr = state[map[type]];
+
+        return Array.isArray(arr)
+            ? String(arr[index] || "")
+            : "";
+    };
+
+    const getScore = (type,index) => {
+
+        let valore = "-";
+
+        if(type === "Q" && Array.isArray(state.qRes))
+            valore = state.qRes[index] || "-";
+
+        if(type === "S" && Array.isArray(state.sTopRes))
+            valore = state.sTopRes[index] || "-";
+
+        if(type === "F")
+            valore = state.fTopRes || "-";
+
+        const parti = String(valore)
+            .split("|")[0]
+            .split("-");
+
+        if(
+            parti.length === 2 &&
+            parti[0] !== "" &&
+            parti[1] !== ""
+        ){
+            return esc(parti[0] + " - " + parti[1]);
+        }
+
+        return "—";
+    };
+
+    const winner = (match,type,index) => {
+
+        let risultato = "-";
+
+        if(type === "Q" && Array.isArray(state.qRes))
+            risultato = state.qRes[index] || "-";
+
+        if(type === "S" && Array.isArray(state.sTopRes))
+            risultato = state.sTopRes[index] || "-";
+
+        if(type === "F")
+            risultato = state.fTopRes || "-";
+
+        try{
+            if(
+                Array.isArray(match) &&
+                match.length === 2 &&
+                typeof getWinner === "function"
+            ){
+                return getWinner(match,risultato);
+            }
+        }catch(e){}
+
+        return null;
+    };
+
+    const matchCard = (
+        fase,
+        numero,
+        match,
+        type,
+        index
+    ) => {
+
+        const squadra1 =
+            Array.isArray(match) ? match[0] : "";
+
+        const squadra2 =
+            Array.isArray(match) ? match[1] : "";
+
+        const vincitore =
+            winner(match,type,index);
+
+        const campo =
+            getField(type,index);
+
+        const ora =
+            getTime(type,index);
+
+        return `
+            <div class="print-match ${vincitore ? "print-finished" : ""}">
+
+                <div class="print-match-title">
+                    ${esc(fase)} ${numero}
+                </div>
+
+                <div class="print-team-row">
+                    <span>${esc(displayTeam(squadra1))}</span>
+                </div>
+
+                <div class="print-score">
+                    ${getScore(type,index)}
+                </div>
+
+                <div class="print-team-row">
+                    <span>${esc(displayTeam(squadra2))}</span>
+                </div>
+
+                <div class="print-match-info">
+                    <span>${campo ? "Campo " + esc(campo) : "Campo —"}</span>
+                    <span>${ora ? esc(ora) : "Ora —"}</span>
+                </div>
+
+                ${vincitore ? `
+                    <div class="print-winner">
+                        ✓ ${esc(displayTeam(vincitore))}
+                    </div>
+                ` : ""}
+
+            </div>
+        `;
+    };
+
+    const teams =
+        typeof getFinalQualified === "function"
+            ? getFinalQualified()
+            : [];
+
+    if(!Array.isArray(teams) || teams.length < 2){
+
+        alert(
+            "Il tabellone finale non è ancora disponibile: servono almeno 2 squadre qualificate."
+        );
+
+        return;
+    }
+
+    let htmlQuarti = "";
+    let htmlSemifinali = "";
+    let htmlFinale = "";
+
+    let finalisti = [];
+
+    /*
+    ============================
+    QUARTI
+    ============================
+    */
+
+    if(state.rules.usaQuarti === true){
+
+        const quarti = [
+
+            [teams[0] || "",teams[7] || ""],
+            [teams[3] || "",teams[4] || ""],
+            [teams[1] || "",teams[6] || ""],
+            [teams[2] || "",teams[5] || ""]
+
+        ];
+
+        quarti.forEach((match,index)=>{
+
+            htmlQuarti +=
+                matchCard(
+                    "Quarto",
+                    index + 1,
+                    match,
+                    "Q",
+                    index
+                );
+
+        });
+
+        const vincitoriQ =
+            quarti.map((match,index)=>
+                winner(match,"Q",index)
+            );
+
+        finalisti = [
+            [
+                vincitoriQ[0] || "Vincitore Quarto 1",
+                vincitoriQ[1] || "Vincitore Quarto 2"
+            ],
+            [
+                vincitoriQ[2] || "Vincitore Quarto 3",
+                vincitoriQ[3] || "Vincitore Quarto 4"
+            ]
+        ];
+
+    }else{
+
+        const semifinaliBase =
+
+            teams.length >= 4
+
+                ? [
+                    [teams[0],teams[3]],
+                    [teams[1],teams[2]]
+                ]
+
+                : [
+                    [teams[0],teams[1]]
+                ];
+
+        finalisti = semifinaliBase;
+
+    }
+
+    /*
+    ============================
+    SEMIFINALI
+    ============================
+    */
+
+    if(state.rules.usaSemifinali === true){
+
+        finalisti.forEach((match,index)=>{
+
+            htmlSemifinali +=
+                matchCard(
+                    "Semifinale",
+                    index + 1,
+                    match,
+                    "S",
+                    index
+                );
+
+        });
+
+    }
+
+    /*
+    ============================
+    FINALE
+    ============================
+    */
+
+    let finalMatch = [];
+
+    if(state.rules.usaSemifinali === true){
+
+        const vincitoriS =
+            finalisti.map((match,index)=>
+                winner(match,"S",index)
+            );
+
+        finalMatch = [
+            vincitoriS[0] || "Vincitore Semifinale 1",
+            vincitoriS[1] || "Vincitore Semifinale 2"
+        ];
+
+    }else{
+
+        finalMatch = finalisti[0] || [];
+
+    }
+
+    if(state.rules.usaFinale === true && finalMatch.length === 2){
+
+        htmlFinale =
+            matchCard(
+                "Finale",
+                1,
+                finalMatch,
+                "F",
+                0
+            );
+
+    }
+
+    let campione =
+        state.campioneTop || winner(finalMatch,"F",0);
+
+    if(!campione && typeof getWinner === "function"){
+
+        try{
+            campione =
+                getWinner(
+                    finalMatch,
+                    state.fTopRes || "-"
+                );
+        }catch(e){}
+
+    }
+
+    const nomeTorneo =
+        state.nomeTorneo ||
+        document.getElementById("titoloTorneo")?.textContent ||
+        "Torneo";
+
+    const dataTorneo =
+        state.dataTorneo ||
+        document.getElementById("dataTorneoInput")?.value ||
+        "";
+
+    const formula =
+        state.rules?.tipoTorneo ||
+        "Fase finale";
+
+    const board =
+        document.createElement("div");
+
+    board.id = "bovePrintBoard";
+
+    board.innerHTML = `
+
+        <div class="print-header">
+
+            <div class="print-brand">
+                NEXT POINT PADEL
+            </div>
+
+            <div class="print-title">
+                ${esc(nomeTorneo)}
+            </div>
+
+            <div class="print-subtitle">
+                TABELLONE FINALE
+                ${dataTorneo ? " • " + esc(dataTorneo) : ""}
+                • ${esc(formula)}
+            </div>
+
+        </div>
+
+        <div class="print-columns">
+
+            ${state.rules.usaQuarti === true ? `
+                <section class="print-phase print-phase-q">
+
+                    <h2>QUARTI DI FINALE</h2>
+
+                    <div class="print-phase-list">
+                        ${htmlQuarti}
+                    </div>
+
+                </section>
+            ` : ""}
+
+            ${state.rules.usaSemifinali === true ? `
+                <section class="print-phase print-phase-s">
+
+                    <h2>SEMIFINALI</h2>
+
+                    <div class="print-phase-list">
+                        ${htmlSemifinali}
+                    </div>
+
+                </section>
+            ` : ""}
+
+            ${state.rules.usaFinale === true ? `
+                <section class="print-phase print-phase-f">
+
+                    <h2>FINALE</h2>
+
+                    <div class="print-phase-list">
+                        ${htmlFinale}
+                    </div>
+
+                    <div class="print-champion">
+                        <div class="print-champion-label">
+                            CAMPIONE DEL TORNEO
+                        </div>
+
+                        <div class="print-champion-name">
+                            ${campione
+                                ? "🏆 " + esc(displayTeam(campione))
+                                : "Da determinare"}
+                        </div>
+                    </div>
+
+                </section>
+            ` : ""}
+
+        </div>
+
+        <div class="print-footer">
+            Tabellone generato dal gestionale Torneo Roberto Bove
+        </div>
+    `;
+
+    const style =
+        document.createElement("style");
+
+    style.id = "bovePrintBoardStyle";
+
+    style.textContent = `
+
+        @page{
+            size:A4 landscape;
+            margin:9mm;
+        }
+
+        #bovePrintBoard{
+            display:none;
+        }
+
+        @media print{
+
+            html,
+            body{
+                width:100%;
+                min-height:100%;
+                margin:0 !important;
+                padding:0 !important;
+                background:#fff !important;
+                color:#111827 !important;
+            }
+
+            body.bove-printing > *:not(#bovePrintBoard){
+                display:none !important;
+            }
+
+            body.bove-printing #bovePrintBoard{
+                display:block !important;
+                width:100% !important;
+                min-height:100vh;
+                box-sizing:border-box;
+                background:#fff !important;
+                color:#111827 !important;
+                font-family:Arial,Helvetica,sans-serif;
+                padding:3mm 4mm 2mm;
+            }
+
+            .print-header{
+                text-align:center;
+                border-bottom:2px solid #111827;
+                padding-bottom:5mm;
+                margin-bottom:5mm;
+            }
+
+            .print-brand{
+                font-size:9px;
+                font-weight:700;
+                letter-spacing:2.5px;
+                margin-bottom:2mm;
+                color:#475569;
+            }
+
+            .print-title{
+                font-size:23px;
+                font-weight:800;
+                line-height:1.15;
+                margin-bottom:2mm;
+            }
+
+            .print-subtitle{
+                font-size:10px;
+                color:#475569;
+                text-transform:uppercase;
+                letter-spacing:.7px;
+            }
+
+            .print-columns{
+                display:grid;
+                grid-template-columns:
+                    minmax(0,1.05fr)
+                    minmax(0,.95fr)
+                    minmax(0,.95fr);
+                gap:7mm;
+                align-items:stretch;
+            }
+
+            .print-phase{
+                position:relative;
+                min-width:0;
+            }
+
+            .print-phase h2{
+                font-size:11px;
+                letter-spacing:1px;
+                text-align:center;
+                margin:0 0 3mm;
+                padding:2.2mm 2mm;
+                border:1px solid #cbd5e1;
+                background:#f1f5f9;
+                border-radius:5px;
+            }
+
+            .print-phase-list{
+                display:flex;
+                flex-direction:column;
+                justify-content:space-around;
+                min-height:145mm;
+                gap:4mm;
+            }
+
+            .print-phase-q .print-phase-list{
+                gap:3mm;
+            }
+
+            .print-match{
+                position:relative;
+                border:1.2px solid #334155;
+                border-radius:6px;
+                background:#fff;
+                overflow:hidden;
+                page-break-inside:avoid;
+            }
+
+            .print-match-title{
+                background:#111827;
+                color:#fff;
+                font-size:8px;
+                font-weight:700;
+                text-transform:uppercase;
+                letter-spacing:.6px;
+                padding:1.5mm 2mm;
+                text-align:left;
+            }
+
+            .print-team-row{
+                min-height:8mm;
+                display:flex;
+                align-items:center;
+                padding:1.2mm 2.2mm;
+                font-size:10px;
+                font-weight:600;
+                line-height:1.2;
+                border-bottom:1px solid #e2e8f0;
+                text-align:center;
+                justify-content:center;
+                overflow-wrap:anywhere;
+            }
+
+            .print-score{
+                position:absolute;
+                right:2mm;
+                top:12mm;
+                font-size:11px;
+                font-weight:800;
+                min-width:12mm;
+                text-align:center;
+                padding:1mm;
+                border:1px solid #94a3b8;
+                border-radius:3px;
+                background:#f8fafc;
+            }
+
+            .print-match-info{
+                display:flex;
+                justify-content:space-between;
+                gap:2mm;
+                padding:1.4mm 2.2mm;
+                font-size:8px;
+                color:#475569;
+                background:#f8fafc;
+            }
+
+            .print-winner{
+                padding:1.2mm 2mm;
+                font-size:8px;
+                font-weight:700;
+                text-align:center;
+                background:#ecfdf5;
+                color:#166534;
+                border-top:1px solid #bbf7d0;
+            }
+
+            .print-champion{
+                margin-top:7mm;
+                border:2px solid #111827;
+                border-radius:8px;
+                text-align:center;
+                padding:5mm 3mm;
+                background:#f8fafc;
+                page-break-inside:avoid;
+            }
+
+            .print-champion-label{
+                font-size:9px;
+                font-weight:800;
+                letter-spacing:1.2px;
+                margin-bottom:2mm;
+            }
+
+            .print-champion-name{
+                font-size:15px;
+                font-weight:800;
+                line-height:1.25;
+            }
+
+            .print-footer{
+                margin-top:4mm;
+                padding-top:2mm;
+                border-top:1px solid #cbd5e1;
+                text-align:center;
+                font-size:7px;
+                color:#64748b;
+            }
+
+        }
+
+    `;
+
+    document.head.appendChild(style);
+    document.body.appendChild(board);
+
     const menu =
         document.getElementById("menuComandi");
 
@@ -11949,20 +12603,36 @@ function stampaTabellone(){
 
     if(menu){
         menu.classList.remove("show");
-        menu.style.setProperty("display","none","important");
-        menu.style.setProperty("visibility","hidden","important");
+        menu.style.setProperty(
+            "display",
+            "none",
+            "important"
+        );
+        menu.style.setProperty(
+            "visibility",
+            "hidden",
+            "important"
+        );
     }
 
     if(menuContainer){
-        menuContainer.style.setProperty("display","none","important");
-        menuContainer.style.setProperty("visibility","hidden","important");
+        menuContainer.style.setProperty(
+            "display",
+            "none",
+            "important"
+        );
+        menuContainer.style.setProperty(
+            "visibility",
+            "hidden",
+            "important"
+        );
     }
 
     setTimeout(()=>{
 
         window.print();
 
-    },150);
+    },180);
 
 }
 
