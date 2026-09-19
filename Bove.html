@@ -1793,6 +1793,8 @@ Seleziona formato torneo
 
           type="checkbox" 
 
+          onchange="aggiornaPannelloRegole()" 
+
           checked>
 
         Usa Quarti di Finale
@@ -1809,6 +1811,8 @@ Seleziona formato torneo
 
           type="checkbox" 
 
+          onchange="aggiornaPannelloRegole()" 
+
           checked>
 
         Usa Semifinali
@@ -1824,6 +1828,8 @@ Seleziona formato torneo
           id="usaFinale" 
 
           type="checkbox" 
+
+          onchange="aggiornaPannelloRegole()" 
 
           checked>
 
@@ -4670,13 +4676,13 @@ function ensureRules(){
 
     if(state.rules.tipoTorneo===undefined)
 
-        state.rules.tipoTorneo="gironi";
+        state.rules.tipoTorneo="gironiFinale";
 
 
     if(state.rules.formatoTorneo===undefined)
 
         state.rules.formatoTorneo =
-            state.rules.tipoTorneo;
+            String(state.rules.numeroSquadre || state.formato || 8);
 
 
 
@@ -5092,6 +5098,45 @@ function ensureRules(){
     if(state.rules.note===undefined)
 
         state.rules.note="";
+
+
+    /*
+        ============================
+        COERENZA FASE FINALE
+        ============================
+    */
+
+    const tipiSenzaKO = [
+        "svizzero",
+        "americano",
+        "mexicano",
+        "king"
+    ];
+
+    if(tipiSenzaKO.includes(state.rules.tipoTorneo)){
+
+        state.rules.usaQuarti=false;
+        state.rules.usaSemifinali=false;
+        state.rules.usaFinale=false;
+        state.rules.ripescaggio=false;
+        state.rules.numeroRipescate=0;
+
+    }else if(state.rules.tipoTorneo==="eliminazione"){
+
+        state.rules.usaQuarti=false;
+        state.rules.usaSemifinali=true;
+        state.rules.usaFinale=true;
+        state.rules.ripescaggio=false;
+        state.rules.numeroRipescate=0;
+
+    }else if(
+        state.rules.usaQuarti===true &&
+        state.rules.usaSemifinali!==true
+    ){
+
+        state.rules.usaQuarti=false;
+
+    }
 
 
 
@@ -6880,11 +6925,26 @@ try{
         "A","B","C","D","E","F","G"
     ];
 
+    const tipiSenzaGironiState = [
+        "eliminazione",
+        "svizzero",
+        "americano",
+        "mexicano",
+        "king"
+    ];
+
+    const senzaGironi =
+        tipiSenzaGironiState.includes(state.rules.tipoTorneo);
+
     const numeroGironi =
-        Number(state.rules.numeroGironi)||2;
+        senzaGironi
+            ? 0
+            : Number(state.rules.numeroGironi) || 2;
 
     const perGirone =
-        Number(state.rules.squadrePerGirone)||4;
+        senzaGironi
+            ? 0
+            : Number(state.rules.squadrePerGirone) || 4;
 
     const gironiAttivi =
         lettere.slice(
@@ -11334,7 +11394,7 @@ function applicaModelloTorneo(){
     }[n] || {gironi:2,perGirone:4};
 
     state.rules.tipoTorneo=tipo;
-    state.rules.formatoTorneo=tipo;
+    state.rules.formatoTorneo=String(n);
 
     state.qRes=Array(4).fill("-");
     state.sTopRes=Array(2).fill("-");
@@ -11840,23 +11900,28 @@ async function initDefaults(){
                     8;
 
 
+                const tipiSenzaGironiAdmin = [
+                    "eliminazione",
+                    "svizzero",
+                    "americano",
+                    "mexicano",
+                    "king"
+                ];
+
+                const tipoTorneoAdmin =
+                    rulesAdmin.tipoTorneo || "gironiFinale";
+
                 let numeroGironi =
                     Number(rulesAdmin.numeroGironi);
 
+                if(tipiSenzaGironiAdmin.includes(tipoTorneoAdmin)){
 
+                    numeroGironi=0;
 
-                if(!numeroGironi){
+                }else if(!numeroGironi){
 
                     numeroGironi =
-                        numeroSquadre >= 16
-                        ?
-                        4
-                        :
-                        numeroSquadre >= 12
-                        ?
-                        3
-                        :
-                        2;
+                        numeroSquadre / 4;
 
                 }
 
@@ -11904,16 +11969,12 @@ async function initDefaults(){
         String(numeroSquadre),
 
     tipoTorneo:
-        rulesAdmin.tipoTorneo
-        ||
-        "gironiFinale",
+        tipoTorneoAdmin,
 
     squadrePerGirone:
-        Number(
-            rulesAdmin.squadrePerGirone
-        )
-        ||
-        4
+        tipiSenzaGironiAdmin.includes(tipoTorneoAdmin)
+            ? 0
+            : Number(rulesAdmin.squadrePerGirone) || 4
 
 },
 
@@ -12048,13 +12109,15 @@ async function initDefaults(){
 
 
 
-                let perGirone =
+                const noGironiAdmin =
+                    tipiSenzaGironiAdmin.includes(
+                        state.rules.tipoTorneo
+                    );
 
-                    Number(
-                        state.rules.squadrePerGirone
-                    )
-                    ||
-                    4;
+                let perGirone =
+                    noGironiAdmin
+                        ? 0
+                        : Number(state.rules.squadrePerGirone) || 4;
 
 
 
@@ -12070,18 +12133,21 @@ async function initDefaults(){
 
 
 
-                for(
-                    let i=0;
-                    i<numeroGironi;
-                    i++
-                ){
+                if(!noGironiAdmin){
 
-                    state[lettere[i]] =
+                    for(
+                        let i=0;
+                        i<numeroGironi;
+                        i++
+                    ){
 
-                        squadre.slice(
-                            i * perGirone,
-                            (i + 1) * perGirone
-                        );
+                        state[lettere[i]] =
+                            squadre.slice(
+                                i * perGirone,
+                                (i + 1) * perGirone
+                            );
+
+                    }
 
                 }
 
