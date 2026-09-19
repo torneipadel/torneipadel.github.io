@@ -416,14 +416,22 @@ async function simulate(){
   }
 
   const c=work.configurazione;
-  const risultati=[[6,4],[7,5],[5,7],[6,6],[4,6],[7,5]];
-  c.rotazione.giornate.forEach(g=>(g.partite||[]).forEach((m,i)=>{
-    const r=risultati[i%risultati.length];
-    m.risA=String(r[0]);
-    m.risB=String(r[1]);
+  const risultati=[[6,4],[7,5],[5,7],[6,6],[4,6],[7,4],[5,3],[6,5],[3,6],[7,6],[4,5],[6,3]];
+  let partiteTotali=0;
+  c.rotazione.giornate.forEach((g,gi)=>(g.partite||[]).forEach((m,i)=>{
+    const rr=risultati[(gi*6+i)%risultati.length];
+    m.risA=String(rr[0]);
+    m.risB=String(rr[1]);
     m.campo=(i%2===0)?c.rotazione.campoDefault:'Campo 2';
     m.ora=c.rotazione.oraDefault||'19:00';
+    partiteTotali++;
   }));
+  if(c.rotazione.giornate.length!==12)throw Error('La simulazione non ha generato esattamente 12 giornate.');
+  if(partiteTotali!==72)throw Error('La simulazione non ha generato esattamente 72 partite.');
+  c.rotazione.giornate.forEach(g=>{
+    const check=auditDay(g,ps);
+    if(!check.valid||check.partite!==6||check.results!==6)throw Error('La simulazione contiene una giornata non valida: giornata '+g.numero+'.');
+  });
 
   c.rotazione.version=2;
   c.rotazione.numeroGiocatori=8;
