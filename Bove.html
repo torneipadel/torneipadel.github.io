@@ -12385,7 +12385,7 @@ function stampaTabellone(){
 
         @page{
             size:A4 landscape;
-            margin:9mm;
+            margin:6mm;
         }
 
         #bovePrintBoard{
@@ -12396,12 +12396,14 @@ function stampaTabellone(){
 
             html,
             body{
-                width:100%;
-                min-height:100%;
+                width:100% !important;
+                height:100% !important;
+                min-height:0 !important;
                 margin:0 !important;
                 padding:0 !important;
                 background:#fff !important;
                 color:#111827 !important;
+                overflow:hidden !important;
             }
 
             body.bove-printing > *:not(#bovePrintBoard){
@@ -12411,184 +12413,304 @@ function stampaTabellone(){
             body.bove-printing #bovePrintBoard{
                 display:block !important;
                 width:100% !important;
-                min-height:100vh;
+                height:186mm !important;
+                min-height:0 !important;
                 box-sizing:border-box;
                 background:#fff !important;
                 color:#111827 !important;
                 font-family:Arial,Helvetica,sans-serif;
-                padding:3mm 4mm 2mm;
+                padding:2mm 3mm 1mm;
+                overflow:hidden !important;
             }
 
             .print-header{
+                height:23mm;
+                box-sizing:border-box;
                 text-align:center;
-                border-bottom:2px solid #111827;
-                padding-bottom:5mm;
-                margin-bottom:5mm;
+                border-bottom:1.2px solid #111827;
+                padding:1mm 0 3mm;
+                margin-bottom:3mm;
             }
 
             .print-brand{
-                font-size:9px;
+                font-size:8px;
                 font-weight:700;
-                letter-spacing:2.5px;
-                margin-bottom:2mm;
+                letter-spacing:2px;
+                margin-bottom:1mm;
                 color:#475569;
             }
 
             .print-title{
-                font-size:23px;
+                font-size:19px;
                 font-weight:800;
-                line-height:1.15;
-                margin-bottom:2mm;
+                line-height:1.1;
+                margin-bottom:1.2mm;
             }
 
             .print-subtitle{
-                font-size:10px;
+                font-size:8.5px;
                 color:#475569;
                 text-transform:uppercase;
-                letter-spacing:.7px;
+                letter-spacing:.55px;
             }
 
             .print-columns{
+                position:relative;
                 display:grid;
                 grid-template-columns:
-                    minmax(0,1.05fr)
-                    minmax(0,.95fr)
-                    minmax(0,.95fr);
-                gap:7mm;
+                    minmax(0,1.12fr)
+                    minmax(0,1fr)
+                    minmax(0,1fr);
+                gap:9mm;
+                height:145mm;
                 align-items:stretch;
             }
 
             .print-phase{
                 position:relative;
                 min-width:0;
+                z-index:2;
             }
 
             .print-phase h2{
-                font-size:11px;
+                height:8mm;
+                box-sizing:border-box;
+                font-size:9px;
                 letter-spacing:1px;
                 text-align:center;
-                margin:0 0 3mm;
-                padding:2.2mm 2mm;
+                margin:0 0 2.5mm;
+                padding:2mm;
                 border:1px solid #cbd5e1;
                 background:#f1f5f9;
-                border-radius:5px;
+                border-radius:4px;
             }
 
             .print-phase-list{
+                height:134.5mm;
+                min-height:0;
                 display:flex;
                 flex-direction:column;
                 justify-content:space-around;
-                min-height:145mm;
-                gap:4mm;
+                gap:0;
             }
 
             .print-phase-q .print-phase-list{
-                gap:3mm;
+                justify-content:space-between;
+                padding:2mm 0;
+                box-sizing:border-box;
+            }
+
+            .print-phase-s .print-phase-list{
+                justify-content:space-around;
+                padding:18mm 0;
+                box-sizing:border-box;
+            }
+
+            .print-phase-f .print-phase-list{
+                justify-content:center;
+                padding:0 0 22mm;
+                box-sizing:border-box;
             }
 
             .print-match{
                 position:relative;
-                border:1.2px solid #334155;
-                border-radius:6px;
+                width:100%;
+                min-height:24mm;
+                border:1px solid #334155;
+                border-radius:5px;
                 background:#fff;
-                overflow:hidden;
+                overflow:visible;
+                box-sizing:border-box;
                 page-break-inside:avoid;
             }
 
             .print-match-title{
                 background:#111827;
                 color:#fff;
-                font-size:8px;
+                font-size:7px;
                 font-weight:700;
                 text-transform:uppercase;
-                letter-spacing:.6px;
-                padding:1.5mm 2mm;
+                letter-spacing:.5px;
+                padding:1.2mm 1.8mm;
                 text-align:left;
+                border-radius:4px 4px 0 0;
             }
 
             .print-team-row{
-                min-height:8mm;
+                min-height:5.6mm;
                 display:flex;
                 align-items:center;
-                padding:1.2mm 2.2mm;
-                font-size:10px;
+                padding:1mm 12mm 1mm 1.8mm;
+                font-size:8.3px;
                 font-weight:600;
-                line-height:1.2;
+                line-height:1.1;
                 border-bottom:1px solid #e2e8f0;
                 text-align:center;
                 justify-content:center;
                 overflow-wrap:anywhere;
+                box-sizing:border-box;
             }
 
             .print-score{
                 position:absolute;
-                right:2mm;
-                top:12mm;
-                font-size:11px;
+                right:1.5mm;
+                top:10mm;
+                font-size:9px;
                 font-weight:800;
-                min-width:12mm;
+                min-width:10mm;
+                box-sizing:border-box;
                 text-align:center;
-                padding:1mm;
+                padding:1mm .8mm;
                 border:1px solid #94a3b8;
                 border-radius:3px;
                 background:#f8fafc;
+                z-index:3;
             }
 
             .print-match-info{
                 display:flex;
                 justify-content:space-between;
-                gap:2mm;
-                padding:1.4mm 2.2mm;
-                font-size:8px;
+                gap:1.5mm;
+                padding:1mm 1.8mm;
+                font-size:6.8px;
                 color:#475569;
                 background:#f8fafc;
+                border-radius:0 0 4px 4px;
             }
 
             .print-winner{
-                padding:1.2mm 2mm;
-                font-size:8px;
+                padding:1mm 1.5mm;
+                font-size:6.8px;
                 font-weight:700;
                 text-align:center;
                 background:#ecfdf5;
                 color:#166534;
                 border-top:1px solid #bbf7d0;
+                overflow:hidden;
+                white-space:nowrap;
+                text-overflow:ellipsis;
+            }
+
+            /*
+            ========================================================
+            LINEE DEL PERCORSO
+            ========================================================
+            Le linee sono dietro ai box e collegano:
+            Quarti → Semifinali → Finale.
+            ========================================================
+            */
+
+            .print-phase-q .print-match::after{
+                content:"";
+                position:absolute;
+                top:50%;
+                right:-9mm;
+                width:9mm;
+                height:0;
+                border-top:1px solid #94a3b8;
+                z-index:0;
+            }
+
+            .print-phase-s .print-match::before{
+                content:"";
+                position:absolute;
+                top:50%;
+                left:-9mm;
+                width:9mm;
+                height:0;
+                border-top:1px solid #94a3b8;
+                z-index:0;
+            }
+
+            .print-phase-s .print-match::after{
+                content:"";
+                position:absolute;
+                top:50%;
+                right:-9mm;
+                width:9mm;
+                height:0;
+                border-top:1px solid #94a3b8;
+                z-index:0;
+            }
+
+            .print-phase-f .print-match::before{
+                content:"";
+                position:absolute;
+                top:50%;
+                left:-9mm;
+                width:9mm;
+                height:0;
+                border-top:1px solid #94a3b8;
+                z-index:0;
+            }
+
+            /*
+            Piccoli raccordi verticali per rendere evidente
+            il percorso dai due quarti alla semifinale.
+            */
+
+            .print-phase-q .print-match:nth-child(1)::before,
+            .print-phase-q .print-match:nth-child(3)::before{
+                content:"";
+                position:absolute;
+                right:-9mm;
+                top:50%;
+                width:4.5mm;
+                height:calc(100% + 25mm);
+                border-right:1px solid #94a3b8;
+                border-top:0;
+                border-bottom:0;
+                z-index:0;
+            }
+
+            .print-phase-q .print-match:nth-child(2)::before,
+            .print-phase-q .print-match:nth-child(4)::before{
+                content:"";
+                position:absolute;
+                right:-9mm;
+                top:calc(50% - 25mm);
+                width:4.5mm;
+                height:calc(100% + 25mm);
+                border-right:1px solid #94a3b8;
+                z-index:0;
             }
 
             .print-champion{
-                margin-top:7mm;
-                border:2px solid #111827;
-                border-radius:8px;
+                margin-top:5mm;
+                border:1.5px solid #111827;
+                border-radius:6px;
                 text-align:center;
-                padding:5mm 3mm;
+                padding:3mm 2mm;
                 background:#f8fafc;
                 page-break-inside:avoid;
             }
 
             .print-champion-label{
-                font-size:9px;
+                font-size:7px;
                 font-weight:800;
-                letter-spacing:1.2px;
-                margin-bottom:2mm;
+                letter-spacing:1px;
+                margin-bottom:1mm;
             }
 
             .print-champion-name{
-                font-size:15px;
+                font-size:11px;
                 font-weight:800;
-                line-height:1.25;
+                line-height:1.2;
             }
 
             .print-footer{
-                margin-top:4mm;
-                padding-top:2mm;
+                margin-top:2mm;
+                padding-top:1mm;
                 border-top:1px solid #cbd5e1;
                 text-align:center;
-                font-size:7px;
+                font-size:6px;
                 color:#64748b;
             }
 
         }
 
-    `;
+    `
+
 
     document.head.appendChild(style);
     document.body.appendChild(board);
