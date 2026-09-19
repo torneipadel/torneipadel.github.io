@@ -5339,7 +5339,7 @@ function applyRules(){
 
     state.rules.numeroSquadre=n;
     state.rules.tipoTorneo=tipo;
-    state.rules.formatoTorneo=tipo;
+    state.rules.formatoTorneo=String(n);
 
     const struttura={
         8:{gironi:2,perGirone:4},
@@ -5427,9 +5427,9 @@ function applyRules(){
         state.rules.usaSemifinali=document.getElementById("usaSemifinali")?.checked===true;
         state.rules.usaFinale=document.getElementById("usaFinale")?.checked===true;
     }else if(tipo==="eliminazione"){
-        state.rules.usaQuarti=false;
-        state.rules.usaSemifinali=true;
-        state.rules.usaFinale=true;
+        state.rules.usaQuarti=document.getElementById("usaQuarti")?.checked===true;
+        state.rules.usaSemifinali=document.getElementById("usaSemifinali")?.checked===true;
+        state.rules.usaFinale=document.getElementById("usaFinale")?.checked===true;
     }else if(noKO.includes(tipo)){
         state.rules.usaQuarti=false;
         state.rules.usaSemifinali=false;
@@ -8019,7 +8019,9 @@ function renderClass(){
 
         "C",
 
-        "D"
+        "D",
+        "E",
+        "F"
 
     ].forEach(tag=>{
 
@@ -8174,6 +8176,12 @@ function updateRes(g,i,pos,val){
 
     else if(g==="D")
         s=state.Dres;
+
+    else if(g==="E")
+        s=state.Eres;
+
+    else if(g==="F")
+        s=state.Fres;
 
     else
         return;
@@ -10246,7 +10254,9 @@ function renderTables(){
         A:[2,3],
         B:[4,5],
         C:[6,7],
-        D:[8,9]
+        D:[8,9],
+        E:[10,11],
+        F:[12,13]
     };
 
     let durata=Number(state.rules.duration||30);
@@ -10265,7 +10275,7 @@ function renderTables(){
 
     let calendario=[];
 
-    ["A","B","C","D"].forEach(tag=>{
+    ["A","B","C","D","E","F"].forEach(tag=>{
 
         let squadre=state[tag];
 
@@ -10404,7 +10414,7 @@ function renderTables(){
 
     });
 
-    ["A","B","C","D"].forEach(tag=>{
+    ["A","B","C","D","E","F"].forEach(tag=>{
 
         let box=
             document.getElementById(
@@ -10577,7 +10587,7 @@ oninput="updateRes('${tag}',${i},1,this.value)">
                 Number(state.rules.numeroGironi)||2;
 
             const indiceGirone =
-                ["A","B","C","D"].indexOf(tag);
+                ["A","B","C","D","E","F"].indexOf(tag);
 
             card.style.display =
                 indiceGirone>=0 &&
@@ -11279,7 +11289,7 @@ function applicaModelloTorneo(){
     }[n] || {gironi:2,perGirone:4};
 
     state.rules.tipoTorneo=tipo;
-    state.rules.formatoTorneo=tipo;
+    state.rules.formatoTorneo=String(n);
 
     state.qRes=Array(4).fill("-");
     state.sTopRes=Array(2).fill("-");
