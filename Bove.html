@@ -5339,7 +5339,7 @@ function applyRules(){
 
     state.rules.numeroSquadre=n;
     state.rules.tipoTorneo=tipo;
-    state.rules.formatoTorneo=String(n);
+    state.rules.formatoTorneo=tipo;
 
     const struttura={
         8:{gironi:2,perGirone:4},
@@ -5427,9 +5427,9 @@ function applyRules(){
         state.rules.usaSemifinali=document.getElementById("usaSemifinali")?.checked===true;
         state.rules.usaFinale=document.getElementById("usaFinale")?.checked===true;
     }else if(tipo==="eliminazione"){
-        state.rules.usaQuarti=document.getElementById("usaQuarti")?.checked===true;
-        state.rules.usaSemifinali=document.getElementById("usaSemifinali")?.checked===true;
-        state.rules.usaFinale=document.getElementById("usaFinale")?.checked===true;
+        state.rules.usaQuarti=false;
+        state.rules.usaSemifinali=true;
+        state.rules.usaFinale=true;
     }else if(noKO.includes(tipo)){
         state.rules.usaQuarti=false;
         state.rules.usaSemifinali=false;
@@ -8019,9 +8019,7 @@ function renderClass(){
 
         "C",
 
-        "D",
-        "E",
-        "F"
+        "D"
 
     ].forEach(tag=>{
 
@@ -8176,12 +8174,6 @@ function updateRes(g,i,pos,val){
 
     else if(g==="D")
         s=state.Dres;
-
-    else if(g==="E")
-        s=state.Eres;
-
-    else if(g==="F")
-        s=state.Fres;
 
     else
         return;
@@ -10254,9 +10246,7 @@ function renderTables(){
         A:[2,3],
         B:[4,5],
         C:[6,7],
-        D:[8,9],
-        E:[10,11],
-        F:[12,13]
+        D:[8,9]
     };
 
     let durata=Number(state.rules.duration||30);
@@ -10275,7 +10265,7 @@ function renderTables(){
 
     let calendario=[];
 
-    ["A","B","C","D","E","F"].forEach(tag=>{
+    ["A","B","C","D"].forEach(tag=>{
 
         let squadre=state[tag];
 
@@ -10414,7 +10404,7 @@ function renderTables(){
 
     });
 
-    ["A","B","C","D","E","F"].forEach(tag=>{
+    ["A","B","C","D"].forEach(tag=>{
 
         let box=
             document.getElementById(
@@ -10587,7 +10577,7 @@ oninput="updateRes('${tag}',${i},1,this.value)">
                 Number(state.rules.numeroGironi)||2;
 
             const indiceGirone =
-                ["A","B","C","D","E","F"].indexOf(tag);
+                ["A","B","C","D"].indexOf(tag);
 
             card.style.display =
                 indiceGirone>=0 &&
@@ -10715,18 +10705,282 @@ function sincronizzaFaseFinale(){
     ensureRules();
 
     /*
-     * La sincronizzazione della fase finale deve usare una sola
-     * sorgente di verita': renderKO(), che rispetta i flag
-     * usaQuarti / usaSemifinali / usaFinale e i campi canonici
-     * qCamp/qTime, sTopCamp/sTopTime, fTopCamp/fTopTime.
-     *
-     * Non vengono piu' azzerati i vecchi campi legacy sCamp/sTime
-     * e fCamp/fTime, che potevano creare disallineamenti con la UI.
+    ==================================================
+    FASE FINALE: RICOSTRUZIONE COERENTE
+    ==================================================
+    */
+
+    const qualificati = getFinalQualified();
+
+    /*
+     * Se i gironi non sono completati,
+     * NON devono esistere quarti, semifinali o finale.
      */
-    if(typeof renderKO === "function"){
-        renderKO();
+
+    if(!Array.isArray(qualificati) || qualificati.length < 2){
+
+        state.quarti = [];
+        state.semiTop = [];
+        state.finalTop = [];
+
+        state.qRes = Array(4).fill("-");
+        state.qCamp = [];
+        state.qTime = [];
+
+        state.sTopRes = Array(2).fill("-");
+        state.sTopCamp = [];
+        state.sTopTime = [];
+
+        state.fTopRes = "-";
+        state.fTopCamp = "";
+        state.fTopTime = "";
+
+        state.campioneTop = null;
+
+        console.log(
+            "FASE FINALE AZZERATA: gironi non completati."
+        );
+
+        return;
     }
 
+
+    /*
+    ==================================================
+    QUARTI
+    ==================================================
+    */
+
+    if(
+        state.rules.usaQuarti === true &&
+        qualificati.length >= 8
+    ){
+
+        /*
+         * Abbinamento standard:
+         *
+         * 1A vs 4B
+         * 2A vs 3B
+         * 1B vs 4A
+         * 2B vs 3A
+         *
+         * Se i qualificati arrivano già ordinati
+         * da getFinalQualified(), utilizziamo comunque
+         * blocchi da 4.
+         */
+
+        const q = [];
+
+        for(let i=0; i<8; i+=2){
+
+            if(
+                qualificati[i] &&
+                qualificati[i+1]
+            ){
+
+                q.push([
+                    qualificati[i],
+                    qualificati[i+1]
+                ]);
+
+            }
+
+        }
+
+        state.quarti = q;
+
+        /*
+         * Mantiene i risultati esistenti SOLO se
+         * esiste realmente la partita corrispondente.
+         */
+
+        if(!Array.isArray(state.qRes))
+            state.qRes = Array(4).fill("-");
+
+        while(state.qRes.length < 4)
+            state.qRes.push("-");
+
+        state.qRes = state.qRes.slice(0,4);
+
+    }
+    else{
+
+        state.quarti = [];
+        state.qRes = Array(4).fill("-");
+        state.qCamp = [];
+        state.qTime = [];
+
+    }
+
+
+    /*
+    ==================================================
+    VINCITORI QUARTI
+    ==================================================
+    */
+
+    const vincitoriQuarti = [];
+
+    if(Array.isArray(state.quarti)){
+
+        state.quarti.forEach((match,index)=>{
+
+            const risultato =
+                Array.isArray(state.qRes)
+                    ? state.qRes[index]
+                    : "-";
+
+            const vincitore =
+                getWinner(match,risultato);
+
+            if(vincitore)
+                vincitoriQuarti.push(vincitore);
+
+        });
+
+    }
+
+
+    /*
+    ==================================================
+    SEMIFINALI
+    ==================================================
+    */
+
+    if(vincitoriQuarti.length === 4){
+
+        state.semiTop = [
+
+            [
+                vincitoriQuarti[0],
+                vincitoriQuarti[1]
+            ],
+
+            [
+                vincitoriQuarti[2],
+                vincitoriQuarti[3]
+            ]
+
+        ];
+
+    }
+    else{
+
+        state.semiTop = [];
+
+        /*
+         * Se non esistono quattro vincitori dei quarti,
+         * i risultati delle semifinali non possono essere
+         * considerati validi.
+         */
+
+        state.sTopRes = Array(2).fill("-");
+        state.sTopCamp = [];
+        state.sTopTime = [];
+
+        state.finalTop = [];
+
+        state.fTopRes = "-";
+        state.fTopCamp = "";
+        state.fTopTime = "";
+
+        state.campioneTop = null;
+
+        console.log(
+            "SEMIFINALI NON RICOSTRUITE: quarti incompleti."
+        );
+
+        return;
+    }
+
+
+    /*
+    ==================================================
+    VINCITORI SEMIFINALI
+    ==================================================
+    */
+
+    const vincitoriSemi = [];
+
+    state.semiTop.forEach((match,index)=>{
+
+        const risultato =
+            Array.isArray(state.sTopRes)
+                ? state.sTopRes[index]
+                : "-";
+
+        const vincitore =
+            getWinner(match,risultato);
+
+        if(vincitore)
+            vincitoriSemi.push(vincitore);
+
+    });
+
+
+    /*
+    ==================================================
+    FINALE
+    ==================================================
+    */
+
+    if(vincitoriSemi.length === 2){
+
+        state.finalTop = [
+
+            vincitoriSemi[0],
+            vincitoriSemi[1]
+
+        ];
+
+    }
+    else{
+
+        state.finalTop = [];
+
+        state.fTopRes = "-";
+        state.fTopCamp = "";
+        state.fTopTime = "";
+
+        state.campioneTop = null;
+
+        console.log(
+            "FINALE NON RICOSTRUITA: semifinali incomplete."
+        );
+
+        return;
+    }
+
+
+    /*
+    ==================================================
+    CAMPIONE
+    ==================================================
+    */
+
+    const campione =
+        getWinner(
+            state.finalTop,
+            state.fTopRes
+        );
+
+    state.campioneTop =
+        campione || null;
+
+
+    console.log(
+        "FASE FINALE SINCRONIZZATA:",
+        {
+            qualificati: qualificati,
+            quarti: state.quarti,
+            qRes: state.qRes,
+            semiTop: state.semiTop,
+            sTopRes: state.sTopRes,
+            finalTop: state.finalTop,
+            fTopRes: state.fTopRes,
+            campioneTop: state.campioneTop
+        }
+    );
 }
 
 
@@ -10783,6 +11037,7 @@ function renderKO(){
         const vincitori=[];
 
         quarti.forEach((match,index)=>{
+
             q.innerHTML+=renderMatchCard(
                 "QUARTO "+(index+1),
                 match,
@@ -10791,36 +11046,34 @@ function renderKO(){
                 state.qRes[index]
             );
 
-            const vincitore=getWinner(match,state.qRes[index]);
+            const vincitore=getWinner(
+                match,
+                state.qRes[index]
+            );
+
             if(vincitore) vincitori.push(vincitore);
         });
 
-        /*
-         * La struttura delle semifinali deve essere visibile
-         * contemporaneamente ai quarti. Prima dei risultati dei
-         * quarti vengono mostrati i relativi slot "Vincitore Qx".
-         * Dopo ogni risultato, lo slot viene sostituito dal vincitore reale.
-         */
         if(vincitori.length===4){
             semifinali=[
                 [vincitori[0],vincitori[1]],
                 [vincitori[2],vincitori[3]]
             ];
-        }else{
-            semifinali=[
-                [vincitori[0] || "Vincitore Q1", vincitori[1] || "Vincitore Q2"],
-                [vincitori[2] || "Vincitore Q3", vincitori[3] || "Vincitore Q4"]
-            ];
         }
 
     }else{
+
         if(teams.length>=4){
+
             semifinali=[
                 [teams[0],teams[3]],
                 [teams[1],teams[2]]
             ];
+
         }else if(teams.length===2){
+
             semifinali=[teams];
+
         }
     }
 
@@ -10829,6 +11082,7 @@ function renderKO(){
     if(state.rules.usaSemifinali===true && semifinali.length>0){
 
         semifinali.forEach((match,index)=>{
+
             s.innerHTML+=renderMatchCard(
                 "SEMIFINALE "+(index+1),
                 match,
@@ -10837,16 +11091,18 @@ function renderKO(){
                 state.sTopRes[index]
             );
 
-            const reale = match[0] && match[1] &&
-                !String(match[0]).startsWith("Vincitore Q") &&
-                !String(match[1]).startsWith("Vincitore Q");
+            const vincitore=getWinner(
+                match,
+                state.sTopRes[index]
+            );
 
-            const vincitore=reale ? getWinner(match,state.sTopRes[index]) : null;
             if(vincitore) finalisti.push(vincitore);
         });
 
     }else{
+
         finalisti=semifinali.flat();
+
     }
 
     if(finalisti.length===2){
@@ -10864,8 +11120,9 @@ function renderKO(){
         state.fTopRes
     );
 
+    /* --- GESTIONE CAMPIONE E POSIZIONAMENTO SICURO SOTTO LA FINALE --- */
     let campione = getWinner(finalisti, state.fTopRes);
-
+    
     if (!campione && finalisti.length === 2) {
         const resSplit = String(state.fTopRes || "").split("-");
         if(resSplit.length === 2) {
@@ -10880,17 +11137,20 @@ function renderKO(){
 
     let winnerCard = document.getElementById("winnerCardKO");
 
+    // Se non esiste, lo creiamo e lo posizioniamo subito sotto la finale (f)
     if (!winnerCard && f.parentNode) {
         winnerCard = document.createElement("div");
         winnerCard.id = "winnerCardKO";
         winnerCard.className = "card winner-card-ko";
         f.parentNode.insertBefore(winnerCard, f.nextSibling);
     } else if (winnerCard && f.parentNode && winnerCard.previousElementSibling !== f) {
+        // Se esiste già ma è altrove, lo spostiamo nel posto giusto
         f.parentNode.insertBefore(winnerCard, f.nextSibling);
     }
 
     if(campione){
         state.campioneTop=campione;
+
         if(winnerCard){
             winnerCard.style.cssText = "display: block !important; margin-top: 15px;";
             winnerCard.innerHTML=`
@@ -10900,16 +11160,17 @@ function renderKO(){
                 </div>
             `;
         }
+
     }else{
         state.campioneTop=null;
+
         if(winnerCard){
             winnerCard.style.cssText = "display: none !important;";
             winnerCard.innerHTML="";
         }
     }
 }
-
-
+                   
 function renderMatchCard(titolo, match, type, index, risultato) {
     const res = String(risultato || "-").split("-");
 
@@ -11018,7 +11279,7 @@ function applicaModelloTorneo(){
     }[n] || {gironi:2,perGirone:4};
 
     state.rules.tipoTorneo=tipo;
-    state.rules.formatoTorneo=String(n);
+    state.rules.formatoTorneo=tipo;
 
     state.qRes=Array(4).fill("-");
     state.sTopRes=Array(2).fill("-");
