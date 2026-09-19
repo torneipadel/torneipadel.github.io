@@ -44,7 +44,7 @@ $('newsSave').onclick=async()=>{
 const titolo=$('newsTitle')?.value.trim();
 const testo=$('newsText')?.value.trim();
 if(!titolo||!testo){alert('Inserisci titolo e testo della news.');return}
-const next=[...items,{id:'news-'+Date.now(),titolo,testo,data:new Date().toISOString()}];
+const next=[...items,{id:'news-'+Date.now(),titolo,testo,data:new Date().toISOString(),pubblicataVisitatore:true,inEvidenza:items.length===0}];
 if(await saveCfg(t,{...c,news:next}))news()
 };
 document.querySelectorAll('[data-news-del]').forEach(b=>b.onclick=async()=>{
