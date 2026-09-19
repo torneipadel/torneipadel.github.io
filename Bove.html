@@ -12345,313 +12345,36 @@ function stampaTabellone(){
 
     const style=document.createElement("style");
     style.id="bovePrintBoardStyle";
-    style.textContent=String.raw\`
-
-        @page{
-            size:A4 landscape;
-            margin:4mm;
-        }
-
-        #bovePrintBoard{
-            display:none;
-        }
-
+        style.textContent=String.raw\`
+        @page{size:A4 landscape;margin:10mm;}
+        #bovePrintBoard{display:none;}
         @media print{
-
-            html,body{
-                width:100%!important;
-                height:100%!important;
-                min-height:0!important;
-                margin:0!important;
-                padding:0!important;
-                background:#fff!important;
-                color:#111827!important;
-                overflow:hidden!important;
-            }
-
-            body.bove-printing>*:not(#bovePrintBoard){
-                display:none!important;
-            }
-
-            body.bove-printing #bovePrintBoard{
-                display:flex!important;
-                flex-direction:column!important;
-                width:289mm!important;
-                max-width:289mm!important;
-                height:202mm!important;
-                max-height:202mm!important;
-                margin:0 auto!important;
-                padding:0 1mm!important;
-                box-sizing:border-box!important;
-                background:#fff!important;
-                color:#111827!important;
-                font-family:Arial,Helvetica,sans-serif!important;
-                overflow:hidden!important;
-            }
-
-            .print-header{
-                flex:0 0 18mm;
-                height:18mm;
-                text-align:center;
-                border-bottom:1.5px solid #111827;
-                padding:0 1mm 1.5mm;
-                margin:0 0 2.5mm;
-                box-sizing:border-box;
-            }
-
-            .print-brand{
-                font-size:8px;
-                font-weight:800;
-                letter-spacing:2px;
-                margin-bottom:.7mm;
-            }
-
-            .print-title{
-                font-size:22px;
-                font-weight:900;
-                line-height:1;
-                margin-bottom:1mm;
-            }
-
-            .print-subtitle{
-                font-size:8.5px;
-                font-weight:800;
-                text-transform:uppercase;
-                letter-spacing:.55px;
-                line-height:1;
-            }
-
-            .print-columns{
-                flex:1 1 auto;
-                min-height:0;
-                display:grid;
-                width:100%;
-                gap:2.5mm;
-                align-items:stretch;
-                box-sizing:border-box;
-            }
-
-            .print-columns-1{grid-template-columns:1fr;}
-            .print-columns-2{grid-template-columns:repeat(2,minmax(0,1fr));}
-            .print-columns-3{grid-template-columns:repeat(3,minmax(0,1fr));}
-            .print-columns-4{grid-template-columns:repeat(4,minmax(0,1fr));}
-            .print-columns-5{grid-template-columns:repeat(5,minmax(0,1fr));}
-            .print-columns-6,
-            .print-columns-7,
-            .print-columns-8{grid-template-columns:repeat(6,minmax(0,1fr));}
-
-            .print-phase{
-                min-width:0;
-                height:100%;
-                display:flex;
-                flex-direction:column;
-                position:relative;
-            }
-
-            .print-phase h2{
-                flex:0 0 8mm;
-                height:8mm;
-                margin:0 0 1.2mm;
-                padding:2.2mm .5mm;
-                box-sizing:border-box;
-                border:1.3px solid #334155;
-                border-radius:4px;
-                background:#e2e8f0;
-                text-align:center;
-                font-size:9px;
-                font-weight:900;
-                line-height:1;
-                white-space:nowrap;
-                overflow:hidden;
-                text-overflow:ellipsis;
-            }
-
-            .print-phase-list{
-                flex:1 1 auto;
-                min-height:0;
-                display:flex;
-                flex-direction:column;
-                justify-content:space-around;
-                gap:1mm;
-                padding:.3mm 0;
-                box-sizing:border-box;
-            }
-
-            .print-match{
-                position:relative;
-                width:100%;
-                min-width:0;
-                min-height:0;
-                border:1.2px solid #111827;
-                border-radius:3px;
-                background:#fff;
-                overflow:hidden;
-                box-sizing:border-box;
-                page-break-inside:avoid;
-                break-inside:avoid;
-            }
-
-            .print-match-title{
-                background:#111827;
-                color:#fff;
-                font-size:7px;
-                font-weight:900;
-                text-transform:uppercase;
-                letter-spacing:.2px;
-                line-height:1;
-                padding:1mm .8mm;
-                white-space:nowrap;
-                overflow:hidden;
-                text-overflow:ellipsis;
-            }
-
-            .print-team-row{
-                min-height:5.2mm;
-                height:5.2mm;
-                display:flex;
-                align-items:center;
-                justify-content:center;
-                padding:.4mm 6mm .4mm .8mm;
-                font-size:7.7px;
-                font-weight:800;
-                line-height:1;
-                border-bottom:1px solid #cbd5e1;
-                text-align:center;
-                overflow:hidden;
-                text-overflow:ellipsis;
-                white-space:nowrap;
-                box-sizing:border-box;
-            }
-
-            .print-score{
-                position:absolute;
-                right:.7mm;
-                top:6.3mm;
-                min-width:7mm;
-                height:5.2mm;
-                padding:.7mm .25mm;
-                border:1px solid #334155;
-                border-radius:2px;
-                background:#f8fafc;
-                font-size:7.2px;
-                font-weight:900;
-                line-height:1;
-                text-align:center;
-                box-sizing:border-box;
-                z-index:3;
-            }
-
-            .print-match-info{
-                display:flex;
-                justify-content:space-between;
-                gap:.7mm;
-                padding:.65mm .8mm;
-                font-size:6px;
-                line-height:1;
-                color:#334155;
-                font-weight:800;
-                background:#f8fafc;
-                white-space:nowrap;
-                overflow:hidden;
-            }
-
-            .print-winner{
-                position:absolute;
-                left:0;
-                right:0;
-                bottom:0;
-                padding:.5mm .6mm;
-                font-size:5.8px;
-                font-weight:800;
-                text-align:center;
-                background:#ecfdf5;
-                color:#166534;
-                border-top:1px solid #bbf7d0;
-                overflow:hidden;
-                white-space:nowrap;
-                text-overflow:ellipsis;
-            }
-
-            .print-phase:not(:last-child) .print-match::after{
-                content:"";
-                position:absolute;
-                top:50%;
-                right:-2.5mm;
-                width:2.5mm;
-                border-top:1px solid #64748b;
-            }
-
-            .print-phase:not(:first-child) .print-match::before{
-                content:"";
-                position:absolute;
-                top:50%;
-                left:-2.5mm;
-                width:2.5mm;
-                border-top:1px solid #64748b;
-            }
-
-            .print-columns-4 .print-team-row,
-            .print-columns-5 .print-team-row,
-            .print-columns-6 .print-team-row{
-                font-size:7px;
-            }
-
-            .print-columns-5 .print-team-row,
-            .print-columns-6 .print-team-row{
-                min-height:4.6mm;
-                height:4.6mm;
-            }
-
-            .print-columns-5 .print-match-title,
-            .print-columns-6 .print-match-title{
-                font-size:6.2px;
-                padding:.8mm .6mm;
-            }
-
-            .print-columns-5 .print-match-info,
-            .print-columns-6 .print-match-info{
-                font-size:5.5px;
-                padding:.45mm .6mm;
-            }
-
-            .print-champion{
-                flex:0 0 12mm;
-                min-height:12mm;
-                margin:1.5mm 0 0;
-                padding:1.4mm 1mm;
-                box-sizing:border-box;
-                border:1.5px solid #111827;
-                border-radius:3px;
-                text-align:center;
-                background:#f8fafc;
-            }
-
-            .print-champion-label{
-                font-size:6px;
-                font-weight:900;
-                letter-spacing:.5px;
-                margin-bottom:.4mm;
-            }
-
-            .print-champion-name{
-                font-size:9px;
-                font-weight:900;
-                line-height:1;
-            }
-
-            .print-footer{
-                flex:0 0 3.5mm;
-                height:3.5mm;
-                margin-top:.7mm;
-                padding-top:.5mm;
-                border-top:1px solid #94a3b8;
-                text-align:center;
-                font-size:4.2px;
-                line-height:1;
-                color:#64748b;
-            }
+            html,body{width:100%!important;height:100%!important;margin:0!important;padding:0!important;background:#fff!important;color:#0f172a!important;overflow:hidden!important;}
+            body.bove-printing>*:not(#bovePrintBoard){display:none!important;}
+            body.bove-printing #bovePrintBoard{display:flex!important;flex-direction:column!important;width:277mm!important;height:190mm!important;max-height:190mm!important;margin:0 auto!important;box-sizing:border-box!important;background:#fff!important;font-family:'Segoe UI',Roboto,Helvetica,Arial,sans-serif!important;color:#0f172a!important;overflow:hidden!important;}
+            .print-header{flex:0 0 auto;text-align:center;border-bottom:2.5px solid #0f172a;padding-bottom:3mm;margin-bottom:4mm;}
+            .print-brand{font-size:11px;font-weight:800;letter-spacing:3px;color:#475569;margin-bottom:1mm;}
+            .print-title{font-size:26px;font-weight:900;text-transform:uppercase;line-height:1.1;}
+            .print-subtitle{font-size:12px;font-weight:700;color:#334155;text-transform:uppercase;letter-spacing:1px;margin-top:1.5mm;}
+            .print-columns{flex:1 1 auto;min-height:0;display:grid;width:100%;gap:4mm;align-items:stretch;}
+            .print-columns-1{grid-template-columns:1fr;}.print-columns-2{grid-template-columns:repeat(2,minmax(0,1fr));}.print-columns-3{grid-template-columns:repeat(3,minmax(0,1fr));}.print-columns-4{grid-template-columns:repeat(4,minmax(0,1fr));}.print-columns-5{grid-template-columns:repeat(5,minmax(0,1fr));}.print-columns-6,.print-columns-7,.print-columns-8{grid-template-columns:repeat(6,minmax(0,1fr));}
+            .print-phase{display:flex;flex-direction:column;min-width:0;min-height:0;}
+            .print-phase h2{flex:0 0 auto;margin:0 0 3mm;padding:2mm;border:1.5px solid #64748b;border-radius:5px;background:#e2e8f0;text-align:center;font-size:11px;font-weight:900;color:#1e293b;text-transform:uppercase;letter-spacing:.5px;}
+            .print-phase-list{flex:1 1 auto;min-height:0;display:flex;flex-direction:column;justify-content:space-around;gap:2.5mm;}
+            .print-match{position:relative;min-width:0;border:1.5px solid #334155;border-radius:6px;background:#fff;overflow:hidden;page-break-inside:avoid;break-inside:avoid;}
+            .print-match-title{background:#0f172a;color:#fff;font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;padding:1.2mm 2mm;}
+            .print-team-row{height:8mm;min-height:8mm;display:flex;align-items:center;padding:0 15mm 0 2mm;font-size:11px;font-weight:800;line-height:1.05;border-bottom:1.5px solid #cbd5e1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#0f172a;box-sizing:border-box;}
+            .print-score{position:absolute;right:1.5mm;top:8.2mm;width:11mm;height:8mm;display:flex;align-items:center;justify-content:center;background:#f1f5f9;border:1.5px solid #475569;border-radius:4px;font-size:11px;font-weight:900;text-align:center;color:#0f172a;box-sizing:border-box;z-index:3;}
+            .print-match-info{display:flex;justify-content:space-between;gap:2mm;padding:1.2mm 2mm;font-size:8.5px;line-height:1.05;font-weight:700;color:#475569;background:#f8fafc;white-space:nowrap;overflow:hidden;}
+            .print-winner{padding:1.2mm 2mm;font-size:9px;font-weight:800;text-align:center;background:#dcfce7;color:#166534;border-top:1.5px solid #86efac;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+            .print-phase:not(:last-child) .print-match::after{content:"";position:absolute;top:50%;right:-4mm;width:4mm;border-top:1px solid #64748b;}
+            .print-phase:not(:first-child) .print-match::before{content:"";position:absolute;top:50%;left:-4mm;width:4mm;border-top:1px solid #64748b;}
+            .print-columns-4 .print-team-row{font-size:10px;}.print-columns-5 .print-team-row,.print-columns-6 .print-team-row{height:7mm;min-height:7mm;font-size:9px;}
+            .print-columns-5 .print-match-title,.print-columns-6 .print-match-title{font-size:8px;padding:1mm 1.5mm;}.print-columns-5 .print-match-info,.print-columns-6 .print-match-info{font-size:7.5px;padding:1mm 1.5mm;}
+            .print-champion{flex:0 0 auto;margin-top:4mm;padding:2.5mm;border:2px solid #0f172a;border-radius:6px;text-align:center;background:#f8fafc;}
+            .print-champion-label{font-size:8.5px;font-weight:900;color:#475569;letter-spacing:1.5px;margin-bottom:.5mm;}.print-champion-name{font-size:14px;font-weight:900;color:#0f172a;}
+            .print-footer{flex:0 0 auto;margin-top:2.5mm;text-align:center;font-size:7px;color:#64748b;border-top:1px solid #cbd5e1;padding-top:1mm;}
         }
-
     \`;
 
     document.head.appendChild(style);
@@ -12678,6 +12401,18 @@ function stampaTabellone(){
     },180);
 }
 
+
+window.addEventListener("afterprint",()=>{
+    document.body.classList.remove("bove-printing");
+    const menu=document.getElementById("menuComandi");
+    const menuContainer=document.querySelector(".menu-container");
+    if(menu){menu.classList.remove("show");menu.style.removeProperty("display");menu.style.removeProperty("visibility");}
+    if(menuContainer){menuContainer.style.removeProperty("display");menuContainer.style.removeProperty("visibility");}
+    const board=document.getElementById("bovePrintBoard");
+    const style=document.getElementById("bovePrintBoardStyle");
+    if(board) board.remove();
+    if(style) style.remove();
+});
 
 function toggleMenu(){
 
