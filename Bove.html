@@ -11449,6 +11449,15 @@ function applicaModelloTorneo(){
         break;
     }
 
+    const formatoInput=document.getElementById("formatoTorneo");
+    if(formatoInput) formatoInput.value=String(n);
+
+    const numeroGironiInput=document.getElementById("numeroGironi");
+    if(numeroGironiInput) numeroGironiInput.value=String(state.rules.numeroGironi);
+
+    const squadrePerGironeInput=document.getElementById("squadrePerGirone");
+    if(squadrePerGironeInput) squadrePerGironeInput.value=String(state.rules.squadrePerGirone);
+
     aggiornaPannelloRegole();
     aggiornaDescrizioneTipoTorneo();
 
