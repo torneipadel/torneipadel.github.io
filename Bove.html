@@ -2779,7 +2779,7 @@ let state = {
 
         tipoTorneo:"gironi",
 
-        formatoTorneo:"gironi",
+        formatoTorneo:8,
 
 
 
@@ -4688,19 +4688,16 @@ function ensureRules(){
     const formatoSalvato =
         Number(state.rules.formatoTorneo);
 
-    if(
-        ![8,12,16,20,24].includes(formatoSalvato)
-    ){
+    let formato =
+        [8,12,16,20,24].includes(formatoSalvato)
+        ? formatoSalvato
+        : Number(state.rules.numeroSquadre);
 
-        state.rules.formatoTorneo =
-            Number(state.rules.numeroSquadre) || 8;
+    if(![8,12,16,20,24].includes(formato))
+        formato=8;
 
-    }else{
-
-        state.rules.formatoTorneo =
-            formatoSalvato;
-
-    }
+    state.rules.formatoTorneo=formato;
+    state.rules.numeroSquadre=formato;
 
 
 
@@ -4711,19 +4708,10 @@ function ensureRules(){
     */
 
 
-    state.rules.numeroSquadre =
-        Number(state.rules.numeroSquadre) || 8;
-
-
-
     /*
         FORMATI SUPPORTATI
         8-12-16-20-24
     */
-
-
-    let formato =
-        state.rules.numeroSquadre;
 
 
 
@@ -4742,6 +4730,9 @@ function ensureRules(){
     }
 
 
+
+    state.rules.formatoTorneo =
+        formato;
 
     state.rules.numeroSquadre =
         formato;
@@ -4805,23 +4796,11 @@ function ensureRules(){
 
 
 
-    if(
+    state.rules.numeroGironi =
+        strutturaCorretta.gironi;
 
-        !gironi ||
-        !perGirone ||
-        gironi * perGirone !== formato
-
-    ){
-
-        state.rules.numeroGironi =
-            strutturaCorretta.gironi;
-
-
-        state.rules.squadrePerGirone =
-            strutturaCorretta.perGirone;
-
-
-    }
+    state.rules.squadrePerGirone =
+        strutturaCorretta.perGirone;
 
 
 
