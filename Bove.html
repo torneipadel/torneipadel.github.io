@@ -6525,31 +6525,45 @@ async function updateAndSync(){
 
         ){
 
+            /*
+            * Se il torneo esiste già, Bove aggiorna solo i dati
+            * propri del motore e non sovrascrive i campi amministrativi.
+            */
+            const {data:torneoEsistente,error:errorLettura} =
+                await sb
+                .from("tornei")
+                .select("id")
+                .eq("id",snapshot.idTorneo)
+                .maybeSingle();
+
+            if(errorLettura){
+                console.error(
+                    "Errore lettura torneo prima del salvataggio:",
+                    errorLettura
+                );
+                return false;
+            }
+
+            const recordSupabase = torneoEsistente
+                ? {
+                    id:snapshot.idTorneo,
+                    nome:snapshot.nomeTorneo,
+                    data:snapshot.dataTorneo || null,
+                    configurazione:snapshot
+                }
+                : {
+                    id:snapshot.idTorneo,
+                    nome:snapshot.nomeTorneo,
+                    data:snapshot.dataTorneo || null,
+                    stato:"attivo",
+                    configurazione:snapshot
+                };
+
             const {error} =
                 await sb
                 .from("tornei")
                 .upsert(
-                    {
-                        id:
-                            snapshot.idTorneo,
-
-                        nome:
-                            snapshot.nomeTorneo,
-
-                        data:
-                            snapshot.dataTorneo || null,
-
-                        stato:
-                            "attivo",
-
-                        /*
-                        * Salva tutto lo snapshot.
-                        */
-
-                        configurazione:
-                            snapshot
-
-                    },
+                    recordSupabase,
                     {
                         onConflict:"id"
                     }
@@ -8575,36 +8589,40 @@ async function salvaTorneoSupabase(){
         */
 
 
-        const record = {
+        /*
+        * Se il torneo esiste già, aggiorniamo solo i dati del motore.
+        * I campi amministrativi del record restano invariati.
+        * Per un nuovo torneo, lo stato iniziale è "attivo".
+        */
+        const {data:torneoEsistente,error:errorLettura} =
+            await sb
+            .from("tornei")
+            .select("id")
+            .eq("id",state.idTorneo)
+            .maybeSingle();
 
+        if(errorLettura){
+            console.error(
+                "Errore lettura torneo prima del salvataggio:",
+                errorLettura
+            );
+            return false;
+        }
 
-            id:
-                state.idTorneo,
-
-
-            nome:
-                state.nomeTorneo,
-
-
-            data:
-                state.dataTorneo,
-
-
-            stato:
-                "attivo",
-
-
-            configurazione:
-                state
-
-
-        };
-
-
-
-
-
-
+        const record = torneoEsistente
+            ? {
+                id:state.idTorneo,
+                nome:state.nomeTorneo,
+                data:state.dataTorneo,
+                configurazione:state
+            }
+            : {
+                id:state.idTorneo,
+                nome:state.nomeTorneo,
+                data:state.dataTorneo,
+                stato:"attivo",
+                configurazione:state
+            };
 
         const {
 
