@@ -5342,7 +5342,7 @@ function applyRules(){
         return;
 
     const tipo=document.getElementById("tipoTorneo")?.value || state.rules.tipoTorneo;
-    const n=Number(document.getElementById("numeroSquadre")?.value)||8;
+    const n=Number(document.getElementById("formatoTorneo")?.value)||Number(state.rules.numeroSquadre)||8;
 
     if(![8,12,16,20,24].includes(n)){
         alert("Numero squadre non valido.");
