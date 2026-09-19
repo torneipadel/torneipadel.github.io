@@ -8257,228 +8257,110 @@ function calc(squadre, risultati){
 
 }
 function renderClass(){
-
     ensureRules();
 
-
-
     [
-
         "A",
-
         "B",
-
         "C",
-
-        "D"
-
+        "D",
+        "E",
+        "F"
     ].forEach(tag=>{
 
-
-
         if(
-            tag==="C" &&
-            (!Array.isArray(state.C) ||
-            state.C.length===0)
+            !Array.isArray(state[tag]) ||
+            state[tag].length===0
         )
-
             return;
-
-
-
-
-        if(
-            tag==="D" &&
-            (!Array.isArray(state.D) ||
-            state.D.length===0)
-        )
-
-            return;
-
-
-
-
-
-
 
         let box =
             document.getElementById(
                 tag+"class"
             );
 
-
-
         if(!box)
-
             return;
 
-
-
-
-
-
-
-
-
         let classifica =
+            calc(
+                state[tag],
+                state[tag+"res"]
+            );
 
-    calc(
+        if(!Array.isArray(classifica))
+            classifica=[];
 
-        state[tag],
-
-        state[tag+"res"]
-
-    );
-
-
-if(
-    !Array.isArray(classifica)
-)
-
-    classifica=[];
-       state["rank"+tag] = classifica;
-
-
-state["rank"+tag] = classifica;
-
-
+        state["rank"+tag] = classifica;
 
         box.innerHTML =
-
-        classifica.map(x=>`
-
-
-
+            classifica.map(x=>`
 <tr>
-
-
 <td>
-
-
-<span class="${
-x.qual
-?
-"qual-arrow-up"
-:
-"qual-arrow-down"
-}">
-
-
-${
-x.qual
-?
-"▲"
-:
-"▼"
-}
-
-
+<span class="${x.qual ? "qual-arrow-up" : "qual-arrow-down"}">
+${x.qual ? "▲" : "▼"}
 </span>
-
-
 ${formatCoppiaDisplay(x.n)}
-
-
-
 </td>
-
-
-
-
 <td>${x.pt}</td>
-
 <td>${x.gf}</td>
-
 <td>${x.gs}</td>
-
 <td>${x.df}</td>
-
-
-
 </tr>
-
-
-
 `).join("");
 
-
-
-
-
     });
-
-
 }
+
 function updateRes(g,i,pos,val){
-
     let s;
-
 
     if(g==="A")
         s=state.Ares;
-
     else if(g==="B")
         s=state.Bres;
-
     else if(g==="C")
         s=state.Cres;
-
     else if(g==="D")
         s=state.Dres;
-
+    else if(g==="E")
+        s=state.Eres;
+    else if(g==="F")
+        s=state.Fres;
     else
         return;
-
-
 
     if(!Array.isArray(s))
         return;
 
-
-
     if(!s[i])
         s[i]="-";
-
-
 
     let p =
         s[i]
         .toString()
         .split("-");
 
-
-
     if(p.length<2){
-
         p=[
             "",
             ""
         ];
-
     }
 
-
-
     p[pos]=val;
-
-
 
     s[i]=
         p.join("-");
 
-
-
     renderClass();
-
 
     if(typeof renderKO==="function")
         renderKO();
 
-
-
     updateAndSync();
-
 }
+
 async function salvaTorneoSupabase(){
 
     try{
@@ -10501,7 +10383,9 @@ function renderTables(){
         A:[2,3],
         B:[4,5],
         C:[6,7],
-        D:[8,9]
+        D:[8,9],
+        E:[10,11],
+        F:[12,13]
     };
 
     let durata=Number(state.rules.duration||30);
@@ -10520,7 +10404,7 @@ function renderTables(){
 
     let calendario=[];
 
-    ["A","B","C","D"].forEach(tag=>{
+    ["A","B","C","D","E","F"].forEach(tag=>{
 
         let squadre=state[tag];
 
