@@ -11942,49 +11942,49 @@ function stampaTabellone(){
     const menu =
         document.getElementById("menuComandi");
 
+    const menuContainer =
+        document.querySelector(".menu-container");
+
+    document.body.classList.add("bove-printing");
+
     if(menu){
-
         menu.classList.remove("show");
-
-        menu.style.setProperty(
-            "display",
-            "none",
-            "important"
-        );
-
-        menu.style.setProperty(
-            "visibility",
-            "hidden",
-            "important"
-        );
-
+        menu.style.setProperty("display","none","important");
+        menu.style.setProperty("visibility","hidden","important");
     }
 
-    requestAnimationFrame(()=>{
+    if(menuContainer){
+        menuContainer.style.setProperty("display","none","important");
+        menuContainer.style.setProperty("visibility","hidden","important");
+    }
 
-        requestAnimationFrame(()=>{
+    setTimeout(()=>{
 
-            window.print();
+        window.print();
 
-        });
-
-    });
+    },150);
 
 }
 
 window.addEventListener("afterprint",()=>{
 
+    document.body.classList.remove("bove-printing");
+
     const menu =
         document.getElementById("menuComandi");
 
+    const menuContainer =
+        document.querySelector(".menu-container");
+
     if(menu){
-
-        menu.style.removeProperty("display");
-
-        menu.style.removeProperty("visibility");
-
         menu.classList.remove("show");
+        menu.style.removeProperty("display");
+        menu.style.removeProperty("visibility");
+    }
 
+    if(menuContainer){
+        menuContainer.style.removeProperty("display");
+        menuContainer.style.removeProperty("visibility");
     }
 
 });
