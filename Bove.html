@@ -10786,19 +10786,21 @@ function getFinalQualified(){
                 : [];
 
         /*
-         * NON qualificare nessuno finché non sono stati
-         * inseriti tutti i risultati del girone.
+         * Un girone entra in qualificazione solo quando
+         * tutte le sue partite sono state completate.
          */
         const numeroPartite =
             squadre.length * (squadre.length - 1) / 2;
 
         if(
             risultati.length < numeroPartite ||
-            risultati.slice(0, numeroPartite).some(r => 
-                r === "-" ||
-                r === "" ||
-                r == null
-            )
+            risultati
+                .slice(0, numeroPartite)
+                .some(r =>
+                    r === "-" ||
+                    r === "" ||
+                    r == null
+                )
         ){
             console.log(
                 "Girone", tag,
@@ -10815,38 +10817,30 @@ function getFinalQualified(){
         if(!Array.isArray(classifica) || classifica.length === 0)
             return;
 
+        /*
+         * Rispettiamo sempre il numero configurato
+         * di qualificate per ciascun girone.
+         * Non forziamo più 4 qualificate solo perché
+         * i Quarti sono attivi.
+         */
         let q = Number(state.rules.qualificatePerGirone);
 
         if(!Number.isFinite(q) || q < 1)
             q = 1;
 
-        /*
-         * Con i quarti attivi e girone da 4,
-         * tutte le 4 squadre vengono considerate
-         * SOLO DOPO che il girone è completo.
-         */
-        if(
-            state.rules.usaQuarti === true &&
-            squadre.length === 4
-        ){
-            q = 4;
-        }
+        q = Math.min(q, classifica.length);
 
-        classifica.forEach((x,i) => {
+        classifica.slice(0, q).forEach((x, i) => {
 
-            if(i < q){
-
-                qualificate.push({
-                    nome:x.n,
-                    pt:x.pt,
-                    gf:x.gf,
-                    gs:x.gs,
-                    df:x.df,
-                    girone:tag,
-                    posizione:i+1
-                });
-
-            }
+            qualificate.push({
+                nome:x.n,
+                pt:x.pt,
+                gf:x.gf,
+                gs:x.gs,
+                df:x.df,
+                girone:tag,
+                posizione:i + 1
+            });
 
         });
 
@@ -10855,22 +10849,18 @@ function getFinalQualified(){
     let limite =
         Number(state.rules.numeroQualificateFinali);
 
-    if(
-        state.rules.usaQuarti === true &&
-        qualificate.length >= 8
-    ){
-        limite = 8;
-    }
-
-    if(!limite || limite < 1)
+    if(!Number.isFinite(limite) || limite < 1)
         limite = qualificate.length;
 
+    /*
+     * Il limite finale è quello configurato.
+     * Non eliminiamo arbitrariamente squadre di un girone
+     * solo perché il tabellone dei Quarti richiede 8 posti.
+     */
     return qualificate
-        .slice(0,limite)
+        .slice(0, limite)
         .map(x => x.nome);
 }
-
-
 function sincronizzaFaseFinale(){
 
     ensureRules();
