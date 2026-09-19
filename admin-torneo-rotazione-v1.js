@@ -451,7 +451,22 @@ async function open(){
     if(rawMissingDefaults||rawMissingMeta||simulationNeedsDayLimit){
       t=await save(t,normalized);
     }
-    render(t,await players(t));
+    const finalPlayers=await players(t);
+    if(isSimulation){
+      const simCfg=config(t),giornate=simCfg.rotazione.giornate||[];
+      const risultati=[[6,4],[7,5],[5,7],[6,4],[4,6],[7,5]];
+      let ripristinata=false;
+      giornate.forEach(g=>(g.partite||[]).forEach((m,i)=>{
+        if(m.risA===''||m.risA==null||m.risB===''||m.risB==null){
+          const rr=risultati[i%risultati.length];
+          m.risA=String(rr[0]);m.risB=String(rr[1]);ripristinata=true;
+        }
+      }));
+      if(ripristinata){
+        t=await save(t,simCfg);
+      }
+    }
+    render(t,finalPlayers);
   }catch(e){alert(e.message||e)}
 }
 function inject(){
