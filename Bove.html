@@ -4642,12 +4642,11 @@ function aggiornaFaseFinaleDaUI(){
     const s=document.getElementById("usaSemifinali");
     const f=document.getElementById("usaFinale");
 
-    if(q && s){
-        if(!s.checked && q.checked)
-            q.checked=false;
-        if(q.checked && !s.checked)
-            s.checked=true;
-    }
+    if(q && s && q.checked && !s.checked)
+        s.checked=true;
+
+    if(f && s && f.checked && !s.checked)
+        s.checked=true;
 
     if(q) state.rules.usaQuarti=q.checked===true;
     if(s) state.rules.usaSemifinali=s.checked===true;
@@ -5023,7 +5022,7 @@ function applyRules(){
         state.rules.usaSemifinali=document.getElementById("usaSemifinali")?.checked===true;
         state.rules.usaFinale=document.getElementById("usaFinale")?.checked===true;
     }else if(tipo==="eliminazione"){
-        state.rules.usaQuarti=false;
+        state.rules.usaQuarti=true;
         state.rules.usaSemifinali=true;
         state.rules.usaFinale=true;
     }else if(noKO.includes(tipo)){
@@ -10183,6 +10182,30 @@ function getFinalQualified(){
 
     ensureRules();
 
+    const tipoTorneo=String(state.rules.tipoTorneo||"").trim();
+
+    /*
+     * ELIMINAZIONE DIRETTA:
+     * non usa le qualificazioni dai gironi.
+     * Tutte le squadre del formato corrente entrano
+     * direttamente nel tabellone.
+     */
+    if(tipoTorneo==="eliminazione"){
+        const tutte=[];
+        const lettere=["A","B","C","D","E","F","G"];
+
+        lettere.forEach(tag=>{
+            if(Array.isArray(state[tag])){
+                state[tag].forEach(nome=>{
+                    if(nome!==undefined && nome!==null && String(nome).trim()!=="")
+                        tutte.push(String(nome));
+                });
+            }
+        });
+
+        return tutte.slice(0, Number(state.rules.numeroSquadre)||tutte.length);
+    }
+
     const qualificate = [];
     const lettereGironi = ["A","B","C","D","E","F","G"];
 
@@ -11027,10 +11050,10 @@ function applicaModelloTorneo(){
             state.rules.usaQuarti=false;
 
 
-            state.rules.usaSemifinali=true;
+            state.rules.usaSemifinali=false;
 
 
-            state.rules.usaFinale=true;
+            state.rules.usaFinale=false;
 
 
             if(!state.svizzero){
