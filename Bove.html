@@ -778,7 +778,13 @@ window.toggleMenu = function(){
 body{background:#fff!important;color:#1f2937!important;padding:0!important;margin:0!important;-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
 body>*:not(#bovePrintLayout){display:none!important}
 #bovePrintLayout{display:block!important;width:100%!important;background:#f5f7fa!important;color:#1f2937!important;font-family:Arial,Helvetica,sans-serif!important}
-.bpl-page{width:100%;min-height:180mm;page-break-after:always;padding:4mm;box-sizing:border-box}
+.bpl-page{width:100%;min-height:180mm;page-break-after:always;padding:4mm;box-sizing:border-box;position:relative;overflow:hidden}
+.bpl-page>*{position:relative;z-index:2}
+.bpl-bracket-page::before{content:"";position:absolute;inset:10mm;border:1.2px solid rgba(255,255,255,.78);border-radius:3mm;z-index:0;pointer-events:none;background:
+linear-gradient(90deg,transparent 49.6%,rgba(255,255,255,.58) 49.6%,rgba(255,255,255,.58) 50.4%,transparent 50.4%),
+linear-gradient(0deg,transparent 31.8%,rgba(255,255,255,.58) 31.8%,rgba(255,255,255,.58) 32.5%,transparent 32.5%,transparent 67.5%,rgba(255,255,255,.58) 67.5%,rgba(255,255,255,.58) 68.2%,transparent 68.2%),
+linear-gradient(0deg,transparent 49.6%,rgba(255,255,255,.72) 49.6%,rgba(255,255,255,.72) 50.4%,transparent 50.4%)}
+.bpl-bracket-page::after{content:"";position:absolute;left:50%;top:10mm;bottom:10mm;width:18mm;transform:translateX(-50%);border-left:1px solid rgba(255,255,255,.28);border-right:1px solid rgba(255,255,255,.28);z-index:0;pointer-events:none}
 .bpl-page:last-child{page-break-after:auto}
 .bpl-title{text-align:center;font-size:20px;font-weight:800;letter-spacing:.08em;margin:0 0 2mm;color:#172033}
 .bpl-subtitle{text-align:center;font-size:10px;color:#64748b;margin-bottom:5mm}
