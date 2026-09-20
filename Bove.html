@@ -823,8 +823,9 @@ linear-gradient(0deg,transparent 49.6%,rgba(255,255,255,.72) 49.6%,rgba(255,255,
 .bpl-time{font-size:6px;color:#64748b;text-align:right;margin-top:1mm}
 .bpl-winner-label{font-size:9px;font-weight:800;letter-spacing:.06em;color:#8a6b1f}
 .bpl-winner-name{font-size:14px;font-weight:900;margin-top:2mm;color:#4b3a0f}
-.bpl-connectors{position:absolute;inset:0;width:100%;height:100%;z-index:1;pointer-events:none;overflow:visible}
-.bpl-connectors path{fill:none;stroke:#64748b;stroke-width:1.8;vector-effect:non-scaling-stroke;stroke-linecap:round;stroke-linejoin:round}
+.bpl-connectors{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;z-index:2!important;pointer-events:none!important;overflow:visible!important}
+.bpl-connectors path{fill:none!important;stroke:#475569!important;stroke-width:2.4!important;vector-effect:non-scaling-stroke;stroke-linecap:round;stroke-linejoin:round}
+.bpl-match,.bpl-winner{z-index:3!important}
 .bpl-note{text-align:center;font-size:7px;color:#94a3b8;margin-top:2mm}
 }
 @media screen{#bovePrintLayout{display:none!important}}
