@@ -12235,7 +12235,7 @@ el.replaceWith(span);
 clone.querySelectorAll("[style]").forEach(el=>el.removeAttribute("style"));
 return clone.outerHTML;
 }
-const groupCards=[...document.querySelectorAll(".groups > .card")].filter(card=>getComputedStyle(card).display!=="none"&&card.querySelector("table"));
+const groupCards=[...document.querySelectorAll(".groups > .card[id^="card"]")].filter(card=>/^card[A-F]$/i.test(card.id||"")&&getComputedStyle(card).display!=="none"&&card.querySelector("table"));
 let groupsHtml="";
 groupCards.forEach((card,index)=>{
 const tables=card.querySelectorAll("table");
