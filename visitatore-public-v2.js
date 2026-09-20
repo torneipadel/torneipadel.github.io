@@ -38,32 +38,14 @@ window.apriClassificaKing=apriClassificaKing;
 
 async function myTournament(){const box=document.getElementById('npMyTournament');const {data}=await client.auth.getUser();const u=data?.user;if(!u){box.innerHTML='<div class="np-empty">Accedi per visualizzare il tuo torneo.</div>';return}const {data:rows,error}=await client.from('iscrizioni').select('id,torneo_id,stato,tornei(id,nome,data,formula,configurazione)').eq('user_id',u.id);if(error){console.warn(error);box.innerHTML='<div class="np-empty">Informazioni torneo non disponibili.</div>';return}const r=rows?.[0],t=r?.tornei;if(!r||!t){box.innerHTML='<div class="np-empty">Non risulti iscritto a nessun torneo.</div>';return}const isKing=String(formula(t)).toLowerCase()==='individualecoppievariabili'||String(formula(t)).toLowerCase()==='king';box.innerHTML=`<div class="np-tour-feature np-panel"><div class="np-tour-media">${poster(t)?`<img src="${esc(poster(t))}" alt="${esc(t.nome)}">`:'<div class="np-no-poster">🎾</div>'}</div><div class="np-tour-info"><span class="np-kicker">Il tuo torneo</span><h3>${esc(t.nome||'Torneo')}</h3><div class="np-meta"><span class="np-chip">📅 ${esc(dateLabel(t.data))}</span><span class="np-chip">🎾 ${esc(formula(t))}</span><span class="np-chip">📌 ${esc(r.stato||'richiesta')}</span></div><div class="np-hero-actions"><button class="np-btn np-primary" onclick="apriTorneoPubblico(${id(t.id)})">APRI IL TORNEO</button>${isKing?`<button class="np-btn np-ghost" onclick='apriClassificaKing(${JSON.stringify(t).replace(/'/g,"&#39;")})'>🏆 CLASSIFICA</button>`:''}</div></div></div>`}
 
-function news(){
+async function news(){
   const box=document.getElementById('npNews');
   if(!box)return;
-
-  const all=[];
-  tournaments.forEach(t=>{
-    if(!(t.pubblicato===true||String(t.stato||'').toLowerCase()==='attivo'))return;
-    (Array.isArray(t.configurazione?.news)?t.configurazione.news:[]).forEach(n=>all.push({
-      ...n,
-      __torneo:t.nome,
-      __torneoId:t.id,
-      __data:n.data||t.updated_at||t.data_torneo||t.data||''
-    }));
-  });
-
-  all.sort((a,b)=>{
-    if(Boolean(b.inEvidenza)!==Boolean(a.inEvidenza))return b.inEvidenza?1:-1;
-    return new Date(b.__data||0)-new Date(a.__data||0)
-  });
-
-  if(!all.length){
-    box.innerHTML='<div class="np-empty">Nessuna comunicazione pubblicata al momento.</div>';
-    return
-  }
-
-  box.innerHTML=all.slice(0,6).map(n=>`<article class="np-news-card">${n.immagine?`<div class="np-news-img"><img src="${esc(n.immagine)}" alt="${esc(n.titolo||'News')}" loading="lazy"></div>`:''}<div class="np-news-body"><span class="np-news-type">${esc(n.tipo||'Comunicazione')}</span><h3>${esc(n.titolo||'Senza titolo')}</h3>${n.testo?`<p>${esc(n.testo)}</p>`:''}${n.link?`<a class="np-btn np-ghost" href="${esc(n.link)}" target="_blank" rel="noopener">SCOPRI →</a>`:''}</div></article>`).join('')
+  const {data,error}=await client.from('news').select('id,titolo,testo,immagine,pubblicata,created_at,tipo,link,in_evidenza,ordine,torneo_id').eq('pubblicata',true).order('in_evidenza',{ascending:false}).order('ordine',{ascending:true}).order('created_at',{ascending:false}).limit(30);
+  if(error){console.error('[NEWS GLOBALI]',error);box.innerHTML='<div class="np-empty">News non disponibili al momento.</div>';return}
+  const all=(data||[]).map(n=>{const t=tournaments.find(x=>String(x.id)===String(n.torneo_id));return {...n,__torneo:t?.nome||''}}).sort((a,b)=>{if(Boolean(b.in_evidenza)!==Boolean(a.in_evidenza))return b.in_evidenza?1:-1;return new Date(b.created_at||0)-new Date(a.created_at||0)});
+  if(!all.length){box.innerHTML='<div class="np-empty">Nessuna comunicazione pubblicata al momento.</div>';return}
+  box.innerHTML=all.slice(0,6).map(n=>`<article class="np-news-card">${n.immagine?`<div class="np-news-img"><img src="${esc(n.immagine)}" alt="${esc(n.titolo||'News')}" loading="lazy"></div>`:''}<div class="np-news-body"><span class="np-news-type">${esc(n.tipo||'Comunicazione')}${n.__torneo?' · '+esc(n.__torneo):''}</span><h3>${esc(n.titolo||'Senza titolo')}</h3>${n.testo?`<p>${esc(n.testo)}</p>`:''}${n.link?`<a class="np-btn np-ghost" href="${esc(n.link)}" target="_blank" rel="noopener">SCOPRI →</a>`:''}</div></article>`).join('')
 }
 
 function installMenu(open){const section=document.getElementById('tornei');if(!section)return;document.getElementById('menuTorneiDaFare')?.remove();const box=document.createElement('div');box.id='menuTorneiDaFare';box.className='np-panel';box.style.cssText='margin-bottom:18px;padding:14px;';box.innerHTML=`<details><summary style="cursor:pointer;font-weight:900;font-size:13px;padding:4px">📋 Tornei ancora da fare (${open.length})</summary><div style="margin-top:12px"><select id="selectTorneiDaFare" style="width:100%;padding:12px;border-radius:10px;border:0;font-weight:800"><option value="">Seleziona un torneo...</option>${open.map(t=>`<option value="${id(t.id)}">${esc(t.nome||'Torneo')} — ${esc(dateLabel(t.data))}</option>`).join('')}</select><div id="azioniTorneoSelezionato" style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px"></div></div></details></div>`;const list=document.getElementById('npTournaments');section.insertBefore(box,list||null);document.getElementById('selectTorneiDaFare')?.addEventListener('change',function(){const value=this.value,target=document.getElementById('azioniTorneoSelezionato');if(!target)return;target.innerHTML=value?`<button class="np-btn np-primary" onclick="vaiIscrizione(${Number(value)})">ISCRIVITI AL TORNEO</button><button class="np-btn np-ghost" onclick="apriTorneoPubblico(${Number(value)})">APRI TORNEO</button>`:''})}
