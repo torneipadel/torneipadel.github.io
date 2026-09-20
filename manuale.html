@@ -26,7 +26,7 @@ footer{max-width:1180px;margin:0 auto;padding:30px 18px 60px;color:var(--muted);
 <header><div class="wrap">
 <h1>Manuale Operativo — Next Point Padel</h1>
 <div class="lead">Guida pratica per amministrazione, tornei, Bove, King, comunicazioni, sito pubblico, Supabase e GitHub.</div>
-<div class="meta">Edizione operativa · stato documentato al 20 settembre 2026 · repository: torneirobertobove/torneirobertobove.github.io</div>
+<div class="meta">Edizione operativa · stato documentato al 21 settembre 2026 · repository: torneirobertobove/torneirobertobove.github.io</div>
 </div></header>
 <nav><div class="inner">
 <a href="#mappa">Mappa</a><a href="#admin">Admin</a><a href="#tornei">Tornei</a><a href="#bove">Bove</a><a href="#regole">Regole</a><a href="#calendario">Calendario</a><a href="#finali">Fase finale</a><a href="#king">King</a><a href="#news">News</a><a href="#sponsor">Sponsor</a><a href="#pubblico">Sito pubblico</a><a href="#supabase">Supabase</a><a href="#github">GitHub</a><a href="#diagnosi">Diagnosi</a><a href="#checklist">Checklist</a>
@@ -55,6 +55,7 @@ footer{max-width:1180px;margin:0 auto;padding:30px 18px 60px;color:var(--muted);
 <ol><li>Creare/selezionare il torneo.</li><li>Inserire dati torneo.</li><li>Definire numero squadre/partecipanti.</li><li>Calcolare i giocatori/coppie.</li><li>Scegliere la formula.</li><li>Configurare la formula.</li><li>Creare il torneo.</li><li>Aprire Bove con l'identificativo corretto.</li></ol>
 <h3>Formati squadre</h3><p>Sono previsti i formati 8, 12, 16, 20 e 24 squadre. La gestione dei gironi utilizza gruppi da quattro quando il formato lo consente, con lettere A-F.</p>
 <h3>Salvataggio</h3><p>Il salvataggio deve mantenere un unico torneo per identificativo. Non creare copie dello stesso torneo per risolvere un problema di ricaricamento.</p>
+<h3>Salva risultato — area Admin</h3><p>Nel tabellone, in modalità amministratore, il pulsante <code>💾 Salva risultato</code> è visibile direttamente fuori dal menu hamburger. Al salvataggio riuscito mostra temporaneamente <code>✅ Risultato salvato!</code> e torna automaticamente a <code>💾 Salva risultato</code> dopo circa 2 secondi. In modalità visitatore/TV il pulsante amministrativo non deve essere utilizzabile.</p>
 </section>
 
 <section id="bove"><h2>4. Bove — macchina a stati del torneo</h2>
@@ -146,9 +147,9 @@ footer{max-width:1180px;margin:0 auto;padding:30px 18px 60px;color:var(--muted);
 </section>
 
 <section id="checklist"><h2>15. Checklist operativa</h2>
-<h3>Nuovo torneo</h3><ul><li>☐ Dati torneo</li><li>☐ Numero squadre</li><li>☐ Partecipanti/coppie</li><li>☐ Formula</li><li>☐ Regole</li><li>☐ Gironi</li><li>☐ Campi/orari</li><li>☐ Creazione</li><li>☐ Apertura Bove</li><li>☐ Salvataggio e ricaricamento</li></ul>
+<h3>Nuovo torneo</h3><ul><li>☐ Dati torneo</li><li>☐ Numero squadre</li><li>☐ Partecipanti/coppie</li><li>☐ Formula</li><li>☐ Regole</li><li>☐ Gironi</li><li>☐ Campi/orari</li><li>☐ Creazione</li><li>☐ Apertura Bove</li><li>☐ Salvataggio e ricaricamento</li><li>☐ Se si modifica un risultato da Admin, verificare il messaggio “✅ Risultato salvato!”</li></ul>
 <h3>Prima di dichiarare concluso un torneo</h3><ul><li>☐ Tutti i risultati presenti</li><li>☐ Classifica corretta</li><li>☐ Qualificate corrette</li><li>☐ Fase finale corretta</li><li>☐ Campi/orari finali salvati</li><li>☐ Ricaricamento verificato</li><li>☐ Stampa verificata</li><li>☐ Dati pubblici verificati</li></ul>
-<h3>Modifica tecnica</h3><ul><li>☐ Problema riprodotto</li><li>☐ File/funzione individuati</li><li>☐ Nessuna modifica non richiesta</li><li>☐ Commit eseguito</li><li>☐ Test di regressione eseguito</li><li>☐ Risultato documentato</li></ul>
+<h3>Modifica tecnica</h3><ul><li>☐ Problema riprodotto</li><li>☐ File/funzione individuati</li><li>☐ Nessuna modifica non richiesta</li><li>☐ Commit eseguito</li><li>☐ Test di regressione eseguito</li><li>☐ Risultato documentato</li><li>☐ Manuale operativo aggiornato con la modifica</li></ul>
 </section>
 
 <section id="stato"><h2>16. Stato documentale e prossime verifiche</h2>
@@ -157,6 +158,7 @@ footer{max-width:1180px;margin:0 auto;padding:30px 18px 60px;color:var(--muted);
 <tr><td>Macchina Bove</td><td class="ok">Operativa / in verifica di regressione</td></tr>
 <tr><td>Admin → Bove</td><td class="ok">Operativa</td></tr>
 <tr><td>Salvataggio torneo</td><td class="ok">Operativo</td></tr>
+<tr><td>Pulsante Admin “Salva risultato”</td><td class="ok">Operativo: feedback “Risultato salvato!” temporaneo</td></tr>
 <tr><td>Regole e configurazione</td><td class="warn">In verifica completa</td></tr>
 <tr><td>Formati 8/12/16/20/24</td><td class="warn">In verifica completa</td></tr>
 <tr><td>King</td><td class="warn">Operativo con verifiche UI da mantenere</td></tr>
