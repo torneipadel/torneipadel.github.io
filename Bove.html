@@ -6110,6 +6110,26 @@ async function updateAndSync(){
 
         /*
         ==========================================
+        MODALITÀ TV — SOLA LETTURA
+        ==========================================
+        *
+        * La TV deve soltanto leggere e visualizzare
+        * il torneo. Non deve mai riscrivere Supabase
+        * durante render/loadState, altrimenti un refresh
+        * Realtime potrebbe generare un ciclo di aggiornamenti.
+        */
+        const tvMode =
+            new URLSearchParams(window.location.search).get("tv") === "1";
+
+        if(tvMode){
+            console.log(
+                "BOVE TV: updateAndSync ignorato — modalità sola lettura."
+            );
+            return true;
+        }
+
+        /*
+        ==========================================
         CONTROLLO TORNEO REMOTO
         ==========================================
         */
