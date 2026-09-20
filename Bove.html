@@ -10048,7 +10048,6 @@ function generaPartiteGironi(){
         if(!Array.isArray(girone) || girone.length !== 4)
             return partite;
 
-
         const coppie = [
             [0,1],
             [2,3],
@@ -10058,97 +10057,91 @@ function generaPartiteGironi(){
             [1,2]
         ];
 
-
         coppie.forEach(x=>{
-
             partite.push({
-
                 casa:x[0],
-
                 ospite:x[1]
-
             });
-
         });
 
-
         return partite;
-
     };
 
+    /*
+     * IMPORTANTE:
+     * la funzione viene richiamata anche durante il refresh TV.
+     * Non deve mai cancellare risultati, campi o orari già salvati.
+     */
+    const vecchi = {};
+
+    ["A","B","C","D","E","F"].forEach(tag=>{
+        vecchi[tag+"res"] =
+            Array.isArray(state[tag+"res"])
+                ? [...state[tag+"res"]]
+                : [];
+
+        vecchi[tag+"time"] =
+            Array.isArray(state[tag+"time"])
+                ? [...state[tag+"time"]]
+                : [];
+
+        vecchi[tag+"camp"] =
+            Array.isArray(state[tag+"camp"])
+                ? [...state[tag+"camp"]]
+                : [];
+    });
 
     state.partiteGironi = {};
 
-
-    [
-        "A",
-        "B",
-        "C",
-        "D",
-        "E",
-        "F"
-    ].forEach(tag=>{
+    ["A","B","C","D","E","F"].forEach(tag=>{
 
         if(
             Array.isArray(state[tag]) &&
             state[tag].length===4
         ){
-
             state.partiteGironi[tag] =
                 crea(state[tag]);
-
         }
 
     });
 
+    ["A","B","C","D","E","F"].forEach(tag=>{
 
+        if(!state.partiteGironi[tag])
+            return;
 
-    [
-        "A",
-        "B",
-        "C",
-        "D",
-        "E",
-        "F"
-    ].forEach(tag=>{
+        const numeroPartite =
+            state.partiteGironi[tag].length;
 
+        state[tag+"res"] =
+            vecchi[tag+"res"]
+                .slice(0,numeroPartite);
 
-        if(state.partiteGironi[tag]){
+        state[tag+"time"] =
+            vecchi[tag+"time"]
+                .slice(0,numeroPartite);
 
+        state[tag+"camp"] =
+            vecchi[tag+"camp"]
+                .slice(0,numeroPartite);
 
-            state[tag+"res"] =
-                Array(
-                    state.partiteGironi[tag].length
-                )
-                .fill("-");
+        while(state[tag+"res"].length < numeroPartite)
+            state[tag+"res"].push("-");
 
+        while(state[tag+"time"].length < numeroPartite)
+            state[tag+"time"].push("");
 
-            state[tag+"time"] =
-                Array(
-                    state.partiteGironi[tag].length
-                )
-                .fill("");
-
-
-            state[tag+"camp"] =
-                Array(
-                    state.partiteGironi[tag].length
-                )
-                .fill("");
-
-        }
-
+        while(state[tag+"camp"].length < numeroPartite)
+            state[tag+"camp"].push("");
     });
-
-
 
     console.log(
-        "PARTITE GENERATE:",
+        "PARTITE GENERATE SENZA PERDITA RISULTATI:",
         state.partiteGironi
     );
-
 }
- function render(){
+
+function render(){
     ensureRules();
 
     if(
