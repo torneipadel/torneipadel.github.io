@@ -10009,43 +10009,41 @@ function nascondiFormuleTorneo(){
 }
 function renderItaliana(){
 
-    let box =
-        document.getElementById("finaleBox");
+    const box =
+        document.getElementById("formulaTorneoBox");
 
+    const titolo =
+        document.getElementById("formulaTorneoTitolo");
 
-    if(!box)
+    const contenuto =
+        document.getElementById("formulaTorneoContenuto");
+
+    if(!box || !titolo || !contenuto)
         return;
 
-
-
-    if(
-        state.rules.tipoTorneo !== "italiana"
-    )
+    if(state.rules.tipoTorneo !== "italiana")
         return;
 
+    box.style.display="block";
 
+    titolo.innerHTML =
+        "🇮🇹 Torneo all'italiana";
 
-    box.innerHTML = `
-
+    contenuto.innerHTML = `
         <div class="match-card">
 
             <h3>
-                🇮🇹 Torneo all'italiana
+                Formula torneo
             </h3>
 
-
             <p>
-                <b>Formula:</b><br>
-                Round Robin - Tutti contro tutti.
+                <b>Round Robin - Tutti contro tutti.</b>
             </p>
 
-
             <p>
-                <b>Regola:</b><br>
                 Ogni squadra affronta tutte le altre
                 squadre del proprio girone.
             </p>
-
 
             <p>
                 <b>Classifica:</b><br>
@@ -10053,7 +10051,6 @@ function renderItaliana(){
                 • Pareggio = ${state.rules.d} punti<br>
                 • Sconfitta = ${state.rules.l} punti
             </p>
-
 
             <p>
                 <b>Criteri spareggio:</b><br>
@@ -10063,14 +10060,12 @@ function renderItaliana(){
                 • Game subiti
             </p>
 
-
             <p>
                 <b>Qualificazione:</b><br>
                 Passano le migliori
                 ${state.rules.qualificatePerGirone}
                 squadre per girone.
             </p>
-
 
             <p>
                 <b>Fase finale:</b><br>
@@ -10085,9 +10080,7 @@ function renderItaliana(){
                 }
             </p>
 
-
         </div>
-
     `;
 
 }
