@@ -294,10 +294,14 @@ function isolateKingUi(){
   }
 }
 function previousRanking(t,ps){
-  const c=config(t), days=(c.rotazione.giornate||[]).filter(g=>(g.partite||[]).some(m=>m.risA!==''&&m.risA!=null&&m.risB!==''&&m.risB!=null));
-  if(days.length<2)return {};
-  const last=days[days.length-1];
-  const before=clone(c); before.rotazione.giornate=days.slice(0,-1);
+  const c=config(t), days=(c.rotazione.giornate||[]).filter(g=>(g.partite||[]).length>0);
+  if(!days.length)return {};
+  const completed=days.filter(g=>(g.partite||[]).length>0&&(g.partite||[]).every(m=>m.risA!==''&&m.risA!=null&&m.risB!==''&&m.risB!=null));
+  if(!completed.length)return {};
+  const before=clone(c);
+  const lastCompleted=completed[completed.length-1];
+  const idx=days.indexOf(lastCompleted);
+  before.rotazione.giornate=days.slice(0,idx);
   const rows=standings({...t,configurazione:before},ps);
   return Object.fromEntries(rows.map((x,i)=>[x.id,i+1]));
 }
