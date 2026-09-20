@@ -1,22 +1,33 @@
 # Architettura — NEXT POINT PADEL
 
-> Riferimento: NPPADEL-TECH-DOC-01
+> Riferimento: **NPPADEL-TECH-DOC-01**
 
 ## Livelli
-
-1. Browser / UI
+1. Browser/UI
 2. HTML + CSS + JavaScript
 3. Supabase JS client
 4. Supabase Auth
-5. PostgreSQL
-6. GitHub / GitHub Actions / GitHub Pages
+5. PostgreSQL/Supabase
+6. Git/GitHub
+7. GitHub Actions/GitHub Pages
 
-## Flusso principale
+## Flusso
+`Pagina HTML → modulo JS → Supabase → Auth/Database`
 
-Utente → pagina HTML → JavaScript → Supabase → PostgreSQL/Auth.
+`Codice → Git → GitHub main → GitHub Actions → GitHub Pages`
 
-Codice → Git → GitHub → GitHub Actions → GitHub Pages → sito pubblicato.
+## Aree
+- **Admin:** `admin.html` e moduli `admin-*.js`.
+- **Bove:** configurazione, gironi, risultati, classifiche e KO.
+- **Pubblico:** `visitatore.html` e moduli pubblici.
+- **King:** torneo individuale con coppie variabili.
+- **Servizi:** Supabase, sponsor, PWA, deployment.
 
-## Principio di manutenzione
+## Separazioni da preservare
+Admin non sostituisce Bove. King resta separato. Grafica bracket e logica dati vanno trattate separatamente. Stato localStorage admin non sostituisce il DB. Il singleton Supabase pubblico deve evitare client Auth duplicati.
 
-Bove.html è il motore centrale del torneo. Le modifiche grafiche devono rimanere separate dalla logica di stato, salvataggio, risultati e fase finale.
+## Punti sensibili
+Cache-busting `?v=`, ordine script, funzioni globali, serializzazione stato torneo, salvataggio/reload, campi/orari KO e workflow automatici GitHub.
+
+## Principio
+Ogni modifica parte dal codice Git corrente, è limitata al requisito, viene committata e verificata dopo il deploy.
