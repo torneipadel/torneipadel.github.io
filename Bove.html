@@ -12297,12 +12297,25 @@ const p=document.createElementNS(ns,"path");
 p.setAttribute("d",d);
 svg.appendChild(p);
 }
-const bracket=root.querySelector(".bpl-bracket"),svg=bracket.querySelector(".bpl-connectors");
-const qs=[...bracket.querySelectorAll(".bpl-q-match")],ss=[...bracket.querySelectorAll(".bpl-s-match")],ff=[...bracket.querySelectorAll(".bpl-f-match")],winnerBox=bracket.querySelector(".bpl-winner");
+const bracket=root.querySelector(".bpl-bracket");
+const svg=bracket.querySelector(".bpl-connectors");
+const qs=[...bracket.querySelectorAll(".bpl-q-match")];
+const ss=[...bracket.querySelectorAll(".bpl-s-match")];
+const ff=[...bracket.querySelectorAll(".bpl-f-match")];
+const winnerBox=bracket.querySelector(".bpl-winner");
+function drawBracketLines(){
+svg.innerHTML="";
+const width=Math.ceil(bracket.getBoundingClientRect().width);
+const height=Math.ceil(bracket.getBoundingClientRect().height);
+svg.setAttribute("viewBox",`0 0 ${width} ${height}`);
+svg.setAttribute("width",String(width));
+svg.setAttribute("height",String(height));
 function connectPair(a,b,target){
 if(!a||!b||!target)return;
-const ar=edge(a,bracket,"right"),br=edge(b,bracket,"right"),tl=edge(target,bracket,"left");
-const junctionX=Math.min(tl.x-5,Math.max(ar.x,br.x)+(tl.x-Math.max(ar.x,br.x))/2);
+const ar=edge(a,bracket,"right");
+const br=edge(b,bracket,"right");
+const tl=edge(target,bracket,"left");
+const junctionX=ar.x+(tl.x-ar.x)/2;
 path(svg,`M ${ar.x} ${ar.y} H ${junctionX}`);
 path(svg,`M ${br.x} ${br.y} H ${junctionX}`);
 path(svg,`M ${junctionX} ${ar.y} V ${br.y}`);
@@ -12312,10 +12325,13 @@ if(qs.length>=2&&ss.length>=1)connectPair(qs[0],qs[1],ss[0]);
 if(qs.length>=4&&ss.length>=2)connectPair(qs[2],qs[3],ss[1]);
 if(ss.length>=2&&ff.length>=1)connectPair(ss[0],ss[1],ff[0]);
 if(ff.length>=1&&winnerBox){
-const a=edge(ff[0],bracket,"right"),b=edge(winnerBox,bracket,"left");
+const a=edge(ff[0],bracket,"right");
+const b=edge(winnerBox,bracket,"left");
 path(svg,`M ${a.x} ${a.y} H ${b.x}`);
 }
-window.print();
+}
+drawBracketLines();
+setTimeout(()=>{drawBracketLines();window.print();},100);
 }
 </script>\n
   <script src="sponsor-public-v2.js?v=8"></script>
