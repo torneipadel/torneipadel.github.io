@@ -12542,177 +12542,175 @@ window.print();
 }
 </script>\n
   <script>
-/* BOVE_TV_REALTIME_V5
-   Smart TV compatibility: XMLHttpRequest, ES5, no fetch/URLSearchParams/async.
-   Reads the complete saved Supabase snapshot and applies it without reload.
+/* BOVE_TV_SYNC_V6
+   TV: lettura diretta Supabase via client gia' inizializzato.
+   Fallback REST XHR per browser/Smart TV incompatibili.
 */
 (function(){
     "use strict";
 
     function getParam(name){
-        var search = window.location.search || "";
-        var re = new RegExp("[?&]" + name.replace(/[.*+?^$\\{}()|[\\]\\\\]/g,"\\$&") + "=([^&]*)");
-        var m = re.exec(search);
-        return m ? decodeURIComponent(m[1].replace(/\+/g," ")) : "";
+        var search=window.location.search||"";
+        var re=new RegExp("[?&]"+name.replace(/[.*+?^$\\{}()|[\\]\\\\]/g,"\\$&")+"=([^&]*)");
+        var m=re.exec(search);
+        return m?decodeURIComponent(m[1].replace(/\\+/g," ")):"";
     }
 
-    var idTorneo = getParam("idTorneo");
+    function getTournamentId(){
+        var id=getParam("idTorneo");
+        if(id) return id;
 
-    if(!idTorneo)
-        return;
+        var torneo=getParam("torneo");
+        if(!torneo) return "";
 
-    var REST_URL =
-        "https://iybjvtmfaupgthqqsngd.supabase.co/rest/v1/tornei";
+        if(/^\\d+$/.test(torneo)) return torneo;
 
-    var API_KEY =
-        "sb_publishable_oLLML3_ne0I1dWKIinSRNA_K1Ao5SOl";
+        try{
+            var obj=JSON.parse(torneo);
+            if(obj && obj.idTorneo) return String(obj.idTorneo);
+            if(obj && obj.id) return String(obj.id);
+            if(obj && obj.configurazione && obj.configurazione.idTorneo)
+                return String(obj.configurazione.idTorneo);
+        }catch(e){}
 
-    var lastSignature = null;
-    var busy = false;
+        return "";
+    }
 
-    function applica(configurazione){
-        if(!configurazione || typeof configurazione !== "object")
-            return;
+    var idTorneo=getTournamentId();
+    if(!idTorneo) return;
 
-        if(typeof state === "undefined" || !state)
-            return;
+    var lastSignature=null;
+    var busy=false;
+
+    function applica(configurazione,updatedAt){
+        if(!configurazione || typeof configurazione!=="object") return;
+        if(typeof state==="undefined" || !state) return;
 
         for(var key in configurazione){
             if(Object.prototype.hasOwnProperty.call(configurazione,key))
-                state[key] = configurazione[key];
+                state[key]=configurazione[key];
         }
 
-        if(typeof ensureRules === "function")
-            ensureRules();
-
-        if(typeof render === "function")
-            render();
-    }
-
-    function leggi(){
-        if(busy)
-            return;
-
-        busy = true;
+        window.__BOVE_TV_LAST_UPDATE__=updatedAt||"";
 
         try{
-            var xhr = new XMLHttpRequest();
+            if(typeof ensureRules==="function") ensureRules();
+            if(typeof render==="function") render();
+        }catch(e){
+            console.error("BOVE TV V6 RENDER:",e);
+        }
+    }
+
+    function processa(remoto){
+        if(!remoto || !remoto.configurazione) return;
+
+        var signature=String(remoto.updated_at||"")+"|"+JSON.stringify(remoto.configurazione);
+
+        if(lastSignature===null){
+            lastSignature=signature;
+            applica(remoto.configurazione,remoto.updated_at);
+            console.log("BOVE TV V6 ATTIVO:",idTorneo,remoto.updated_at);
+            return;
+        }
+
+        if(signature!==lastSignature){
+            lastSignature=signature;
+            applica(remoto.configurazione,remoto.updated_at);
+            console.log("BOVE TV V6 AGGIORNAMENTO:",idTorneo,remoto.updated_at);
+        }
+    }
+
+    function leggiClient(){
+        if(busy || typeof sb==="undefined" || !sb) return false;
+
+        busy=true;
+
+        sb.from("tornei")
+          .select("id,configurazione,updated_at")
+          .eq("id",Number(idTorneo))
+          .maybeSingle()
+          .then(function(result){
+              busy=false;
+              if(result && !result.error && result.data){
+                  processa(result.data);
+                  return;
+              }
+              leggiREST();
+          })
+          .catch(function(){
+              busy=false;
+              leggiREST();
+          });
+
+        return true;
+    }
+
+    function leggiREST(){
+        if(busy) return;
+        busy=true;
+
+        try{
+            var xhr=new XMLHttpRequest();
 
             xhr.open(
                 "GET",
-                REST_URL +
-                "?id=eq." +
-                encodeURIComponent(idTorneo) +
-                "&select=id,configurazione,updated_at&_=" +
-                new Date().getTime(),
+                "https://iybjvtmfaupgthqqsngd.supabase.co/rest/v1/tornei?id=eq."+
+                encodeURIComponent(idTorneo)+
+                "&select=id,configurazione,updated_at&_="+new Date().getTime(),
                 true
             );
 
-            xhr.setRequestHeader("apikey",API_KEY);
-            xhr.setRequestHeader("Authorization","Bearer " + API_KEY);
+            xhr.setRequestHeader("apikey","sb_publishable_oLLML3_ne0I1dWKIinSRNA_K1Ao5SOl");
+            xhr.setRequestHeader("Authorization","Bearer sb_publishable_oLLML3_ne0I1dWKIinSRNA_K1Ao5SOl");
             xhr.setRequestHeader("Cache-Control","no-cache");
 
-            xhr.onreadystatechange = function(){
-                if(xhr.readyState !== 4)
-                    return;
+            xhr.onreadystatechange=function(){
+                if(xhr.readyState!==4) return;
 
-                busy = false;
+                busy=false;
 
-                if(xhr.status < 200 || xhr.status >= 300){
-                    console.warn(
-                        "BOVE TV V5 HTTP:",
-                        xhr.status
-                    );
+                if(xhr.status<200 || xhr.status>=300){
+                    console.warn("BOVE TV V6 REST HTTP:",xhr.status);
                     return;
                 }
 
                 try{
-                    var rows = JSON.parse(xhr.responseText);
-
-                    if(!rows || !rows.length || !rows[0])
-                        return;
-
-                    var remoto = rows[0];
-
-                    if(!remoto.configurazione)
-                        return;
-
-                    var signature =
-                        String(remoto.updated_at || "") +
-                        "|" +
-                        JSON.stringify(remoto.configurazione);
-
-                    if(lastSignature === null){
-                        lastSignature = signature;
-                        applica(remoto.configurazione);
-
-                        console.log(
-                            "BOVE TV V5 ATTIVO:",
-                            idTorneo,
-                            remoto.updated_at
-                        );
-
-                        return;
-                    }
-
-                    if(signature !== lastSignature){
-                        lastSignature = signature;
-
-                        console.log(
-                            "BOVE TV V5 AGGIORNAMENTO:",
-                            remoto.updated_at
-                        );
-
-                        applica(remoto.configurazione);
-                    }
-
-                }catch(error){
-                    console.warn(
-                        "BOVE TV V5 PARSE:",
-                        error
-                    );
+                    var rows=JSON.parse(xhr.responseText);
+                    if(rows && rows.length) processa(rows[0]);
+                }catch(e){
+                    console.warn("BOVE TV V6 REST PARSE:",e);
                 }
             };
 
-            xhr.onerror = function(){
-                busy = false;
-                console.warn("BOVE TV V5: errore rete");
+            xhr.onerror=function(){
+                busy=false;
+                console.warn("BOVE TV V6 REST NETWORK");
             };
 
-            xhr.ontimeout = function(){
-                busy = false;
-                console.warn("BOVE TV V5: timeout");
+            xhr.ontimeout=function(){
+                busy=false;
+                console.warn("BOVE TV V6 REST TIMEOUT");
             };
 
-            xhr.timeout = 5000;
+            xhr.timeout=5000;
             xhr.send(null);
 
-        }catch(error){
-            busy = false;
-            console.warn(
-                "BOVE TV V5:",
-                error
-            );
+        }catch(e){
+            busy=false;
+            console.warn("BOVE TV V6 REST:",e);
         }
     }
 
-    /*
-     * Parte senza attendere DOMContentLoaded:
-     * il codice viene eseguito dopo il caricamento del documento.
-     */
-    leggi();
+    function ciclo(){
+        if(!leggiClient()) leggiREST();
+    }
 
-    /*
-     * Polling HTTP indipendente da WebSocket/Reatime.
-     */
-    window.setInterval(
-        leggi,
-        1000
-    );
+    window.__BOVE_TV_V6_ACTIVE__=true;
+    ciclo();
+    window.setInterval(ciclo,1000);
 
-    window.__BOVE_TV_V5_ACTIVE__ = true;
-
-})();</script>
+})();
+</script>
   <script src="sponsor-public-v2.js?v=8"></script>
 </body>
 </html>
