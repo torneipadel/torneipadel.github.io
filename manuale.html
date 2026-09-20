@@ -1,0 +1,176 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Manuale Operativo — Next Point Padel</title>
+<style>
+:root{--bg:#f5f7fa;--card:#fff;--ink:#20252b;--muted:#68717c;--line:#dfe4e9;--accent:#1261a0;--ok:#176b3a;--warn:#9a6700}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.6 Arial,sans-serif}
+header{background:#17212b;color:#fff;padding:38px 24px}header .wrap,main{max-width:1180px;margin:auto}
+h1{margin:0 0 8px;font-size:32px}h2{margin-top:42px;border-bottom:1px solid var(--line);padding-bottom:8px}h3{margin-top:28px}
+.lead{color:#dce7ef}.meta{font-size:13px;color:#b8c6d1}
+nav{position:sticky;top:0;background:#fff;border-bottom:1px solid var(--line);z-index:5}
+nav .inner{max-width:1180px;margin:auto;padding:10px 18px;display:flex;gap:8px;flex-wrap:wrap}
+nav a{color:var(--accent);text-decoration:none;font-size:13px;padding:5px 7px}
+main{padding:22px 18px 70px}.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:18px;margin:14px 0;box-shadow:0 2px 8px #00000008}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:12px}.tag{display:inline-block;border-radius:20px;padding:3px 9px;font-size:12px;font-weight:700;background:#edf3f8}.ok{color:var(--ok)}.warn{color:var(--warn)}
+code{background:#eef1f4;padding:2px 5px;border-radius:4px}pre{background:#101820;color:#e9eef2;padding:14px;overflow:auto;border-radius:8px}
+table{width:100%;border-collapse:collapse;background:#fff}th,td{text-align:left;border-bottom:1px solid var(--line);padding:9px;vertical-align:top}th{background:#f0f3f6}
+.note{border-left:4px solid var(--accent);padding:10px 14px;background:#eef6fc}.danger{border-left-color:#b42318;background:#fff3f1}
+footer{max-width:1180px;margin:0 auto;padding:30px 18px 60px;color:var(--muted);font-size:13px}
+@media print{nav{display:none}header{color:#000;background:#fff;border-bottom:2px solid #000}.card{box-shadow:none}}
+</style>
+</head>
+<body>
+<header><div class="wrap">
+<h1>Manuale Operativo — Next Point Padel</h1>
+<div class="lead">Guida pratica per amministrazione, tornei, Bove, King, comunicazioni, sito pubblico, Supabase e GitHub.</div>
+<div class="meta">Edizione operativa · stato documentato al 20 settembre 2026 · repository: torneirobertobove/torneirobertobove.github.io</div>
+</div></header>
+<nav><div class="inner">
+<a href="#mappa">Mappa</a><a href="#admin">Admin</a><a href="#tornei">Tornei</a><a href="#bove">Bove</a><a href="#regole">Regole</a><a href="#calendario">Calendario</a><a href="#finali">Fase finale</a><a href="#king">King</a><a href="#news">News</a><a href="#sponsor">Sponsor</a><a href="#pubblico">Sito pubblico</a><a href="#supabase">Supabase</a><a href="#github">GitHub</a><a href="#diagnosi">Diagnosi</a><a href="#checklist">Checklist</a>
+</div></nav>
+<main>
+<section id="mappa"><h2>1. Mappa generale del progetto</h2>
+<div class="grid">
+<div class="card"><b>Area amministrativa</b><br><code>admin.html</code> + moduli JavaScript. Gestisce tornei, iscrizioni, comunicazioni, King e funzioni amministrative.</div>
+<div class="card"><b>Macchina torneo</b><br><code>Bove.html</code>. È il motore di stato del torneo: caricamento, regole, gironi, calendario, risultati, classifiche e fase finale.</div>
+<div class="card"><b>Area pubblica</b><br><code>visitatore.html</code> e relativi script. Mostra tornei, news, eventi, mercatino, sponsor e classifiche pubbliche.</div>
+<div class="card"><b>Dati</b><br>Supabase: tornei, iscrizioni, profili, news, sponsor, mercatino e dati collegati.</div>
+<div class="card"><b>Versionamento</b><br>GitHub è la fonte del codice. Le modifiche devono essere tracciabili tramite commit.</div>
+</div>
+<div class="note"><b>Regola fondamentale:</b> Bove è la macchina a stati del torneo. L'area Admin deve alimentarla senza sostituirne la logica centrale.</div>
+</section>
+
+<section id="admin"><h2>2. Area amministrativa</h2>
+<h3>Accesso</h3><p>L'area amministrativa è il punto di ingresso per la gestione operativa. Le funzioni devono essere utilizzate rispettando il flusso previsto dal progetto e senza creare dati duplicati.</p>
+<h3>Sezioni principali</h3>
+<ul><li>Gestione tornei</li><li>Iscrizioni e partecipanti</li><li>News</li><li>Sponsor</li><li>WhatsApp/comunicazioni</li><li>King Torneo Individuale a Coppie Variabili</li></ul>
+<div class="note"><b>Principio di manutenzione:</b> non modificare autenticazione, menu o UI quando la richiesta riguarda esclusivamente la logica di torneo.</div>
+</section>
+
+<section id="tornei"><h2>3. Gestione tornei</h2>
+<h3>Flusso operativo</h3>
+<ol><li>Creare/selezionare il torneo.</li><li>Inserire dati torneo.</li><li>Definire numero squadre/partecipanti.</li><li>Calcolare i giocatori/coppie.</li><li>Scegliere la formula.</li><li>Configurare la formula.</li><li>Creare il torneo.</li><li>Aprire Bove con l'identificativo corretto.</li></ol>
+<h3>Formati squadre</h3><p>Sono previsti i formati 8, 12, 16, 20 e 24 squadre. La gestione dei gironi utilizza gruppi da quattro quando il formato lo consente, con lettere A-F.</p>
+<h3>Salvataggio</h3><p>Il salvataggio deve mantenere un unico torneo per identificativo. Non creare copie dello stesso torneo per risolvere un problema di ricaricamento.</p>
+</section>
+
+<section id="bove"><h2>4. Bove — macchina a stati del torneo</h2>
+<p>Il flusso concettuale è:</p>
+<pre>apri → identifica torneo → carica stato → inizializza regole → determina formula/gironi
+→ carica o inserisce squadre → genera partite/campi/orari → render
+→ inserisce risultati → aggiorna classifica → qualifica → fase finale → campione → salva</pre>
+<h3>Stato principale</h3>
+<p>Tra le informazioni fondamentali rientrano <code>idTorneo</code>, <code>nomeTorneo</code>, <code>dataTorneo</code>, <code>formato</code>, regole, squadre, risultati, campi, orari e dati della fase finale.</p>
+<h3>Regola di inizializzazione</h3><p>Le funzioni di default devono aggiungere soltanto dati mancanti. Non devono sovrascrivere configurazioni già salvate. Lo stesso principio vale per la gestione delle regole.</p>
+<h3>Gironi</h3><p>Per quattro squadre l'ordine storico delle sei partite è: 1-2, 3-4, 1-4, 2-3, 1-3, 2-4. Le schermate devono mantenere i partecipanti e le coppie già presenti.</p>
+</section>
+
+<section id="regole"><h2>5. Regole e classifiche</h2>
+<p>La configurazione comprende i punti per vittoria, pareggio e sconfitta e i criteri di spareggio. È presente anche la gestione dei punti della sconfitta.</p>
+<table><tr><th>Elemento</th><th>Uso</th></tr>
+<tr><td>Vittoria / pareggio / sconfitta</td><td>Determina i punti assegnati al termine del risultato.</td></tr>
+<tr><td>Criteri 1-3</td><td>Ordine degli spareggi configurabile.</td></tr>
+<tr><td>Qualificate</td><td>Numero di squadre che accedono alla fase successiva.</td></tr>
+<tr><td>KO</td><td>Attivazione e configurazione della fase a eliminazione diretta.</td></tr></table>
+<div class="note"><b>Controllo obbligatorio:</b> dopo ogni modifica delle regole, salvare, ricaricare il torneo e verificare che i valori siano rimasti identici.</div>
+</section>
+
+<section id="calendario"><h2>6. Campi, orari e calendario</h2>
+<p>Campi e orari sono parte dello stato del torneo. Per la fase finale devono essere salvati e ricaricati insieme ai relativi incontri.</p>
+<ul><li>Verificare campo.</li><li>Verificare ora.</li><li>Salvare.</li><li>Ricaricare Bove.</li><li>Controllare che campo e ora coincidano con quelli salvati.</li></ul>
+<p>La stessa verifica va eseguita per quarti, semifinali e finale quando la formula li prevede.</p>
+</section>
+
+<section id="finali"><h2>7. Fase finale</h2>
+<p>La fase finale può comprendere Quarti → Semifinali → Finale. I dati delle partite devono rimanere coerenti con le squadre qualificate.</p>
+<h3>Verifica funzionale</h3>
+<ol><li>Completare la fase a gironi.</li><li>Controllare le qualificate.</li><li>Verificare l'attivazione della fase KO prevista dalla formula.</li><li>Controllare i quarti.</li><li>Controllare le semifinali.</li><li>Controllare la finale.</li><li>Impostare campo e ora.</li><li>Salvare.</li><li>Ricaricare.</li><li>Verificare campi, orari e partecipanti.</li></ol>
+<h3>Stampa</h3><p>La stampa deve essere separata dalla normale UI: menu e controlli non devono comparire nel foglio. Il layout previsto per il tabellone è A4 orizzontale, con box allineati, collegamenti discreti e testi leggibili.</p>
+</section>
+
+<section id="king"><h2>8. 🏆 King Torneo Individuale a Coppie Variabili</h2>
+<p>È una modalità distinta dal normale torneo a squadre. La classifica è individuale mentre le coppie cambiano nel corso delle giornate.</p>
+<ul><li>Vittoria = 3 punti.</li><li>Pareggio = 1 punto.</li><li>Sconfitta = 0 punti.</li><li>Classifica individuale con PF, PS e differenza.</li><li>Inserimento manuale sempre disponibile.</li><li>Automatizzazione per squadre/coppie disponibile.</li><li>Giornate programmabili con numero di slot e giorni/orari.</li></ul>
+<h3>Regola delle giornate</h3><p>Nel test operativo da 8 giocatori, una giornata è stata modellata con 4 coppie e 6 partite: ogni giocatore disputa 3 partite nella giornata. Dodici giornate corrispondono quindi a 12 giornate di partecipazione per giocatore.</p>
+<h3>Archivio</h3><p>Le giornate devono rimanere consultabili e correggibili. L'inserimento manuale non deve essere rimosso quando è presente l'automazione.</p>
+</section>
+
+<section id="news"><h2>9. News</h2>
+<p>La gestione News è stata portata alla tabella globale <code>public.news</code>. Una news può essere globale oppure associata a uno specifico torneo tramite <code>torneo_id</code>.</p>
+<p>Campi principali: titolo, testo, immagine, pubblicata, tipo, link, evidenza, ordine e associazione torneo.</p>
+<h3>Procedura</h3><ol><li>Aprire News.</li><li>Creare o modificare il contenuto.</li><li>Decidere se è globale o collegato a un torneo.</li><li>Salvare.</li><li>Verificare l'elenco.</li><li>Controllare la visualizzazione pubblica.</li></ol>
+</section>
+
+<section id="sponsor"><h2>10. Sponsor</h2>
+<p>La tabella <code>public.sponsor</code> contiene nome, immagine, video, link e data di creazione. La gestione deve essere accessibile dalla sezione Comunicazioni/Sponsor.</p>
+<div class="note"><b>Diagnosi route:</b> se il pulsante Sponsor non apre la sezione, controllare prima il caricamento di <code>admin-comunicazioni-v1.js</code> e il routing <code>openAdminSponsor</code>; non modificare il database per un problema di apertura della pagina.</div>
+</section>
+
+<section id="pubblico"><h2>11. Sito pubblico / Visitatore</h2>
+<p>Il sito pubblico presenta Home, Tornei, News, Mercatino, Eventi, Info e Contatti. La grafica segue un'impostazione leggera tipo Wansport, con sfondo <code>sfondo2.jpg</code> e layout a vetro.</p>
+<h3>Contenuti pubblici</h3><ul><li>Tornei</li><li>Classifiche e vetrina King</li><li>News</li><li>Mercatino</li><li>Eventi/calendario</li><li>Sponsor</li><li>Informazioni e contatti</li></ul>
+<p>Il pubblico non deve mostrare controlli amministrativi o pulsanti di profilo/dashboard non previsti.</p>
+</section>
+
+<section id="supabase"><h2>12. Supabase — struttura operativa</h2>
+<p>Il progetto utilizza Supabase come backend. Le principali tabelle applicative documentate sono:</p>
+<table><tr><th>Tabella</th><th>Funzione</th></tr>
+<tr><td><code>tornei</code></td><td>Anagrafica e configurazione dei tornei.</td></tr>
+<tr><td><code>iscrizioni</code></td><td>Partecipanti/iscrizioni e stato di approvazione.</td></tr>
+<tr><td><code>profili</code></td><td>Dati dei profili utenti.</td></tr>
+<tr><td><code>news</code></td><td>Comunicazioni globali e collegate ai tornei.</td></tr>
+<tr><td><code>sponsor</code></td><td>Contenuti sponsor.</td></tr>
+<tr><td><code>mercatino</code></td><td>Annunci del mercatino.</td></tr></table>
+<h3>Regola</h3><p>Una modifica alla struttura dati va fatta tramite migrazione tracciata. Non usare SQL manuale non documentato come soluzione definitiva a un problema applicativo.</p>
+<h3>Sicurezza</h3><p>RLS è attivo sulle tabelle applicative. Gli avvisi del Security Advisor sulle funzioni con search_path modificabile e sulla protezione password devono essere trattati come attività di sicurezza separate dalla normale manutenzione funzionale.</p>
+</section>
+
+<section id="github"><h2>13. GitHub, versioni e backup</h2>
+<p>Repository operativo: <code>torneirobertobove/torneirobertobove.github.io</code>. Branch operativo: <code>main</code>.</p>
+<div class="card"><b>Snapshot di sicurezza</b><br>Branch <code>backup-2026-09-20-completo</code> creato sul commit <code>0dfdc190a70be28fce047bddda850d1abc49e360</code>. Il branch è uno snapshot GitHub del progetto a quel momento.</div>
+<h3>Regola di modifica</h3><ol><li>Identificare il file.</li><li>Leggere la versione corrente.</li><li>Modificare solo ciò che serve.</li><li>Commit descrittivo.</li><li>Verificare il diff.</li><li>Testare il flusso interessato.</li></ol>
+</section>
+
+<section id="diagnosi"><h2>14. Diagnosi rapida</h2>
+<table><tr><th>Sintomo</th><th>Prima verifica</th><th>Non fare</th></tr>
+<tr><td>Bove perde regole</td><td>Caricamento stato → ensure regole → render; controllare che i default siano solo missing-only.</td><td>Riscrivere l'intero salvataggio.</td></tr>
+<tr><td>Campo/ora non restano</td><td>Controllare stato salvato e ricaricamento DB.</td><td>Modificare la UI senza verificare il dato.</td></tr>
+<tr><td>KO non appare</td><td>Controllare flag fase finale, qualificate e formula.</td><td>Creare un secondo motore KO.</td></tr>
+<tr><td>Sponsor non apre</td><td>Controllare script/routing e console JavaScript.</td><td>Modificare Supabase.</td></tr>
+<tr><td>News chiede un torneo</td><td>Controllare gestione News globale e <code>torneo_id</code> nullo.</td><td>Associare artificialmente una news globale a un torneo.</td></tr>
+<tr><td>King ha scrollbar</td><td>Controllare larghezza del wrapper e tabella ranking.</td><td>Ridurre arbitrariamente i dati della classifica.</td></tr></table>
+<h3>Audit browser</h3><p>Per problemi di runtime, usare la console per raccogliere errori, script caricati, stato Supabase e funzioni globali. L'audit deve essere usato per diagnosticare, non come sostituto della correzione permanente nel repository.</p>
+</section>
+
+<section id="checklist"><h2>15. Checklist operativa</h2>
+<h3>Nuovo torneo</h3><ul><li>☐ Dati torneo</li><li>☐ Numero squadre</li><li>☐ Partecipanti/coppie</li><li>☐ Formula</li><li>☐ Regole</li><li>☐ Gironi</li><li>☐ Campi/orari</li><li>☐ Creazione</li><li>☐ Apertura Bove</li><li>☐ Salvataggio e ricaricamento</li></ul>
+<h3>Prima di dichiarare concluso un torneo</h3><ul><li>☐ Tutti i risultati presenti</li><li>☐ Classifica corretta</li><li>☐ Qualificate corrette</li><li>☐ Fase finale corretta</li><li>☐ Campi/orari finali salvati</li><li>☐ Ricaricamento verificato</li><li>☐ Stampa verificata</li><li>☐ Dati pubblici verificati</li></ul>
+<h3>Modifica tecnica</h3><ul><li>☐ Problema riprodotto</li><li>☐ File/funzione individuati</li><li>☐ Nessuna modifica non richiesta</li><li>☐ Commit eseguito</li><li>☐ Test di regressione eseguito</li><li>☐ Risultato documentato</li></ul>
+</section>
+
+<section id="stato"><h2>16. Stato documentale e prossime verifiche</h2>
+<p>Questo manuale descrive il funzionamento e le regole operative del progetto sulla base dello stato del repository e delle verifiche disponibili al 20/09/2026. Non sostituisce i test reali del browser.</p>
+<table><tr><th>Area</th><th>Stato documentato</th></tr>
+<tr><td>Macchina Bove</td><td class="ok">Operativa / in verifica di regressione</td></tr>
+<tr><td>Admin → Bove</td><td class="ok">Operativa</td></tr>
+<tr><td>Salvataggio torneo</td><td class="ok">Operativo</td></tr>
+<tr><td>Regole e configurazione</td><td class="warn">In verifica completa</td></tr>
+<tr><td>Formati 8/12/16/20/24</td><td class="warn">In verifica completa</td></tr>
+<tr><td>King</td><td class="warn">Operativo con verifiche UI da mantenere</td></tr>
+<tr><td>News globale</td><td class="ok">Implementata</td></tr>
+<tr><td>Sponsor</td><td class="warn">Route riparata; test browser finale da confermare</td></tr>
+<tr><td>Stampa fase finale</td><td class="warn">Rifinitura grafica da completare</td></tr>
+</table>
+<div class="danger note"><b>Nota:</b> le righe “in verifica” non sono dichiarazioni di errore: indicano che il comportamento deve essere ricontrollato dopo modifiche al codice prima di considerarlo definitivamente congelato.</div>
+</section>
+
+<section><h2>17. Principi di manutenzione</h2>
+<ul><li>Una correzione deve risolvere il problema senza rompere funzioni già operative.</li><li>Prima di sostituire una logica, confrontarla con la versione precedente funzionante quando disponibile.</li><li>Non eliminare grandi porzioni di codice per risolvere un difetto locale.</li><li>Non introdurre nuove autenticazioni, menu o flussi se non richiesti.</li><li>Separare sempre diagnosi, correzione e verifica.</li><li>Ogni correzione importante deve avere un commit identificabile.</li><li>Il manuale deve essere aggiornato quando cambia un flusso operativo stabile.</li></ul>
+</section>
+</main>
+<footer>Manuale operativo Next Point Padel · documento integrato nel repository · aggiornare la data e la sezione “Stato documentale” dopo modifiche strutturali.</footer>
+</body>
+</html>
