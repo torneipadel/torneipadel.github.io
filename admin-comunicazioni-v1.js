@@ -117,8 +117,7 @@ const autoText=selectedTournament?[
 tournamentDate?'📅 Data: '+tournamentDate:'',
 tournamentTime?'🕒 Ora: '+tournamentTime:'',
 tournamentDescription?'ℹ️ '+tournamentDescription:''
-].filter(Boolean).join('
-'):'';
+].filter(Boolean).join('\\n'):'';
 const autoType=selectedTournament?'Torneo':'Comunicazione';
 const autoTournamentId=selectedTournament?String(selectedTournament.id):'';
 const autoImage=linkedPoster?.immagine||'';
