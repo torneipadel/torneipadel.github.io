@@ -12261,7 +12261,20 @@ function stage(id,title,mode){
 const rows=rowsFor(id);
 return `<section class="bpl-stage" data-stage="${esc(mode)}"><div class="bpl-stage-title">${esc(title)}</div><div class="bpl-stage-body">${rows.length?rows.map((r,i)=>matchCard(r).replace("bpl-match",`bpl-match bpl-${mode}-match bpl-index-${i+1}`)).join(""):'<div class="bpl-match"><div class="bpl-match-name">Fase non attiva</div></div>'}</div></section>`;
 }
-const winner=window.state&&state.campioneTop?formatCoppiaDisplay(state.campioneTop):"";
+const winner=(()=>{
+const card=document.getElementById("winnerCardKO");
+const span=card?.querySelector(".winner-box.top-win span");
+const domWinner=String(span?.textContent||"").replace(/\\s+/g," ").trim();
+if(domWinner)return domWinner;
+const st=window.state;
+if(st?.campioneTop){
+try{
+const formatted=typeof formatCoppiaDisplay==="function"?formatCoppiaDisplay(st.campioneTop):String(st.campioneTop);
+if(formatted&&formatted!=="Da determinare"&&formatted!=="Da verificare")return formatted;
+}catch(e){}
+}
+return "";
+})();
 root.innerHTML=`<section class="bpl-page"><h1 class="bpl-title">${esc(state?.nomeTorneo||"TABELLONE TORNEO")}</h1><div class="bpl-subtitle">GIRONI — CLASSIFICHE E CALENDARIO</div><div class="bpl-groups">${groupsHtml||'<div class="bpl-group"><h3>Nessun girone</h3></div>'}</div></section><section class="bpl-page bpl-bracket-page"><h1 class="bpl-title">TABELLONE FINALE</h1><div class="bpl-subtitle">QUARTI DI FINALE → SEMIFINALI → FINALE → CAMPIONE</div><div class="bpl-bracket">${stage("Q","QUARTI DI FINALE","q")}${stage("S","SEMIFINALI","s")}${stage("finaleBox","FINALE","f")}<section class="bpl-stage" data-stage="w"><div class="bpl-stage-title">CAMPIONE</div><div class="bpl-stage-body"><div class="bpl-winner"><div class="bpl-winner-label">🏆 CAMPIONE TORNEO</div><div class="bpl-winner-name">${esc(winner||"Da determinare")}</div></div></div></section><svg class="bpl-connectors" aria-hidden="true"></svg></div><div class="bpl-note">Tabellone generato dai dati correnti del torneo.</div></section>`;
 function edge(el,base,side){
 const a=el.getBoundingClientRect(),b=base.getBoundingClientRect();
