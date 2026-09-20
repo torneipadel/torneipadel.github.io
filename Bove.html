@@ -12542,172 +12542,254 @@ window.print();
 }
 </script>\n
   <script>
-/* BOVE_TV_SYNC_V6
-   TV: lettura diretta Supabase via client gia' inizializzato.
-   Fallback REST XHR per browser/Smart TV incompatibili.
+/* BOVE_TV_SYNC_V7
+   Smart TV: Realtime come canale principale + polling di sicurezza.
+   Il TV non modifica mai Supabase: quando arriva un aggiornamento
+   ricarica lo stato reale tramite loadState().
 */
 (function(){
     "use strict";
 
+    var search = window.location.search || "";
+    var isTV = /(?:^|&)tv=1(?:&|$)/.test(search.replace(/^\?/,""));
+    if(!isTV) return;
+
     function getParam(name){
-        var search=window.location.search||"";
-        var re=new RegExp("[?&]"+name.replace(/[.*+?^$\\{}()|[\\]\\\\]/g,"\\$&")+"=([^&]*)");
-        var m=re.exec(search);
-        return m?decodeURIComponent(m[1].replace(/\\+/g," ")):"";
+        try{
+            if(window.URLSearchParams){
+                return new URLSearchParams(window.location.search).get(name) || "";
+            }
+        }catch(e){}
+
+        var m = new RegExp("[?&]"+name+"=([^&]*)").exec(window.location.search||"");
+        return m ? decodeURIComponent(m[1].replace(/\+/g," ")) : "";
     }
 
-    function getTournamentId(){
-        var id=getParam("idTorneo");
-        if(id) return id;
+    function getId(){
+        var id = getParam("idTorneo");
+        if(id) return String(id);
 
-        var torneo=getParam("torneo");
+        var torneo = getParam("torneo");
         if(!torneo) return "";
 
-        if(/^\\d+$/.test(torneo)) return torneo;
+        if(/^\d+$/.test(torneo)) return torneo;
 
         try{
-            var obj=JSON.parse(torneo);
+            var obj = JSON.parse(torneo);
             if(obj && obj.idTorneo) return String(obj.idTorneo);
             if(obj && obj.id) return String(obj.id);
-            if(obj && obj.configurazione && obj.configurazione.idTorneo)
+            if(obj && obj.configurazione && obj.configurazione.idTorneo){
                 return String(obj.configurazione.idTorneo);
+            }
         }catch(e){}
 
         return "";
     }
 
-    var idTorneo=getTournamentId();
-    if(!idTorneo) return;
+    var idTorneo = getId();
+    if(!idTorneo){
+        console.error("BOVE TV V7: ID TORNEO ASSENTE");
+        return;
+    }
 
-    var lastSignature=null;
-    var busy=false;
-
-    function applica(configurazione,updatedAt){
-        if(!configurazione || typeof configurazione!=="object") return;
-        if(typeof state==="undefined" || !state) return;
-
-        for(var key in configurazione){
-            if(Object.prototype.hasOwnProperty.call(configurazione,key))
-                state[key]=configurazione[key];
-        }
-
-        window.__BOVE_TV_LAST_UPDATE__=updatedAt||"";
-
+    /* Se il vecchio link usa ?torneo=..., lo normalizziamo.
+       Cosi' anche loadState() usa la stessa fonte di verita'. */
+    if(!getParam("idTorneo")){
         try{
-            if(typeof ensureRules==="function") ensureRules();
-            if(typeof render==="function") render();
-        }catch(e){
-            console.error("BOVE TV V6 RENDER:",e);
-        }
+            var u = new URL(window.location.href);
+            u.searchParams.set("idTorneo", idTorneo);
+            u.searchParams.set("tv","1");
+            history.replaceState(null,"",u.toString());
+        }catch(e){}
     }
 
-    function processa(remoto){
-        if(!remoto || !remoto.configurazione) return;
+    var busy = false;
+    var lastUpdatedAt = "";
+    var channel = null;
+    var pollTimer = null;
 
-        var signature=String(remoto.updated_at||"")+"|"+JSON.stringify(remoto.configurazione);
+    function aggiorna(){
+        if(busy || typeof loadState !== "function") return;
 
-        if(lastSignature===null){
-            lastSignature=signature;
-            applica(remoto.configurazione,remoto.updated_at);
-            console.log("BOVE TV V6 ATTIVO:",idTorneo,remoto.updated_at);
-            return;
-        }
+        busy = true;
 
-        if(signature!==lastSignature){
-            lastSignature=signature;
-            applica(remoto.configurazione,remoto.updated_at);
-            console.log("BOVE TV V6 AGGIORNAMENTO:",idTorneo,remoto.updated_at);
-        }
+        Promise.resolve(loadState())
+            .then(function(){
+                try{
+                    if(typeof state !== "undefined" && state){
+                        window.__BOVE_TV_LAST_STATE__ = JSON.stringify(state);
+                    }
+                }catch(e){}
+            })
+            .catch(function(err){
+                console.error("BOVE TV V7 LOAD:",err);
+            })
+            .finally(function(){
+                busy = false;
+            });
     }
 
-    function leggiClient(){
-        if(busy || typeof sb==="undefined" || !sb) return false;
-
-        busy=true;
-
-        sb.from("tornei")
-          .select("id,configurazione,updated_at")
-          .eq("id",Number(idTorneo))
-          .maybeSingle()
-          .then(function(result){
-              busy=false;
-              if(result && !result.error && result.data){
-                  processa(result.data);
-                  return;
-              }
-              leggiREST();
-          })
-          .catch(function(){
-              busy=false;
-              leggiREST();
-          });
-
-        return true;
-    }
-
-    function leggiREST(){
-        if(busy) return;
-        busy=true;
-
+    function controllaREST(){
+        var xhr;
         try{
-            var xhr=new XMLHttpRequest();
+            xhr = new XMLHttpRequest();
 
             xhr.open(
                 "GET",
                 "https://iybjvtmfaupgthqqsngd.supabase.co/rest/v1/tornei?id=eq."+
                 encodeURIComponent(idTorneo)+
-                "&select=id,configurazione,updated_at&_="+new Date().getTime(),
+                "&select=id,updated_at&_="+Date.now(),
                 true
             );
 
-            xhr.setRequestHeader("apikey","sb_publishable_oLLML3_ne0I1dWKIinSRNA_K1Ao5SOl");
-            xhr.setRequestHeader("Authorization","Bearer sb_publishable_oLLML3_ne0I1dWKIinSRNA_K1Ao5SOl");
+            xhr.setRequestHeader(
+                "apikey",
+                "sb_publishable_oLLML3_ne0I1dWKIinSRNA_K1Ao5SOl"
+            );
+
+            xhr.setRequestHeader(
+                "Authorization",
+                "Bearer sb_publishable_oLLML3_ne0I1dWKIinSRNA_K1Ao5SOl"
+            );
+
             xhr.setRequestHeader("Cache-Control","no-cache");
 
             xhr.onreadystatechange=function(){
                 if(xhr.readyState!==4) return;
 
-                busy=false;
-
                 if(xhr.status<200 || xhr.status>=300){
-                    console.warn("BOVE TV V6 REST HTTP:",xhr.status);
+                    console.warn("BOVE TV V7 REST HTTP:",xhr.status);
                     return;
                 }
 
                 try{
-                    var rows=JSON.parse(xhr.responseText);
-                    if(rows && rows.length) processa(rows[0]);
+                    var rows = JSON.parse(xhr.responseText);
+                    var row = rows && rows.length ? rows[0] : null;
+                    if(!row) return;
+
+                    var stamp = String(row.updated_at || "");
+
+                    if(!lastUpdatedAt){
+                        lastUpdatedAt = stamp;
+                        aggiorna();
+                        return;
+                    }
+
+                    if(stamp !== lastUpdatedAt){
+                        lastUpdatedAt = stamp;
+                        console.log(
+                            "BOVE TV V7 CAMBIO RILEVATO:",
+                            idTorneo,
+                            stamp
+                        );
+                        aggiorna();
+                    }
                 }catch(e){
-                    console.warn("BOVE TV V6 REST PARSE:",e);
+                    console.warn("BOVE TV V7 REST PARSE:",e);
                 }
             };
 
             xhr.onerror=function(){
-                busy=false;
-                console.warn("BOVE TV V6 REST NETWORK");
+                console.warn("BOVE TV V7 REST NETWORK");
             };
 
             xhr.ontimeout=function(){
-                busy=false;
-                console.warn("BOVE TV V6 REST TIMEOUT");
+                console.warn("BOVE TV V7 REST TIMEOUT");
             };
 
             xhr.timeout=5000;
             xhr.send(null);
 
         }catch(e){
-            busy=false;
-            console.warn("BOVE TV V6 REST:",e);
+            console.warn("BOVE TV V7 REST:",e);
         }
     }
 
-    function ciclo(){
-        if(!leggiClient()) leggiREST();
+    function avviaRealtime(){
+        if(typeof sb === "undefined" || !sb || !sb.channel){
+            console.warn("BOVE TV V7: client Supabase non disponibile");
+            return;
+        }
+
+        try{
+            channel = sb
+                .channel("bove-tv-"+idTorneo)
+                .on(
+                    "postgres_changes",
+                    {
+                        event:"UPDATE",
+                        schema:"public",
+                        table:"tornei",
+                        filter:"id=eq."+idTorneo
+                    },
+                    function(payload){
+                        console.log(
+                            "BOVE TV V7 REALTIME UPDATE:",
+                            payload && payload.new
+                                ? payload.new.updated_at
+                                : ""
+                        );
+
+                        if(
+                            payload &&
+                            payload.new &&
+                            payload.new.updated_at
+                        ){
+                            lastUpdatedAt =
+                                String(payload.new.updated_at);
+                        }
+
+                        aggiorna();
+                    }
+                )
+                .subscribe(function(status,err){
+                    console.log(
+                        "BOVE TV V7 REALTIME STATUS:",
+                        status,
+                        err || ""
+                    );
+                });
+
+        }catch(e){
+            console.error("BOVE TV V7 REALTIME:",e);
+        }
     }
 
-    window.__BOVE_TV_V6_ACTIVE__=true;
-    ciclo();
-    window.setInterval(ciclo,1000);
+    window.__BOVE_TV_V7_ACTIVE__ = true;
+    window.__BOVE_TV_ID__ = idTorneo;
+
+    /*
+     * Prima sincronizzazione immediata.
+     * Poi Realtime per il cambio istantaneo.
+     * Polling REST ogni 3 secondi come rete di sicurezza.
+     */
+    aggiorna();
+    avviaRealtime();
+
+    controllaREST();
+
+    pollTimer = window.setInterval(
+        controllaREST,
+        3000
+    );
+
+    window.addEventListener("beforeunload",function(){
+        if(pollTimer){
+            clearInterval(pollTimer);
+            pollTimer=null;
+        }
+
+        if(
+            channel &&
+            typeof sb !== "undefined" &&
+            sb &&
+            typeof sb.removeChannel === "function"
+        ){
+            try{
+                sb.removeChannel(channel);
+            }catch(e){}
+        }
+    });
 
 })();
 </script>
