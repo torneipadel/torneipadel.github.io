@@ -12249,7 +12249,7 @@ if(!row)return '<div class="bpl-match"><div class="bpl-match-name">Da determinar
 const match=row.querySelector(".match-cell");
 const teams=match?[...match.querySelectorAll(".team-line")].map(textOf):[];
 const inputs=[...row.querySelectorAll("input")];
-const score=inputs.filter(x=>x.type!=="time"&&x.type!=="text"||x.classList.contains("score-input")).map(x=>x.value||"");
+const score=[...row.querySelectorAll(".score-cell input")].map(x=>String(x.value||"").trim()).filter(v=>v!=="");
 const time=inputs.find(x=>x.type==="time");
 return `<div class="bpl-match"><div class="bpl-match-name">${esc(teams[0]||"Da determinare")}</div><div class="bpl-vs">VS</div><div class="bpl-match-name">${esc(teams[1]||"Da determinare")}</div>${score.length?`<div class="bpl-score">${esc(score[0]||"")} ${score[1]!==undefined?"– "+esc(score[1]):""}</div>`:""}${time?.value?`<div class="bpl-time">${esc(time.value)}</div>`:""}</div>`;
 }
