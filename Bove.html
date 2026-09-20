@@ -12236,12 +12236,13 @@ clone.querySelectorAll("[style]").forEach(el=>el.removeAttribute("style"));
 return clone.outerHTML;
 }
 const gironiContainer=document.querySelector("body > .groups");
-const groupCards=gironiContainer?[...gironiContainer.children].filter(card=>card.matches(".card[id^=\"card\"]")&&/^card[A-F]$/i.test(card.id||"")&&getComputedStyle(card).display!=="none"&&card.querySelector("table[id]")):[];
+const groupCards=gironiContainer?[...gironiContainer.children].filter(card=>card.matches(".card")&&/^card[A-F]$/i.test(card.id||"")&&getComputedStyle(card).display!=="none"):[];
 let groupsHtml="";
 groupCards.forEach((card,index)=>{
-const tables=card.querySelectorAll("table");
 const letter=(card.id||"card"+String.fromCharCode(65+index)).replace(/^card/i,"").toUpperCase();
-groupsHtml+=`<section class="bpl-group"><h3>GIRONE ${esc(letter||String.fromCharCode(65+index))}</h3>${printableTable(tables[1]||tables[0])}${tables[1]&&tables[0]?`<div class="bpl-calendar-title">CALENDARIO</div>${printableTable(tables[0])}`:""}</section>`;
+const matchTable=card.querySelector(`table#${letter}`);
+const classTable=card.querySelector(`table tbody#${letter}class`)?.closest("table");
+groupsHtml+=`<section class="bpl-group"><h3>GIRONE ${esc(letter||String.fromCharCode(65+index))}</h3>${printableTable(classTable||matchTable)}${classTable&&matchTable?`<div class="bpl-calendar-title">CALENDARIO</div>${printableTable(matchTable)}`:""}</section>`;
 });
 function matchCard(row){
 if(!row)return '<div class="bpl-match"><div class="bpl-match-name">Da determinare</div></div>';
