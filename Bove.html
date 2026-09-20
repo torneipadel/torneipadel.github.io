@@ -12305,33 +12305,40 @@ const ff=[...bracket.querySelectorAll(".bpl-f-match")];
 const winnerBox=bracket.querySelector(".bpl-winner");
 function drawBracketLines(){
 svg.innerHTML="";
-const width=Math.ceil(bracket.getBoundingClientRect().width);
-const height=Math.ceil(bracket.getBoundingClientRect().height);
+const rect=bracket.getBoundingClientRect();
+const width=Math.max(1,Math.round(rect.width));
+const height=Math.max(1,Math.round(rect.height));
 svg.setAttribute("viewBox",`0 0 ${width} ${height}`);
-svg.setAttribute("width",String(width));
-svg.setAttribute("height",String(height));
+svg.setAttribute("width",width);
+svg.setAttribute("height",height);
+svg.style.cssText="position:absolute!important;left:0!important;top:0!important;width:"+width+"px!important;height:"+height+"px!important;display:block!important;z-index:2!important;overflow:visible!important;pointer-events:none!important;";
+function line(x1,y1,x2,y2){
+const ns="http://www.w3.org/2000/svg";
+const p=document.createElementNS(ns,"line");
+p.setAttribute("x1",x1);p.setAttribute("y1",y1);p.setAttribute("x2",x2);p.setAttribute("y2",y2);
+p.setAttribute("stroke","#334155");p.setAttribute("stroke-width","3");p.setAttribute("fill","none");
+p.setAttribute("stroke-linecap","round");p.setAttribute("vector-effect","non-scaling-stroke");
+svg.appendChild(p);
+}
 function connectPair(a,b,target){
 if(!a||!b||!target)return;
-const ar=edge(a,bracket,"right");
-const br=edge(b,bracket,"right");
-const tl=edge(target,bracket,"left");
-const junctionX=ar.x+(tl.x-ar.x)/2;
-path(svg,`M ${ar.x} ${ar.y} H ${junctionX}`);
-path(svg,`M ${br.x} ${br.y} H ${junctionX}`);
-path(svg,`M ${junctionX} ${ar.y} V ${br.y}`);
-path(svg,`M ${junctionX} ${(ar.y+br.y)/2} H ${tl.x}`);
+const ar=edge(a,bracket,"right"),br=edge(b,bracket,"right"),tl=edge(target,bracket,"left");
+const junctionX=Math.round(ar.x+(tl.x-ar.x)/2);
+line(ar.x,ar.y,junctionX,ar.y);
+line(br.x,br.y,junctionX,br.y);
+line(junctionX,ar.y,junctionX,br.y);
+line(junctionX,(ar.y+br.y)/2,tl.x,(ar.y+br.y)/2);
 }
 if(qs.length>=2&&ss.length>=1)connectPair(qs[0],qs[1],ss[0]);
 if(qs.length>=4&&ss.length>=2)connectPair(qs[2],qs[3],ss[1]);
 if(ss.length>=2&&ff.length>=1)connectPair(ss[0],ss[1],ff[0]);
 if(ff.length>=1&&winnerBox){
-const a=edge(ff[0],bracket,"right");
-const b=edge(winnerBox,bracket,"left");
-path(svg,`M ${a.x} ${a.y} H ${b.x}`);
+const a=edge(ff[0],bracket,"right"),b=edge(winnerBox,bracket,"left");
+line(a.x,a.y,b.x,a.y);
 }
 }
 drawBracketLines();
-setTimeout(()=>{drawBracketLines();window.print();},100);
+setTimeout(()=>{drawBracketLines();window.print();},500);
 }
 </script>\n
   <script src="sponsor-public-v2.js?v=8"></script>
