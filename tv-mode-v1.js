@@ -190,11 +190,17 @@
       .on("postgres_changes",{
         event:"UPDATE",
         schema:"public",
-        table:"tornei",
-        filter:"id=eq."+currentId
+        table:"tornei"
       },(payload)=>{
+        const eventId=payload&&payload.new&&payload.new.id!=null
+          ? String(payload.new.id)
+          : "";
         console.log("[TV] UPDATE ricevuto:",payload);
-        load();
+        if(eventId===String(currentId)){
+          load();
+        }else{
+          console.log("[TV] UPDATE ignorato: id diverso",eventId,"atteso",String(currentId));
+        }
       })
       .subscribe((status,err)=>{
         console.log("[TV] Realtime status:",status,err||"");
