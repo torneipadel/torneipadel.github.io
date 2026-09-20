@@ -800,7 +800,7 @@ linear-gradient(0deg,transparent 49.6%,rgba(255,255,255,.72) 49.6%,rgba(255,255,
 .bpl-group th,.bpl-group td{padding:1.3mm 1mm;border-bottom:1.5px solid #64748b;text-align:center;font-weight:800}.bpl-group tbody tr{border-bottom:1.5px solid #64748b}.bpl-group td:first-child{font-weight:900}.bpl-group h3{font-weight:900}
 .bpl-group td:first-child{text-align:left;font-weight:600}
 .bpl-bracket-page{background:linear-gradient(135deg,#f7f8fa 0%,#eef2f6 100%)}
-.bpl-bracket{position:relative;display:grid;grid-template-columns:1.35fr 1.35fr 1.15fr 1fr;grid-template-rows:repeat(8,1fr);column-gap:10mm;row-gap:0;min-height:142mm;padding:8mm 2mm 3mm}
+.bpl-bracket{position:relative;display:grid;grid-template-columns:1.35fr 10mm 1.35fr 10mm 1.15fr 10mm 1fr;grid-template-rows:repeat(8,1fr);column-gap:0;row-gap:0;min-height:142mm;padding:8mm 2mm 3mm}
 .bpl-stage{position:relative;display:contents}
 .bpl-stage-title{position:absolute;top:0;text-align:center;font-size:11px;font-weight:800;letter-spacing:.06em;color:#334155;z-index:5}
 .bpl-stage[data-stage="q"] .bpl-stage-title{left:0;width:calc((100% - 30mm)/4 * 1.35)}
@@ -813,9 +813,21 @@ linear-gradient(0deg,transparent 49.6%,rgba(255,255,255,.72) 49.6%,rgba(255,255,
 .bpl-q-match.bpl-index-2{grid-column:1;grid-row:3}
 .bpl-q-match.bpl-index-3{grid-column:1;grid-row:5}
 .bpl-q-match.bpl-index-4{grid-column:1;grid-row:7}
-.bpl-s-match.bpl-index-1{grid-column:2;grid-row:2}
-.bpl-s-match.bpl-index-2{grid-column:2;grid-row:6}
-.bpl-f-match.bpl-index-1{grid-column:3;grid-row:4}
+.bpl-s-match.bpl-index-1{grid-column:3;grid-row:2}
+.bpl-s-match.bpl-index-2{grid-column:3;grid-row:6}
+.bpl-f-match.bpl-index-1{grid-column:5;grid-row:4}
+.bpl-bracket-connector{position:relative;z-index:1;pointer-events:none;align-self:stretch}
+.bpl-conn-q1{grid-column:2;grid-row:1 / 4;background:
+linear-gradient(to right,#334155,#334155) left 16.666% / 50% 3px no-repeat,
+linear-gradient(to right,#334155,#334155) left 83.333% / 50% 3px no-repeat,
+linear-gradient(to right,#334155,#334155) right 50% / 50% 3px no-repeat,
+linear-gradient(#334155,#334155) 50% 16.666% / 3px 66.667% no-repeat}
+.bpl-conn-s1{grid-column:4;grid-row:2 / 7;background:
+linear-gradient(to right,#334155,#334155) left 10% / 50% 3px no-repeat,
+linear-gradient(to right,#334155,#334155) left 90% / 50% 3px no-repeat,
+linear-gradient(to right,#334155,#334155) right 50% / 50% 3px no-repeat,
+linear-gradient(#334155,#334155) 50% 10% / 3px 80% no-repeat}
+.bpl-conn-f1{grid-column:6;grid-row:4;background:linear-gradient(to right,#334155,#334155) center / 100% 3px no-repeat}
 .bpl-winner{position:relative;grid-column:4;grid-row:4;align-self:center;justify-self:stretch;background:linear-gradient(135deg,#fffdf5,#f8f3df);border:1.5px solid #c8ae55;border-radius:7px;box-shadow:0 3px 10px rgba(120,90,20,.12);padding:5mm 3mm;text-align:center;z-index:3}
 .bpl-match-name{font-size:11px;font-weight:800;line-height:1.22;color:#1f2937;text-align:left;white-space:normal;padding-right:8mm}
 .bpl-vs{font-size:7px;font-weight:700;color:#64748b;text-align:center;margin:.8mm 0}
@@ -823,8 +835,6 @@ linear-gradient(0deg,transparent 49.6%,rgba(255,255,255,.72) 49.6%,rgba(255,255,
 .bpl-time{font-size:6px;color:#64748b;text-align:right;margin-top:1mm}
 .bpl-winner-label{font-size:9px;font-weight:800;letter-spacing:.06em;color:#8a6b1f}
 .bpl-winner-name{font-size:14px;font-weight:900;margin-top:2mm;color:#4b3a0f}
-.bpl-html-connectors{position:absolute!important;left:0!important;top:0!important;right:0!important;bottom:0!important;width:100%!important;height:100%!important;z-index:1!important;pointer-events:none!important;overflow:visible!important;display:block!important}.bpl-html-connectors div{box-sizing:border-box!important;pointer-events:none!important}.bpl-connectors{display:none!important}
-.bpl-connectors path{fill:none!important;stroke:#334155!important;stroke-width:3!important;vector-effect:non-scaling-stroke;stroke-linecap:round;stroke-linejoin:round!important}
 .bpl-match,.bpl-winner{z-index:20!important}
 .bpl-note{text-align:center;font-size:7px;color:#94a3b8;margin-top:2mm}
 }
@@ -12286,72 +12296,8 @@ if(formatted&&formatted!=="Da determinare"&&formatted!=="Da verificare")return f
 }
 return "";
 })();
-root.innerHTML=`<section class="bpl-page"><h1 class="bpl-title">${esc(state?.nomeTorneo||"TABELLONE TORNEO")}</h1><div class="bpl-subtitle">GIRONI — CLASSIFICHE E CALENDARIO</div><div class="bpl-groups">${groupsHtml||'<div class="bpl-group"><h3>Nessun girone</h3></div>'}</div></section><section class="bpl-page bpl-bracket-page"><h1 class="bpl-title">TABELLONE FINALE</h1><div class="bpl-subtitle">QUARTI DI FINALE → SEMIFINALI → FINALE → CAMPIONE</div><div class="bpl-bracket">${stage("Q","QUARTI DI FINALE","q")}${stage("S","SEMIFINALI","s")}${stage("finaleBox","FINALE","f")}<section class="bpl-stage" data-stage="w"><div class="bpl-stage-title">CAMPIONE</div><div class="bpl-stage-body"><div class="bpl-winner"><div class="bpl-winner-label">🏆 CAMPIONE TORNEO</div><div class="bpl-winner-name">${esc(winner||"Da determinare")}</div></div></div></section><svg class="bpl-connectors" aria-hidden="true"></svg></div><div class="bpl-note">Tabellone generato dai dati correnti del torneo.</div></section>`;
-function edge(el,base,side){
-const a=el.getBoundingClientRect(),b=base.getBoundingClientRect();
-return {x:(side==="right"?a.right:a.left)-b.left,y:a.top+a.height/2-b.top};
-}
-function path(svg,d){
-const ns="http://www.w3.org/2000/svg";
-const p=document.createElementNS(ns,"path");
-p.setAttribute("d",d);
-svg.appendChild(p);
-}
-const bracket=root.querySelector(".bpl-bracket");
-const svg=bracket.querySelector(".bpl-connectors");
-const qs=[...bracket.querySelectorAll(".bpl-q-match")];
-const ss=[...bracket.querySelectorAll(".bpl-s-match")];
-const ff=[...bracket.querySelectorAll(".bpl-f-match")];
-const winnerBox=bracket.querySelector(".bpl-winner");
-function drawBracketLines(){
-let layer=bracket.querySelector(".bpl-html-connectors");
-if(!layer){
-layer=document.createElement("div");
-layer.className="bpl-html-connectors";
-bracket.insertBefore(layer,bracket.firstChild);
-}
-layer.innerHTML="";
-const rect=bracket.getBoundingClientRect();
-function segment(x1,y1,x2,y2){
-const d=document.createElement("div");
-d.style.cssText="position:absolute!important;background:#334155!important;z-index:1!important;pointer-events:none!important;border:0!important;border-radius:2px!important;";
-if(Math.abs(y2-y1)<1){
-d.style.left=Math.min(x1,x2)+"px";
-d.style.top=(y1-1.5)+"px";
-d.style.width=Math.abs(x2-x1)+"px";
-d.style.height="3px";
-}else{
-d.style.left=(x1-1.5)+"px";
-d.style.top=Math.min(y1,y2)+"px";
-d.style.width="3px";
-d.style.height=Math.abs(y2-y1)+"px";
-}
-layer.appendChild(d);
-}
-function connectPair(a,b,target){
-if(!a||!b||!target)return;
-const ar=edge(a,bracket,"right"),br=edge(b,bracket,"right"),tl=edge(target,bracket,"left");
-const junctionX=Math.round(ar.x+(tl.x-ar.x)/2);
-segment(ar.x,ar.y,junctionX,ar.y);
-segment(br.x,br.y,junctionX,br.y);
-segment(junctionX,ar.y,junctionX,br.y);
-segment(junctionX,(ar.y+br.y)/2,tl.x,(ar.y+br.y)/2);
-}
-if(qs.length>=2&&ss.length>=1)connectPair(qs[0],qs[1],ss[0]);
-if(qs.length>=4&&ss.length>=2)connectPair(qs[2],qs[3],ss[1]);
-if(ss.length>=2&&ff.length>=1)connectPair(ss[0],ss[1],ff[0]);
-if(ff.length>=1&&winnerBox){
-const a=edge(ff[0],bracket,"right"),b=edge(winnerBox,bracket,"left");
-segment(a.x,a.y,b.x,a.y);
-}
-}
-window.onbeforeprint=()=>{
-void bracket.offsetWidth;
-void bracket.offsetHeight;
-drawBracketLines();
-};
+root.innerHTML=`<section class="bpl-page"><h1 class="bpl-title">${esc(state?.nomeTorneo||"TABELLONE TORNEO")}</h1><div class="bpl-subtitle">GIRONI — CLASSIFICHE E CALENDARIO</div><div class="bpl-groups">${groupsHtml||'<div class="bpl-group"><h3>Nessun girone</h3></div>'}</div></section><section class="bpl-page bpl-bracket-page"><h1 class="bpl-title">TABELLONE FINALE</h1><div class="bpl-subtitle">QUARTI DI FINALE → SEMIFINALI → FINALE → CAMPIONE</div><div class="bpl-bracket">${stage("Q","QUARTI DI FINALE","q")}<div class="bpl-bracket-connector bpl-conn-q1" aria-hidden="true"></div>${stage("S","SEMIFINALI","s")}<div class="bpl-bracket-connector bpl-conn-s1" aria-hidden="true"></div>${stage("finaleBox","FINALE","f")}<div class="bpl-bracket-connector bpl-conn-f1" aria-hidden="true"></div><section class="bpl-stage" data-stage="w"><div class="bpl-stage-title">CAMPIONE</div><div class="bpl-stage-body"><div class="bpl-winner"><div class="bpl-winner-label">🏆 CAMPIONE TORNEO</div><div class="bpl-winner-name">${esc(winner||"Da determinare")}</div></div></div></section></div><div class="bpl-note">Tabellone generato dai dati correnti del torneo.</div></section>`;
 window.print();
-}
 </script>\n
   <script src="sponsor-public-v2.js?v=8"></script>
 </body>
