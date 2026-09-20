@@ -222,7 +222,7 @@
 
   async function start(){
     const params=new URLSearchParams(location.search);
-    currentId=params.get("id")||params.get("torneo");
+    currentId=params.get("idTorneo")||params.get("id")||params.get("torneo");
     if(!currentId){ $("#status").textContent="ID TORNEO MANCANTE"; return; }
     if(!window.supabase||typeof window.supabase.createClient!=="function"){
       $("#status").textContent="SUPABASE NON DISPONIBILE"; return;
