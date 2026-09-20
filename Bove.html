@@ -12304,37 +12304,45 @@ const ss=[...bracket.querySelectorAll(".bpl-s-match")];
 const ff=[...bracket.querySelectorAll(".bpl-f-match")];
 const winnerBox=bracket.querySelector(".bpl-winner");
 function drawBracketLines(){
-svg.innerHTML="";
+let layer=bracket.querySelector(".bpl-html-connectors");
+if(!layer){
+layer=document.createElement("div");
+layer.className="bpl-html-connectors";
+bracket.insertBefore(layer,bracket.firstChild);
+}
+layer.innerHTML="";
 const rect=bracket.getBoundingClientRect();
-const width=Math.max(1,Math.round(rect.width));
-const height=Math.max(1,Math.round(rect.height));
-svg.setAttribute("viewBox",`0 0 ${width} ${height}`);
-svg.setAttribute("width",width);
-svg.setAttribute("height",height);
-svg.style.cssText="position:absolute!important;left:0!important;top:0!important;width:"+width+"px!important;height:"+height+"px!important;display:block!important;z-index:2!important;overflow:visible!important;pointer-events:none!important;";
-function line(x1,y1,x2,y2){
-const ns="http://www.w3.org/2000/svg";
-const p=document.createElementNS(ns,"line");
-p.setAttribute("x1",x1);p.setAttribute("y1",y1);p.setAttribute("x2",x2);p.setAttribute("y2",y2);
-p.setAttribute("stroke","#334155");p.setAttribute("stroke-width","3");p.setAttribute("fill","none");
-p.setAttribute("stroke-linecap","round");p.setAttribute("vector-effect","non-scaling-stroke");
-svg.appendChild(p);
+function segment(x1,y1,x2,y2){
+const d=document.createElement("div");
+d.style.cssText="position:absolute!important;background:#334155!important;z-index:1!important;pointer-events:none!important;border:0!important;border-radius:2px!important;";
+if(Math.abs(y2-y1)<1){
+d.style.left=Math.min(x1,x2)+"px";
+d.style.top=(y1-1.5)+"px";
+d.style.width=Math.abs(x2-x1)+"px";
+d.style.height="3px";
+}else{
+d.style.left=(x1-1.5)+"px";
+d.style.top=Math.min(y1,y2)+"px";
+d.style.width="3px";
+d.style.height=Math.abs(y2-y1)+"px";
+}
+layer.appendChild(d);
 }
 function connectPair(a,b,target){
 if(!a||!b||!target)return;
 const ar=edge(a,bracket,"right"),br=edge(b,bracket,"right"),tl=edge(target,bracket,"left");
 const junctionX=Math.round(ar.x+(tl.x-ar.x)/2);
-line(ar.x,ar.y,junctionX,ar.y);
-line(br.x,br.y,junctionX,br.y);
-line(junctionX,ar.y,junctionX,br.y);
-line(junctionX,(ar.y+br.y)/2,tl.x,(ar.y+br.y)/2);
+segment(ar.x,ar.y,junctionX,ar.y);
+segment(br.x,br.y,junctionX,br.y);
+segment(junctionX,ar.y,junctionX,br.y);
+segment(junctionX,(ar.y+br.y)/2,tl.x,(ar.y+br.y)/2);
 }
 if(qs.length>=2&&ss.length>=1)connectPair(qs[0],qs[1],ss[0]);
 if(qs.length>=4&&ss.length>=2)connectPair(qs[2],qs[3],ss[1]);
 if(ss.length>=2&&ff.length>=1)connectPair(ss[0],ss[1],ff[0]);
 if(ff.length>=1&&winnerBox){
 const a=edge(ff[0],bracket,"right"),b=edge(winnerBox,bracket,"left");
-line(a.x,a.y,b.x,a.y);
+segment(a.x,a.y,b.x,a.y);
 }
 }
 drawBracketLines();
