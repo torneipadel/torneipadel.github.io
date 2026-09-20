@@ -77,7 +77,6 @@ function buildUniversalText(type,free){
 }
 async function publishUniversal(){
   const t=universalSelected();
-  if(!t){alert('Seleziona prima un torneo');return}
   const sb=window.supabaseClient||window.sb;
   if(!sb){alert('Connessione Supabase non disponibile.');return}
   const title=document.getElementById('naiTitle')?.value.trim()||'Senza titolo';
@@ -85,10 +84,19 @@ async function publishUniversal(){
   const free=document.getElementById('naiUniversalText')?.value||'';
   const text=buildUniversalText(type,free);
   if(!text.trim()){alert('Inserisci il contenuto della pubblicazione.');return}
-  const c=universalCfg(t),items=Array.isArray(c.news)?c.news:[];
-  let image=findPosterImage();
   const file=document.getElementById('naiImage')?.files?.[0];
+  let image=findPosterImage();
   if(file){if(file.size>6*1024*1024){alert('Immagine troppo grande: massimo 6 MB.');return}image=await universalDataUrl(file)}
+  if(!t){
+    const payload={titolo:title,testo:text,immagine:image||null,pubblicata:true,tipo:type,link:null,in_evidenza:false,ordine:0,torneo_id:null};
+    const {error}=await sb.from('news').insert(payload);
+    if(error){console.error(error);alert('Errore salvataggio News: '+error.message);return}
+    universalEditingId=null;
+    alert('News pubblicata correttamente.');
+    document.querySelector('[data-com-page="news"]')?.click();
+    return
+  }
+  const c=universalCfg(t),items=Array.isArray(c.news)?c.news:[];
   const old=universalEditingId?items.find(n=>String(n.id)===String(universalEditingId)):null;
   const item={...(old||{}),id:old?.id||'news-'+Date.now(),tipo:type,titolo:title,testo:text,immagine:image||old?.immagine||'',link:'',inEvidenza:old?.inEvidenza??(items.length===0),data:old?.data||new Date().toISOString(),ordine:old?.ordine??items.length,pubblicata:true,stato:'pubblicata'};
   const next=old?items.map(n=>String(n.id)===String(old.id)?item:n):[...items,item];
