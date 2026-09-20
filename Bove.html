@@ -6513,16 +6513,50 @@ async function updateAndSync(){
              * Non cambiamo lo stato del torneo.
              */
 
+            /*
+             * UPDATE remoto in due passaggi:
+             * 1) scrittura pura, senza .select(), così una eventuale
+             *    anomalia sulla rappresentazione REST non può bloccare il save;
+             * 2) lettura immediata della stessa riga per VERIFICARE davvero
+             *    che Supabase abbia scritto configurazione e updated_at.
+             */
             const resultUpdate =
                 await sb
                 .from("tornei")
                 .update(payloadSupabase)
-                .eq("id", snapshot.idTorneo)
-                .select("id,nome,stato,updated_at")
-                .maybeSingle();
+                .eq("id", snapshot.idTorneo);
 
-            salvatoSupabase = resultUpdate.data;
             error = resultUpdate.error;
+
+            if(!error){
+
+                const verificaRemota =
+                    await sb
+                    .from("tornei")
+                    .select("id,nome,stato,updated_at,configurazione")
+                    .eq("id", snapshot.idTorneo)
+                    .maybeSingle();
+
+                if(verificaRemota.error){
+
+                    error = verificaRemota.error;
+
+                }else{
+
+                    salvatoSupabase = verificaRemota.data;
+
+                }
+
+            }
+
+            console.log(
+                "UPDATE REMOTO VERIFICA:",
+                {
+                    id:snapshot.idTorneo,
+                    errore:error || null,
+                    risultato:salvatoSupabase || null
+                }
+            );
 
         }else{
 
