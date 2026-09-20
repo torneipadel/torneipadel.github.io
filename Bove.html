@@ -816,18 +816,24 @@ linear-gradient(0deg,transparent 49.6%,rgba(255,255,255,.72) 49.6%,rgba(255,255,
 .bpl-s-match.bpl-index-1{grid-column:3;grid-row:2}
 .bpl-s-match.bpl-index-2{grid-column:3;grid-row:6}
 .bpl-f-match.bpl-index-1{grid-column:5;grid-row:4}
-.bpl-bracket-connector{position:relative;z-index:1;pointer-events:none;align-self:stretch}
-.bpl-conn-q1{grid-column:2;grid-row:1 / 4;background:
-linear-gradient(to right,#334155,#334155) left 16.666% / 50% 3px no-repeat,
-linear-gradient(to right,#334155,#334155) left 83.333% / 50% 3px no-repeat,
-linear-gradient(to right,#334155,#334155) right 50% / 50% 3px no-repeat,
-linear-gradient(#334155,#334155) 50% 16.666% / 3px 66.667% no-repeat}
-.bpl-conn-s1{grid-column:4;grid-row:2 / 7;background:
-linear-gradient(to right,#334155,#334155) left 10% / 50% 3px no-repeat,
-linear-gradient(to right,#334155,#334155) left 90% / 50% 3px no-repeat,
-linear-gradient(to right,#334155,#334155) right 50% / 50% 3px no-repeat,
-linear-gradient(#334155,#334155) 50% 10% / 3px 80% no-repeat}
-.bpl-conn-f1{grid-column:6;grid-row:4;background:linear-gradient(to right,#334155,#334155) center / 100% 3px no-repeat}
+.bpl-bracket-connector{position:relative;z-index:1;pointer-events:none;align-self:stretch;min-width:10mm}
+.bpl-bracket-connector span{position:absolute;display:block;background:none;border:0;box-sizing:border-box}
+.bpl-bracket-connector .h-left-top{left:0;right:50%;height:0;border-top:2px solid #334155}
+.bpl-bracket-connector .h-left-bottom{left:0;right:50%;height:0;border-top:2px solid #334155}
+.bpl-bracket-connector .h-right-mid{left:50%;right:0;height:0;border-top:2px solid #334155}
+.bpl-bracket-connector .v-mid{left:50%;width:0;border-left:2px solid #334155}
+.bpl-conn-q1{grid-column:2;grid-row:1 / 4}
+.bpl-conn-q1 .h-left-top{top:16.666%}
+.bpl-conn-q1 .h-left-bottom{top:83.333%}
+.bpl-conn-q1 .h-right-mid{top:50%}
+.bpl-conn-q1 .v-mid{top:16.666%;bottom:16.666%}
+.bpl-conn-s1{grid-column:4;grid-row:2 / 7}
+.bpl-conn-s1 .h-left-top{top:10%}
+.bpl-conn-s1 .h-left-bottom{top:90%}
+.bpl-conn-s1 .h-right-mid{top:50%}
+.bpl-conn-s1 .v-mid{top:10%;bottom:10%}
+.bpl-conn-f1{grid-column:6;grid-row:4}
+.bpl-conn-f1 .h-right-mid{left:0;right:0;top:50%}
 .bpl-winner{position:relative;grid-column:7;grid-row:4;align-self:center;justify-self:stretch;background:linear-gradient(135deg,#fffdf5,#f8f3df);border:1.5px solid #c8ae55;border-radius:7px;box-shadow:0 3px 10px rgba(120,90,20,.12);padding:5mm 3mm;text-align:center;z-index:3}
 .bpl-match-name{font-size:11px;font-weight:800;line-height:1.22;color:#1f2937;text-align:left;white-space:normal;padding-right:8mm}
 .bpl-vs{font-size:7px;font-weight:700;color:#64748b;text-align:center;margin:.8mm 0}
@@ -12296,7 +12302,7 @@ if(formatted&&formatted!=="Da determinare"&&formatted!=="Da verificare")return f
 }
 return "";
 })();
-root.innerHTML=`<section class="bpl-page"><h1 class="bpl-title">${esc(state?.nomeTorneo||"TABELLONE TORNEO")}</h1><div class="bpl-subtitle">GIRONI — CLASSIFICHE E CALENDARIO</div><div class="bpl-groups">${groupsHtml||'<div class="bpl-group"><h3>Nessun girone</h3></div>'}</div></section><section class="bpl-page bpl-bracket-page"><h1 class="bpl-title">TABELLONE FINALE</h1><div class="bpl-subtitle">QUARTI DI FINALE → SEMIFINALI → FINALE → CAMPIONE</div><div class="bpl-bracket">${stage("Q","QUARTI DI FINALE","q")}<div class="bpl-bracket-connector bpl-conn-q1" aria-hidden="true"></div>${stage("S","SEMIFINALI","s")}<div class="bpl-bracket-connector bpl-conn-s1" aria-hidden="true"></div>${stage("finaleBox","FINALE","f")}<div class="bpl-bracket-connector bpl-conn-f1" aria-hidden="true"></div><section class="bpl-stage" data-stage="w"><div class="bpl-stage-title">CAMPIONE</div><div class="bpl-stage-body"><div class="bpl-winner"><div class="bpl-winner-label">🏆 CAMPIONE TORNEO</div><div class="bpl-winner-name">${esc(winner||"Da determinare")}</div></div></div></section></div><div class="bpl-note">Tabellone generato dai dati correnti del torneo.</div></section>`;
+root.innerHTML=`<section class="bpl-page"><h1 class="bpl-title">${esc(state?.nomeTorneo||"TABELLONE TORNEO")}</h1><div class="bpl-subtitle">GIRONI — CLASSIFICHE E CALENDARIO</div><div class="bpl-groups">${groupsHtml||'<div class="bpl-group"><h3>Nessun girone</h3></div>'}</div></section><section class="bpl-page bpl-bracket-page"><h1 class="bpl-title">TABELLONE FINALE</h1><div class="bpl-subtitle">QUARTI DI FINALE → SEMIFINALI → FINALE → CAMPIONE</div><div class="bpl-bracket">${stage("Q","QUARTI DI FINALE","q")}<div class="bpl-bracket-connector bpl-conn-q1" aria-hidden="true"><span class="h-left-top"></span><span class="h-left-bottom"></span><span class="h-right-mid"></span><span class="v-mid"></span></div>${stage("S","SEMIFINALI","s")}<div class="bpl-bracket-connector bpl-conn-s1" aria-hidden="true"><span class="h-left-top"></span><span class="h-left-bottom"></span><span class="h-right-mid"></span><span class="v-mid"></span></div>${stage("finaleBox","FINALE","f")}<div class="bpl-bracket-connector bpl-conn-f1" aria-hidden="true"><span class="h-right-mid"></span></div><section class="bpl-stage" data-stage="w"><div class="bpl-stage-title">CAMPIONE</div><div class="bpl-stage-body"><div class="bpl-winner"><div class="bpl-winner-label">🏆 CAMPIONE TORNEO</div><div class="bpl-winner-name">${esc(winner||"Da determinare")}</div></div></div></section></div><div class="bpl-note">Tabellone generato dai dati correnti del torneo.</div></section>`;
 window.print();
 </script>\n
   <script src="sponsor-public-v2.js?v=8"></script>
