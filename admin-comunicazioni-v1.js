@@ -35,7 +35,9 @@ root.innerHTML=`<div class="page-head"><div><h1>${title}</h1><p>${sub}</p></div>
 $('comBack')?.addEventListener('click',()=>window.openAdminPage?.('torneo'))
 }
 
-async function news(){return newsEditor()}\n\nasync function sponsor(){
+async function news(){return newsEditor()}
+
+async function sponsor(){
 const items=await loadGlobalSponsors();
 const form=(editing=null)=>{
 const s=editing||{};
@@ -64,7 +66,9 @@ document.querySelectorAll('[data-sponsor-del]').forEach(b=>b.onclick=async()=>{i
 function whatsapp(){
 const t=selected();if(!t){alert('Seleziona prima un torneo');return}
 const link=location.origin+'/Bove.html?idTorneo='+encodeURIComponent(t.id);
-shell('WhatsApp',`${esc(t.nome)} · ID ${esc(t.id)}`,`<div class="card feature-card"><div class="card-head"><div><h2>Comunicazioni WhatsApp</h2><span class="notice">Messaggio pronto con il link del torneo selezionato</span></div></div><div class="card-body"><label>Messaggio</label><textarea id="waText" class="input" rows="6">Ciao! Ti invitiamo al torneo ${esc(t.nome)} del ${esc(t.data||t.data_torneo||'')}.\n\n${esc(link)}</textarea><div class="admin-feature-actions"><button class="btn primary" id="waOpen">📱 Apri WhatsApp</button><button class="btn" id="waCopy">📋 Copia link torneo</button></div><div class="notice" style="margin-top:14px">Il link è sempre riferito al torneo attualmente selezionato.</div></div></div>`);
+shell('WhatsApp',`${esc(t.nome)} · ID ${esc(t.id)}`,`<div class="card feature-card"><div class="card-head"><div><h2>Comunicazioni WhatsApp</h2><span class="notice">Messaggio pronto con il link del torneo selezionato</span></div></div><div class="card-body"><label>Messaggio</label><textarea id="waText" class="input" rows="6">Ciao! Ti invitiamo al torneo ${esc(t.nome)} del ${esc(t.data||t.data_torneo||'')}.
+
+${esc(link)}</textarea><div class="admin-feature-actions"><button class="btn primary" id="waOpen">📱 Apri WhatsApp</button><button class="btn" id="waCopy">📋 Copia link torneo</button></div><div class="notice" style="margin-top:14px">Il link è sempre riferito al torneo attualmente selezionato.</div></div></div>`);
 $('waOpen').onclick=()=>window.open('https://wa.me/?text='+encodeURIComponent($('waText')?.value||''),'_blank');
 $('waCopy').onclick=()=>navigator.clipboard?.writeText(link).then(()=>alert('Link copiato negli appunti.'))
 }
@@ -113,7 +117,8 @@ const autoText=selectedTournament?[
 tournamentDate?'📅 Data: '+tournamentDate:'',
 tournamentTime?'🕒 Ora: '+tournamentTime:'',
 tournamentDescription?'ℹ️ '+tournamentDescription:''
-].filter(Boolean).join('\n'):'';
+].filter(Boolean).join('
+'):'';
 const autoType=selectedTournament?'Torneo':'Comunicazione';
 const autoTournamentId=selectedTournament?String(selectedTournament.id):'';
 const autoImage=linkedPoster?.immagine||'';
