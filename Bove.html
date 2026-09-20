@@ -12235,7 +12235,8 @@ el.replaceWith(span);
 clone.querySelectorAll("[style]").forEach(el=>el.removeAttribute("style"));
 return clone.outerHTML;
 }
-const groupCards=[...document.querySelectorAll('.groups > .card[id^="card"]')].filter(card=>/^card[A-F]$/i.test(card.id||"")&&getComputedStyle(card).display!=="none"&&card.querySelector("table"));
+const gironiContainer=document.querySelector("body > .groups");
+const groupCards=gironiContainer?[...gironiContainer.children].filter(card=>card.matches(".card[id^=\"card\"]")&&/^card[A-F]$/i.test(card.id||"")&&getComputedStyle(card).display!=="none"&&card.querySelector("table[id]")):[];
 let groupsHtml="";
 groupCards.forEach((card,index)=>{
 const tables=card.querySelectorAll("table");
