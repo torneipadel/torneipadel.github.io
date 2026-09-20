@@ -3,8 +3,10 @@
 'use strict';
 function openSponsor(){
   document.getElementById('mobileOverlay')?.classList.remove('open');
-  const fn=window.openAdminComPage;
-  if(typeof fn==='function')return fn('sponsor');
+  const fn=window.openAdminSponsor;
+  if(typeof fn==='function')return fn();
+  const router=window.openAdminComPage;
+  if(typeof router==='function')return router('sponsor');
 }
 function bind(){
   if(document.documentElement.dataset.sponsorRouteFix==='1')return;
