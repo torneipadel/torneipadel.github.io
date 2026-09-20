@@ -318,6 +318,34 @@ table.standing .trend-up, table.standing .trend-down,
     right: 20px;
     left: auto;
     z-index: 9999;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.admin-save-result-button {
+    display: none;
+    width: auto;
+    height: 36px;
+    padding: 0 10px;
+    border-radius: 8px;
+    border: 1px solid #334155;
+    background: #166534;
+    color: #fff;
+    font-size: 12px;
+    font-family: system-ui;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+    box-sizing: border-box;
+}
+
+.admin-save-result-button:hover {
+    background: #15803d;
+}
+
+body.user-mode .admin-save-result-button {
+    display: none !important;
 }
 
 .menu-button {
@@ -612,6 +640,27 @@ async function verifyAccess(){
 
     Lascia tutto disponibile.
     */
+
+    const adminSaveResultButton =
+        document.getElementById("adminSaveResultButton");
+
+    if(adminSaveResultButton){
+        adminSaveResultButton.style.setProperty(
+            "display",
+            "inline-flex",
+            "important"
+        );
+        adminSaveResultButton.style.setProperty(
+            "align-items",
+            "center",
+            "important"
+        );
+        adminSaveResultButton.style.setProperty(
+            "justify-content",
+            "center",
+            "important"
+        );
+    }
 
     console.log(
         "ACCESSO ADMIN:",
@@ -2539,7 +2588,9 @@ style="width:80px">
 
 </div>
 
-<div class="menu-container"> <button class="menu-button" onclick="toggleMenu()"> ☰ </button> <div id="menuComandi" class="menu-dropdown"> <button onclick="document.getElementById('formatModal').style.display='block'"> ⚙️ Formato </button> <button onclick="openRules()"> 📖 Regole </button> <button onclick="document.getElementById('teamModal').style.display='block'"> 📝 Squadre </button> <button onclick="stampaTabelloneGrafico()"> 🖨️ Stampa </button> <!-- SALVA TORNEO --> <button type="button" onclick="updateAndSync()"> 💾 Salva </button> <!-- RESET COMPLETO --> <button type="button" onclick="reset()"> 🗑️ Reset completo </button> <button onclick="window.location.href='admin.html'"> ⬅️ Torna ad Admin </button> </div> </div> <div class="groups"> <div class="card" id="cardA">
+<div class="menu-container">
+<button id="adminSaveResultButton" class="admin-save-result-button" type="button" onclick="updateAndSync()">💾 Salva risultato</button>
+<button class="menu-button" onclick="toggleMenu()"> ☰ </button> <div id="menuComandi" class="menu-dropdown"> <button onclick="document.getElementById('formatModal').style.display='block'"> ⚙️ Formato </button> <button onclick="openRules()"> 📖 Regole </button> <button onclick="document.getElementById('teamModal').style.display='block'"> 📝 Squadre </button> <button onclick="stampaTabelloneGrafico()"> 🖨️ Stampa </button> <!-- SALVA TORNEO --> <button type="button" onclick="updateAndSync()"> 💾 Salva </button> <!-- RESET COMPLETO --> <button type="button" onclick="reset()"> 🗑️ Reset completo </button> <button onclick="window.location.href='admin.html'"> ⬅️ Torna ad Admin </button> </div> </div> <div class="groups"> <div class="card" id="cardA">
    
 
       <table id="A"><thead><tr><th>Campo</th><th>Ora</th><th>Match</th><th>Ris</th></tr></thead><tbody id="Arows"></tbody></table>
@@ -12820,6 +12871,11 @@ window.print();
         }catch(e){
             console.error("BOVE TV V8 REALTIME:",e);
         }
+    }
+
+    var adminSaveButton = document.getElementById("adminSaveResultButton");
+    if(adminSaveButton){
+        adminSaveButton.style.setProperty("display","none","important");
     }
 
     window.__BOVE_TV_V8_ACTIVE__ = true;
