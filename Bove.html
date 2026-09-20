@@ -827,6 +827,11 @@ linear-gradient(0deg,transparent 49.6%,rgba(255,255,255,.72) 49.6%,rgba(255,255,
 .bpl-conn-q1 .h-left-bottom{top:83.333%}
 .bpl-conn-q1 .h-right-mid{top:50%}
 .bpl-conn-q1 .v-mid{top:16.666%;bottom:16.666%}
+.bpl-conn-q2{grid-column:2;grid-row:5 / 9}
+.bpl-conn-q2 .h-left-top{top:16.666%}
+.bpl-conn-q2 .h-left-bottom{top:83.333%}
+.bpl-conn-q2 .h-right-mid{top:50%}
+.bpl-conn-q2 .v-mid{top:16.666%;bottom:16.666%}
 .bpl-conn-s1{grid-column:4;grid-row:2 / 7}
 .bpl-conn-s1 .h-left-top{top:10%}
 .bpl-conn-s1 .h-left-bottom{top:90%}
@@ -12302,7 +12307,7 @@ if(formatted&&formatted!=="Da determinare"&&formatted!=="Da verificare")return f
 }
 return "";
 })();
-root.innerHTML=`<section class="bpl-page"><h1 class="bpl-title">${esc(state?.nomeTorneo||"TABELLONE TORNEO")}</h1><div class="bpl-subtitle">GIRONI — CLASSIFICHE E CALENDARIO</div><div class="bpl-groups">${groupsHtml||'<div class="bpl-group"><h3>Nessun girone</h3></div>'}</div></section><section class="bpl-page bpl-bracket-page"><h1 class="bpl-title">TABELLONE FINALE</h1><div class="bpl-subtitle">QUARTI DI FINALE → SEMIFINALI → FINALE → CAMPIONE</div><div class="bpl-bracket">${stage("Q","QUARTI DI FINALE","q")}<div class="bpl-bracket-connector bpl-conn-q1" aria-hidden="true"><span class="h-left-top"></span><span class="h-left-bottom"></span><span class="h-right-mid"></span><span class="v-mid"></span></div>${stage("S","SEMIFINALI","s")}<div class="bpl-bracket-connector bpl-conn-s1" aria-hidden="true"><span class="h-left-top"></span><span class="h-left-bottom"></span><span class="h-right-mid"></span><span class="v-mid"></span></div>${stage("finaleBox","FINALE","f")}<div class="bpl-bracket-connector bpl-conn-f1" aria-hidden="true"><span class="h-right-mid"></span></div><section class="bpl-stage" data-stage="w"><div class="bpl-stage-title">CAMPIONE</div><div class="bpl-stage-body"><div class="bpl-winner"><div class="bpl-winner-label">🏆 CAMPIONE TORNEO</div><div class="bpl-winner-name">${esc(winner||"Da determinare")}</div></div></div></section></div><div class="bpl-note">Tabellone generato dai dati correnti del torneo.</div></section>`;
+root.innerHTML=`<section class="bpl-page"><h1 class="bpl-title">${esc(state?.nomeTorneo||"TABELLONE TORNEO")}</h1><div class="bpl-subtitle">GIRONI — CLASSIFICHE E CALENDARIO</div><div class="bpl-groups">${groupsHtml||'<div class="bpl-group"><h3>Nessun girone</h3></div>'}</div></section><section class="bpl-page bpl-bracket-page"><h1 class="bpl-title">TABELLONE FINALE</h1><div class="bpl-subtitle">QUARTI DI FINALE → SEMIFINALI → FINALE → CAMPIONE</div><div class="bpl-bracket">${stage("Q","QUARTI DI FINALE","q")}<div class="bpl-bracket-connector bpl-conn-q1" aria-hidden="true"><span class="h-left-top"></span><span class="h-left-bottom"></span><span class="h-right-mid"></span><span class="v-mid"></span></div><div class="bpl-bracket-connector bpl-conn-q2" aria-hidden="true"><span class="h-left-top"></span><span class="h-left-bottom"></span><span class="h-right-mid"></span><span class="v-mid"></span></div>${stage("S","SEMIFINALI","s")}<div class="bpl-bracket-connector bpl-conn-s1" aria-hidden="true"><span class="h-left-top"></span><span class="h-left-bottom"></span><span class="h-right-mid"></span><span class="v-mid"></span></div>${stage("finaleBox","FINALE","f")}<div class="bpl-bracket-connector bpl-conn-f1" aria-hidden="true"><span class="h-right-mid"></span></div><section class="bpl-stage" data-stage="w"><div class="bpl-stage-title">CAMPIONE</div><div class="bpl-stage-body"><div class="bpl-winner"><div class="bpl-winner-label">🏆 CAMPIONE TORNEO</div><div class="bpl-winner-name">${esc(winner||"Da determinare")}</div></div></div></section></div><div class="bpl-note">Tabellone generato dai dati correnti del torneo.</div></section>`;
 window.print();
 }
 </script>\n
