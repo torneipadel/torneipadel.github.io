@@ -12542,179 +12542,162 @@ window.print();
 }
 </script>\n
   <script>
-/* BOVE_TV_REALTIME_V2
-   Sincronizzazione automatica del Bove aperto su TV.
-   Per ?tv=1 forza sempre la modalità TV, anche se il browser conserva
-   una vecchia sessione Supabase.
+/* BOVE_TV_REALTIME_V3
+   TV: sincronizzazione diretta REST + Realtime.
+   Il polling REST è indipendente da WebSocket/sessione browser.
 */
 (function(){
     "use strict";
 
-    let refreshTimer = null;
-    let refreshing = false;
-
     async function startBoveTvRealtime(){
-        try{
-            const params = new URLSearchParams(window.location.search);
-            const idTorneo = params.get("idTorneo");
-            const tvMode = params.get("tv") === "1";
+        const params = new URLSearchParams(window.location.search);
 
-            if(!idTorneo || typeof sb === "undefined" || !sb) return;
+        if(params.get("tv") !== "1")
+            return;
 
-            /*
-             * Se la pagina è esplicitamente TV, NON controlliamo la sessione:
-             * il TV deve ricevere gli aggiornamenti anche se in passato
-             * è stato autenticato con lo stesso browser.
-             */
-            if(!tvMode){
-                let session = null;
-                try{
-                    const result = await sb.auth.getSession();
-                    session = result?.data?.session || null;
-                }catch(e){
-                    console.warn("BOVE TV: verifica sessione non disponibile.", e);
+        const idTorneo = params.get("idTorneo");
+
+        if(!idTorneo)
+            return;
+
+        const REST_URL =
+            "https://iybjvtmfaupgthqqsngd.supabase.co/rest/v1/tornei";
+
+        const API_KEY =
+            "sb_publishable_oLLML3_ne0I1dWKIinSRNA_K1Ao5SOl";
+
+        let lastUpdatedAt = null;
+        let busy = false;
+
+        async function leggiTorneoTV(){
+            if(busy)
+                return;
+
+            busy = true;
+
+            try{
+                const response = await fetch(
+                    REST_URL +
+                    "?id=eq." +
+                    encodeURIComponent(idTorneo) +
+                    "&select=id,configurazione,updated_at",
+                    {
+                        method:"GET",
+                        cache:"no-store",
+                        headers:{
+                            "apikey":API_KEY,
+                            "Authorization":"Bearer "+API_KEY
+                        }
+                    }
+                );
+
+                if(!response.ok){
+                    console.warn(
+                        "BOVE TV REST HTTP:",
+                        response.status
+                    );
+                    return;
                 }
 
-                if(session) return;
-            }
+                const rows = await response.json();
+                const remoto = Array.isArray(rows) ? rows[0] : null;
 
-            const remoteId = String(idTorneo);
+                if(!remoto)
+                    return;
 
-            async function refreshFromRemote(reason){
-                if(refreshing) return;
-                refreshing = true;
-
-                try{
+                if(lastUpdatedAt === null){
+                    lastUpdatedAt = remoto.updated_at;
                     console.log(
-                        "BOVE TV: aggiornamento ricevuto:",
-                        reason,
-                        remoteId
+                        "BOVE TV V3 ATTIVO:",
+                        idTorneo,
+                        remoto.updated_at
+                    );
+                    return;
+                }
+
+                if(
+                    String(remoto.updated_at) !==
+                    String(lastUpdatedAt)
+                ){
+                    lastUpdatedAt = remoto.updated_at;
+
+                    console.log(
+                        "BOVE TV: NUOVO AGGIORNAMENTO:",
+                        lastUpdatedAt
                     );
 
+                    /*
+                     * Ricarica lo stato remoto usando la stessa
+                     * pipeline del Bove. In modalità TV
+                     * updateAndSync() è bloccato, quindi non
+                     * viene riscritto nulla su Supabase.
+                     */
                     if(typeof loadState === "function"){
                         await loadState();
                     }else if(typeof render === "function"){
                         render();
                     }
-
-                }catch(e){
-                    console.error(
-                        "BOVE TV: errore aggiornamento:",
-                        e
-                    );
-                }finally{
-                    refreshing = false;
                 }
-            }
 
-            sb
-                .channel("bove-tv-v2-" + remoteId)
+            }catch(error){
+
+                console.warn(
+                    "BOVE TV REST:",
+                    error
+                );
+
+            }finally{
+                busy = false;
+            }
+        }
+
+        /*
+         * Prima lettura immediata.
+         */
+        await leggiTorneoTV();
+
+        /*
+         * Controllo ogni 1 secondo.
+         * È il canale principale per Smart TV.
+         */
+        window.setInterval(
+            leggiTorneoTV,
+            1000
+        );
+
+        /*
+         * Realtime come acceleratore, quando disponibile.
+         */
+        try{
+            if(typeof sb !== "undefined" && sb){
+
+                sb
+                .channel("bove-tv-v3-" + idTorneo)
                 .on(
                     "postgres_changes",
                     {
                         event:"UPDATE",
                         schema:"public",
                         table:"tornei",
-                        filter:"id=eq." + remoteId
+                        filter:"id=eq." + idTorneo
                     },
-                    payload=>{
-                        const changedId = payload?.new?.id;
-
-                        if(String(changedId)!==remoteId)
-                            return;
-
-                        if(refreshTimer)
-                            clearTimeout(refreshTimer);
-
-                        refreshTimer=setTimeout(
-                            ()=>{
-                                refreshFromRemote("Supabase Realtime");
-                            },
-                            100
-                        );
+                    ()=>{
+                        leggiTorneoTV();
                     }
                 )
                 .subscribe(status=>{
                     console.log(
-                        "BOVE TV REALTIME STATUS:",
+                        "BOVE TV REALTIME V3:",
                         status,
-                        "TORNEO:",
-                        remoteId
+                        idTorneo
                     );
                 });
-
-            /*
-             * FALLBACK: controlla ogni 2 secondi.
-             * Serve anche sui browser Smart TV che interrompono
-             * la connessione WebSocket Realtime.
-             */
-            window.setInterval(async()=>{
-                try{
-
-                    const result =
-                        await sb
-                        .from("tornei")
-                        .select("id,configurazione,updated_at")
-                        .eq("id",remoteId)
-                        .maybeSingle();
-
-                    if(result.error || !result.data)
-                        return;
-
-                    const signature =
-                        JSON.stringify([
-                            result.data.id,
-                            result.data.updated_at,
-                            result.data.configurazione
-                        ]);
-
-                    if(
-                        !window.__BOVE_TV_LAST_SIGNATURE__
-                    ){
-
-                        window.__BOVE_TV_LAST_SIGNATURE__ =
-                            signature;
-
-                        return;
-                    }
-
-                    if(
-                        signature !==
-                        window.__BOVE_TV_LAST_SIGNATURE__
-                    ){
-
-                        window.__BOVE_TV_LAST_SIGNATURE__ =
-                            signature;
-
-                        await refreshFromRemote(
-                            "fallback polling"
-                        );
-                    }
-
-                }catch(e){
-
-                    console.warn(
-                        "BOVE TV: polling fallback:",
-                        e
-                    );
-
-                }
-
-            },2000);
-
-            console.log(
-                "=== BOVE TV REALTIME V2 ATTIVO ===",
-                remoteId,
-                tvMode ? "MODALITA TV FORZATA" : "MODALITA PUBBLICA"
+            }
+        }catch(error){
+            console.warn(
+                "BOVE TV REALTIME V3 non disponibile:",
+                error
             );
-
-        }catch(e){
-
-            console.error(
-                "BOVE TV: inizializzazione fallita:",
-                e
-            );
-
         }
     }
 
@@ -12723,7 +12706,7 @@ window.print();
         ()=>{
             setTimeout(
                 startBoveTvRealtime,
-                500
+                300
             );
         }
     );
