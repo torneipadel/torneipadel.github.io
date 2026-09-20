@@ -163,26 +163,50 @@
     $("#content").innerHTML=groups+koHtml(state);
   }
 
+  let loading=false;
+
   async function load(){
-    if(!sb||!currentId) return;
+    if(!sb||!currentId||loading) return;
+    loading=true;
     const {data,error}=await sb.from("tornei").select("id,nome,data,stato,configurazione,updated_at").eq("id",currentId).maybeSingle();
-    if(error){ console.error("[TV] load",error); $("#status").textContent="ERRORE"; return; }
-    if(!data){ $("#status").textContent="TORNEO NON TROVATO"; return; }
+    if(error){ console.error("[TV] load",error); $("#status").textContent="ERRORE"; loading=false; return; }
+    if(!data){ $("#status").textContent="TORNEO NON TROVATO"; loading=false; return; }
     const st=Object.assign({},data.configurazione||{});
     st.idTorneo=data.id; st.nomeTorneo=data.nome||st.nomeTorneo; st.dataTorneo=data.data||st.dataTorneo;
     render(st);
+    loading=false;
   }
 
   function subscribe(){
-    if(channel) sb.removeChannel(channel);
-    channel=sb.channel("tv-torneo-"+currentId)
-      .on("postgres_changes",{event:"*",schema:"public",table:"tornei",filter:"id=eq."+currentId},()=>{
+    if(channel){
+      try{ sb.removeChannel(channel); }catch(e){ console.warn("[TV] removeChannel",e); }
+      channel=null;
+    }
+
+    const channelName="tv-torneo-"+currentId+"-"+Date.now();
+    console.log("[TV] subscribe:",channelName,"id=",currentId);
+
+    channel=sb.channel(channelName)
+      .on("postgres_changes",{
+        event:"UPDATE",
+        schema:"public",
+        table:"tornei",
+        filter:"id=eq."+currentId
+      },(payload)=>{
+        console.log("[TV] UPDATE ricevuto:",payload);
         load();
       })
-      .subscribe((status)=>{
+      .subscribe((status,err)=>{
+        console.log("[TV] Realtime status:",status,err||"");
         const el=$("#connection");
-        el.textContent=status==="SUBSCRIBED"?"● Connessione live":"○ "+status;
-        el.className=status==="SUBSCRIBED"?"live":"offline";
+        if(status==="SUBSCRIBED"){
+          el.textContent="● Connessione live";
+          el.className="live";
+          clearTimeout(reconnectTimer);
+        }else{
+          el.textContent="○ "+status;
+          el.className="offline";
+        }
         if(status==="CHANNEL_ERROR"||status==="TIMED_OUT"){
           clearTimeout(reconnectTimer);
           reconnectTimer=setTimeout(subscribe,3000);
