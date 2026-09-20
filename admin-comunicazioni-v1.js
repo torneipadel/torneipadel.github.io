@@ -35,7 +35,23 @@ root.innerHTML=`<div class="page-head"><div><h1>${title}</h1><p>${sub}</p></div>
 $('comBack')?.addEventListener('click',()=>window.openAdminPage?.('torneo'))
 }
 
-async function news(){return newsEditor()}
+function news(){
+const t=selected();
+if(!t){alert('Seleziona prima un torneo');return}
+const c=cfgOf(t),items=Array.isArray(c.news)?c.news:[];
+shell('News',`${esc(t.nome)} · ID ${esc(t.id)}`,`<div class="card feature-card"><div class="card-head"><div><h2>Gestione News</h2><span class="notice">Pubblica e gestisci le comunicazioni del torneo</span></div></div><div class="card-body"><div class="section-grid"><div class="feature-form"><label>Titolo</label><input id="newsTitle" class="input" placeholder="Titolo della news"><label>Testo</label><textarea id="newsText" class="input" rows="6" placeholder="Testo della comunicazione"></textarea><button class="btn primary" id="newsSave">＋ Pubblica news</button></div><div><h3>News del torneo</h3><div id="newsList" class="feature-list">${items.length?items.map((n,i)=>`<div class="list-item"><strong>${esc(n.titolo)}</strong><small>${esc(n.testo)}</small><button class="btn small danger" data-news-del="${i}">Elimina</button></div>`).join(''):'<div class="empty">Nessuna news pubblicata.</div>'}</div></div></div></div></div>`);
+$('newsSave').onclick=async()=>{
+const titolo=$('newsTitle')?.value.trim();
+const testo=$('newsText')?.value.trim();
+if(!titolo||!testo){alert('Inserisci titolo e testo della news.');return}
+const next=[...items,{id:'news-'+Date.now(),titolo,testo,data:new Date().toISOString()}];
+if(await saveCfg(t,{...c,news:next}))news()
+};
+document.querySelectorAll('[data-news-del]').forEach(b=>b.onclick=async()=>{
+const next=items.filter((_,i)=>i!==Number(b.dataset.newsDel));
+if(await saveCfg(t,{...c,news:next}))news()
+})
+}
 
 async function sponsor(){
 const items=await loadGlobalSponsors();
@@ -153,6 +169,6 @@ list.querySelectorAll('[data-del]').forEach(b=>b.onclick=async()=>{if(!confirm('
 render();
 }
 const oldOpenAdminComPage=window.openAdminComPage;
-window.openAdminComPage=p=>p==='news'?newsEditor():oldOpenAdminComPage?.(p);
-document.addEventListener('click',e=>{const b=e.target?.closest?.('[data-com-page="news"]');if(!b)return;e.preventDefault();e.stopImmediatePropagation();document.getElementById('mobileOverlay')?.classList.remove('open');newsEditor()},true);
+window.openAdminComPage=p=>p==='news'?news():oldOpenAdminComPage?.(p);
+document.addEventListener('click',e=>{const b=e.target?.closest?.('[data-com-page="news"]');if(!b)return;e.preventDefault();e.stopImmediatePropagation();document.getElementById('mobileOverlay')?.classList.remove('open');news()},true);
 })();
