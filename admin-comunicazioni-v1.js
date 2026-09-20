@@ -75,6 +75,7 @@ document.querySelectorAll('[data-com-page]').forEach(b=>{if(b.dataset.comBound)r
 function bindSidebar(){document.querySelectorAll('#areaAdmin .sidebar [data-page]').forEach(b=>{if(b.dataset.sidebarBound)return;b.dataset.sidebarBound='1';b.addEventListener('click',async()=>{const page=b.dataset.page;if(!page)return;document.querySelectorAll('#areaAdmin .sidebar [data-page]').forEach(x=>x.classList.remove('active'));b.classList.add('active');if(typeof window.openAdminPage==='function')await window.openAdminPage(page)})})}
 function bindAll(){bindSidebar();bindComLinks()}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',bindAll,{once:true});else bindAll();
+window.openAdminSponsor=()=>sponsor();
 window.openAdminComPage=p=>p==='news'?news():p==='sponsor'?sponsor():whatsapp();
 
 })();
