@@ -12495,14 +12495,14 @@ window.print();
 }
 </script>\n
   <script>
-/* BOVE_TV_REALTIME_V1
-   Aggiornamento automatico della pagina Bove quando il torneo remoto cambia.
-   Si attiva per ?tv=1 oppure, in assenza di sessione autenticata, per ?idTorneo=...
+/* BOVE_TV_REALTIME_V2
+   Sincronizzazione automatica del Bove aperto su TV.
+   Per ?tv=1 forza sempre la modalità TV, anche se il browser conserva
+   una vecchia sessione Supabase.
 */
 (function(){
     "use strict";
 
-    let channel = null;
     let refreshTimer = null;
     let refreshing = false;
 
@@ -12514,113 +12514,173 @@ window.print();
 
             if(!idTorneo || typeof sb === "undefined" || !sb) return;
 
-            let session = null;
-            try{
-                const result = await sb.auth.getSession();
-                session = result?.data?.session || null;
-            }catch(e){
-                console.warn("BOVE TV: impossibile verificare la sessione.", e);
-            }
+            /*
+             * Se la pagina è esplicitamente TV, NON controlliamo la sessione:
+             * il TV deve ricevere gli aggiornamenti anche se in passato
+             * è stato autenticato con lo stesso browser.
+             */
+            if(!tvMode){
+                let session = null;
+                try{
+                    const result = await sb.auth.getSession();
+                    session = result?.data?.session || null;
+                }catch(e){
+                    console.warn("BOVE TV: verifica sessione non disponibile.", e);
+                }
 
-            /* La modalità TV esplicita ha sempre priorità.
-               Senza ?tv=1, si abilita solo su una pagina remota non autenticata,
-               così l'editor/admin non viene ricaricato mentre lavora. */
-            if(!tvMode && session) return;
+                if(session) return;
+            }
 
             const remoteId = String(idTorneo);
 
             async function refreshFromRemote(reason){
                 if(refreshing) return;
                 refreshing = true;
+
                 try{
-                    console.log("BOVE TV: aggiornamento ricevuto:", reason, remoteId);
+                    console.log(
+                        "BOVE TV: aggiornamento ricevuto:",
+                        reason,
+                        remoteId
+                    );
+
                     if(typeof loadState === "function"){
                         await loadState();
                     }else if(typeof render === "function"){
                         render();
                     }
-                    const updated = document.getElementById("idTorneoDisplay");
-                    if(updated){
-                        updated.title = "Aggiornato automaticamente";
-                    }
+
                 }catch(e){
-                    console.error("BOVE TV: errore aggiornamento:", e);
+                    console.error(
+                        "BOVE TV: errore aggiornamento:",
+                        e
+                    );
                 }finally{
                     refreshing = false;
                 }
             }
 
-            channel = sb
-                .channel("bove-tv-" + remoteId)
+            sb
+                .channel("bove-tv-v2-" + remoteId)
                 .on(
                     "postgres_changes",
                     {
-                        event: "UPDATE",
-                        schema: "public",
-                        table: "tornei",
-                        filter: "id=eq." + remoteId
+                        event:"UPDATE",
+                        schema:"public",
+                        table:"tornei",
+                        filter:"id=eq." + remoteId
                     },
-                    payload => {
+                    payload=>{
                         const changedId = payload?.new?.id;
-                        if(String(changedId) !== remoteId) return;
 
-                        if(refreshTimer) clearTimeout(refreshTimer);
-                        refreshTimer = setTimeout(
-                            () => refreshFromRemote("Supabase Realtime"),
-                            150
+                        if(String(changedId)!==remoteId)
+                            return;
+
+                        if(refreshTimer)
+                            clearTimeout(refreshTimer);
+
+                        refreshTimer=setTimeout(
+                            ()=>{
+                                refreshFromRemote("Supabase Realtime");
+                            },
+                            100
                         );
                     }
                 )
-                .subscribe(status => {
-                    console.log("BOVE TV Realtime:", status);
+                .subscribe(status=>{
+                    console.log(
+                        "BOVE TV REALTIME STATUS:",
+                        status,
+                        "TORNEO:",
+                        remoteId
+                    );
                 });
 
-            /* Fallback leggero: se Realtime viene interrotto dal browser/TV,
-               la pagina continua comunque a sincronizzarsi senza F5. */
+            /*
+             * FALLBACK: controlla ogni 2 secondi.
+             * Serve anche sui browser Smart TV che interrompono
+             * la connessione WebSocket Realtime.
+             */
             window.setInterval(async()=>{
                 try{
-                    const result = await sb
+
+                    const result =
+                        await sb
                         .from("tornei")
                         .select("id,configurazione,updated_at")
-                        .eq("id", idTorneo)
+                        .eq("id",remoteId)
                         .maybeSingle();
 
-                    if(result.error || !result.data) return;
+                    if(result.error || !result.data)
+                        return;
 
-                    const signature = JSON.stringify([
-                        result.data.id,
-                        result.data.updated_at,
-                        result.data.configurazione
-                    ]);
+                    const signature =
+                        JSON.stringify([
+                            result.data.id,
+                            result.data.updated_at,
+                            result.data.configurazione
+                        ]);
 
-                    if(!window.__BOVE_TV_LAST_SIGNATURE__){
-                        window.__BOVE_TV_LAST_SIGNATURE__ = signature;
+                    if(
+                        !window.__BOVE_TV_LAST_SIGNATURE__
+                    ){
+
+                        window.__BOVE_TV_LAST_SIGNATURE__ =
+                            signature;
+
                         return;
                     }
 
-                    if(signature !== window.__BOVE_TV_LAST_SIGNATURE__){
-                        window.__BOVE_TV_LAST_SIGNATURE__ = signature;
-                        refreshFromRemote("fallback polling");
+                    if(
+                        signature !==
+                        window.__BOVE_TV_LAST_SIGNATURE__
+                    ){
+
+                        window.__BOVE_TV_LAST_SIGNATURE__ =
+                            signature;
+
+                        await refreshFromRemote(
+                            "fallback polling"
+                        );
                     }
+
                 }catch(e){
-                    console.warn("BOVE TV: polling fallback non disponibile.", e);
+
+                    console.warn(
+                        "BOVE TV: polling fallback:",
+                        e
+                    );
+
                 }
-            }, 3000);
+
+            },2000);
 
             console.log(
-                "BOVE TV REALTIME ATTIVO — torneo:",
+                "=== BOVE TV REALTIME V2 ATTIVO ===",
                 remoteId,
-                "— modalità:",
-                tvMode ? "tv=1" : "non autenticata"
+                tvMode ? "MODALITA TV FORZATA" : "MODALITA PUBBLICA"
             );
+
         }catch(e){
-            console.error("BOVE TV: inizializzazione Realtime fallita:", e);
+
+            console.error(
+                "BOVE TV: inizializzazione fallita:",
+                e
+            );
+
         }
     }
 
-    window.addEventListener("load", ()=>{
-        setTimeout(startBoveTvRealtime, 500);
-    });
+    window.addEventListener(
+        "load",
+        ()=>{
+            setTimeout(
+                startBoveTvRealtime,
+                500
+            );
+        }
+    );
+
 })();
 </script>
   <script src="sponsor-public-v2.js?v=8"></script>
