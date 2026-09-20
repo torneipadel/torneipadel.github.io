@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>NEXT POINT PADEL — TV</title>
+<style>
+*{box-sizing:border-box}html,body{margin:0;background:#08111f;color:#eef2f7;font-family:Arial,sans-serif}
+body{min-height:100vh;padding:24px}.top{display:flex;justify-content:space-between;gap:20px;align-items:center;margin-bottom:22px}
+h1{margin:0;font-size:clamp(28px,4vw,52px)}h2{margin:24px 0 10px;font-size:28px}.sub{color:#9caec4;font-size:18px}.live{color:#53e08b;font-weight:700}.offline{color:#ffb45b;font-weight:700}
+.group,.knockout{background:#101c2d;border:1px solid #263750;border-radius:16px;padding:16px;margin:16px 0}
+.table-wrap{overflow-x:auto}table{width:100%;border-collapse:collapse;font-size:clamp(15px,1.6vw,23px)}
+th,td{padding:12px 10px;border-bottom:1px solid #263750;text-align:left}th{color:#9fb1c8;font-size:.75em;text-transform:uppercase}
+td.score{font-weight:800;white-space:nowrap}.vs{display:inline-block;margin:0 12px;color:#71839a}
+.ko-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}.ko-card{background:#0b1626;border:1px solid #30435e;border-radius:12px;padding:16px}.ko-title{font-size:20px;font-weight:800}.ko-meta{color:#8296ae;margin:5px 0 12px}.ko-team{display:flex;justify-content:space-between;gap:12px;padding:8px 0;border-top:1px solid #24344b;font-size:20px}.ko-team strong{font-size:24px}.ko-block{margin-top:20px}.final{max-width:700px;margin-left:auto;margin-right:auto}.champion{margin-top:16px;padding:20px;text-align:center;border:2px solid #d6ad43;border-radius:14px;background:#2b2411;color:#f4d77b;font-size:22px}.champion strong{display:block;font-size:30px;margin-top:7px}
+@media(max-width:800px){body{padding:12px}.ko-grid{grid-template-columns:1fr}.top{align-items:flex-start;flex-direction:column}}
+</style>
+</head>
+<body>
+<header class="top">
+<div><h1 id="title">NEXT POINT PADEL</h1><div class="sub" id="date"></div></div>
+<div><div id="status">CARICAMENTO</div><div id="connection" class="offline">○ Connessione...</div><div class="sub" id="updated"></div></div>
+</header>
+<main id="content"></main>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="tv-mode-v1.js"></script>
+</body>
+</html>
