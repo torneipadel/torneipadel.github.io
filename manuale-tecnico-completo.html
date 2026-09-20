@@ -1,0 +1,439 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>NEXT POINT PADEL — Manuale tecnico e funzionale completo</title>
+<style>
+:root{--bg:#f4f7fb;--paper:#fff;--ink:#182230;--muted:#5e6b7a;--line:#d9e0e8;--blue:#0b4f91;--blue2:#eaf3fb;--green:#13795b;--green2:#e9f7f1;--amber:#8a5a00;--amber2:#fff5db;--red:#9b3030;--red2:#fff0f0;--shadow:0 12px 35px rgba(20,45,75,.08)}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,"Segoe UI",Arial,sans-serif;line-height:1.55}
+.wrap{width:min(1280px,calc(100% - 32px));margin:auto}.hero{background:linear-gradient(135deg,#062b52,#0b4f91);color:#fff;padding:46px 0 38px}.hero h1{font-size:clamp(30px,5vw,54px);line-height:1.05;margin:0 0 12px}.hero p{max-width:900px;color:rgba(255,255,255,.84);margin:8px 0}.badge{display:inline-block;border:1px solid rgba(255,255,255,.35);border-radius:999px;padding:5px 10px;font-size:11px;font-weight:800;letter-spacing:.7px;text-transform:uppercase}
+.layout{display:grid;grid-template-columns:280px minmax(0,1fr);gap:24px;align-items:start;padding:24px 0 60px}.toc{position:sticky;top:15px;background:var(--paper);border:1px solid var(--line);border-radius:16px;padding:16px;box-shadow:var(--shadow);max-height:calc(100vh - 30px);overflow:auto}.toc strong{display:block;margin-bottom:10px}.toc a{display:block;color:#31506d;text-decoration:none;font-size:12px;padding:6px 4px;border-radius:7px}.toc a:hover{background:var(--blue2);color:var(--blue)}
+main{min-width:0}.card{background:var(--paper);border:1px solid var(--line);border-radius:18px;padding:24px;margin-bottom:20px;box-shadow:var(--shadow)}h2{font-size:26px;margin:0 0 14px;color:#123b61}h3{font-size:18px;margin:24px 0 10px;color:#214c73}h4{font-size:14px;margin:18px 0 7px}p{margin:8px 0;color:#303c4b}ul,ol{padding-left:22px}li{margin:4px 0}.note{padding:13px 15px;border-left:4px solid var(--blue);background:var(--blue2);border-radius:8px;margin:14px 0}.ok{padding:13px 15px;border-left:4px solid var(--green);background:var(--green2);border-radius:8px}.warn{padding:13px 15px;border-left:4px solid #d89b16;background:var(--amber2);border-radius:8px}.danger{padding:13px 15px;border-left:4px solid #c44;background:var(--red2);border-radius:8px}
+table{width:100%;border-collapse:collapse;margin:12px 0;font-size:12px}th,td{border:1px solid var(--line);padding:9px 10px;text-align:left;vertical-align:top}th{background:#eef3f8;color:#274967;font-weight:800}code{font-family:Consolas,monospace;background:#f1f4f7;border:1px solid #e2e6eb;border-radius:4px;padding:1px 4px;font-size:.92em}.function{font-family:Consolas,monospace;font-weight:800;color:#0b4f91}.status{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;white-space:nowrap}.s-ok{color:var(--green)}.s-check{color:var(--amber)}.s-legacy{color:#68727d}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}.mini{border:1px solid var(--line);border-radius:12px;padding:14px;background:#fbfcfd}.mini h4{margin-top:0}.flow{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:14px 0}.flow span{background:#edf4fa;border:1px solid #cfe0ee;padding:7px 10px;border-radius:9px;font-size:12px;font-weight:700}.arrow{color:#7590a8}.footer{color:var(--muted);font-size:11px;text-align:center;padding:20px 0 50px}.toplink{float:right;font-size:11px}.small{font-size:11px;color:var(--muted)}@media(max-width:900px){.layout{grid-template-columns:1fr}.toc{position:relative;max-height:none;top:auto}.grid{grid-template-columns:1fr}}@media print{body{background:#fff}.hero{background:#fff;color:#000;padding:20px 0;border-bottom:2px solid #222}.hero p{color:#333}.layout{display:block}.toc{display:none}.card{box-shadow:none;break-inside:auto;border:0;border-bottom:1px solid #aaa;border-radius:0;padding:12px 0}.hero h1{font-size:30px}a{color:#000;text-decoration:none}table{font-size:9px}}
+</style>
+</head>
+<body id="top">
+<header class="hero">
+<div class="wrap">
+<span class="badge">NPPADEL-TECH-DOC-02 · DOCUMENTO DI CONSEGNA</span>
+<h1>NEXT POINT PADEL</h1>
+<p><strong>Manuale tecnico e funzionale completo</strong></p>
+<p>Fotografia del progetto, delle aree applicative, dei menu, dei moduli e delle funzioni rilevate nel repository ufficiale.</p>
+<p class="small" style="color:rgba(255,255,255,.72)">Repository: torneirobertobove/torneirobertobove.github.io · Branch: main · Data fotografia: 20 settembre 2026</p>
+</div>
+</header>
+<div class="wrap layout">
+<nav class="toc">
+<strong>Indice</strong>
+<a href="#1">1. Scopo e metodo</a><a href="#2">2. Architettura</a><a href="#3">3. Mappa menu</a><a href="#4">4. Admin</a><a href="#5">5. Bove</a><a href="#6">6. Formule</a><a href="#7">7. Fase finale</a><a href="#8">8. King</a><a href="#9">9. Calendario</a><a href="#10">10. News</a><a href="#11">11. Sponsor</a><a href="#12">12. WhatsApp</a><a href="#13">13. Mercatino</a><a href="#14">14. Visitatore</a><a href="#15">15. Iscrizioni</a><a href="#16">16. Supabase e stato</a><a href="#17">17. Funzioni di supporto</a><a href="#18">18. Legacy e backup</a><a href="#19">19. Verifiche e criticità</a><a href="#20">20. Indice funzionale</a>
+</nav>
+<main>
+<section class="card" id="1">
+<h2>1. Scopo e metodo della documentazione</h2>
+<p>Questo documento è concepito come manuale di consegna: descrive il sistema per area funzionale e, nelle sezioni centrali, associa le funzioni JavaScript ai rispettivi compiti.</p>
+<div class="note"><strong>Regola di lettura:</strong> una funzione viene considerata “attiva” solo quando il suo utilizzo è compatibile con i riferimenti correnti delle pagine/moduli. I file in <code>backup/</code>, <code>bck/</code> e pagine di prova non vengono trattati come runtime principale.</div>
+<table><tr><th>Fonte</th><th>Uso</th></tr>
+<tr><td>Repository GitHub</td><td>Fonte primaria del codice corrente.</td></tr>
+<tr><td>HTML</td><td>Menu, pulsanti, struttura e script caricati.</td></tr>
+<tr><td>JavaScript</td><td>Logica applicativa e comportamento runtime.</td></tr>
+<tr><td>Supabase</td><td>Persistenza, autenticazione e dati applicativi.</td></tr>
+<tr><td>Documentazione tecnica esistente</td><td>Contesto storico e vincoli di manutenzione.</td></tr></table>
+</section>
+
+<section class="card" id="2">
+<h2>2. Architettura generale</h2>
+<div class="flow"><span>VISITATORE</span><b class="arrow">→</b><span>visitatore.html</span><b class="arrow">→</b><span>moduli pubblici</span><b class="arrow">→</b><span>Supabase</span></div>
+<div class="flow"><span>ADMIN</span><b class="arrow">→</b><span>admin.html</span><b class="arrow">→</b><span>gestione tornei / contenuti</span><b class="arrow">→</b><span>Supabase</span></div>
+<div class="flow"><span>ADMIN</span><b class="arrow">→</b><span>Bove.html</span><b class="arrow">→</b><span>motore torneo</span><b class="arrow">→</b><span>salvataggio</span></div>
+<div class="flow"><span>ADMIN</span><b class="arrow">→</b><span>King</span><b class="arrow">→</b><span>coppie variabili / classifica individuale</span></div>
+<p>Il progetto usa HTML5, CSS3, JavaScript browser/ES6+, Supabase JS v2, Supabase Auth, PostgreSQL/Supabase, GitHub Pages e componenti PWA/service worker. Bove utilizza inoltre SheetJS/XLSX.</p>
+<h3>Flusso amministrativo</h3><p><strong>Nuovo torneo → dati torneo → numero squadre → giocatori calcolati → scelta formula → configurazione formula → creazione.</strong></p>
+<h3>Flusso Bove</h3><p><strong>Apertura → identificazione torneo → caricamento stato → regole → formato/gironi → squadre → partite/campi/orari → risultati → classifiche → qualificate → KO → campione → salvataggio/reload.</strong></p>
+</section>
+
+<section class="card" id="3">
+<h2>3. Mappa dei menu e delle aree</h2>
+<table><tr><th>Area</th><th>Voce/funzione</th><th>Scopo</th></tr>
+<tr><td>Admin</td><td>Gestione Tornei</td><td>Creazione, selezione, configurazione e gestione dei tornei.</td></tr>
+<tr><td>Admin</td><td>Iscrizioni</td><td>Richieste, approvazioni e rifiuti.</td></tr>
+<tr><td>Admin</td><td>Partecipanti/Coppie</td><td>Costruzione dei partecipanti e delle coppie.</td></tr>
+<tr><td>Admin</td><td>Tabellone</td><td>Gestione del tabellone del torneo.</td></tr>
+<tr><td>Admin</td><td>Calendario</td><td>Visualizzazione e apertura dei tornei per data.</td></tr>
+<tr><td>Admin</td><td>Comunicazioni / News</td><td>Gestione contenuti informativi.</td></tr>
+<tr><td>Admin</td><td>Sponsor</td><td>Gestione sponsor.</td></tr>
+<tr><td>Admin</td><td>WhatsApp</td><td>Generazione/invio di comunicazioni.</td></tr>
+<tr><td>Admin</td><td>Mercatino</td><td>Gestione degli articoli pubblicati nella bacheca.</td></tr>
+<tr><td>Admin</td><td>Archivio</td><td>Archiviazione, ripristino e blocco dei tornei archiviati.</td></tr>
+<tr><td>Admin</td><td>🏆 King Torneo Individuale a Coppie Variabili</td><td>Gestione separata del torneo King.</td></tr>
+<tr><td>Pubblico</td><td>Home / Tornei / News / Mercatino / Eventi / Info / Contatti</td><td>Navigazione pubblica del circolo.</td></tr>
+</table>
+</section>
+
+<section class="card" id="4">
+<h2>4. Area Admin — funzioni principali</h2>
+<p><code>admin.html</code> è la console centrale. La logica è distribuita tra <code>admin-master.js</code> e moduli specializzati.</p>
+<table><tr><th>Funzione</th><th>Responsabilità</th><th>Stato</th></tr>
+<tr><td class="function">loginAdmin</td><td>Gestisce l'accesso amministrativo e lo stato di autenticazione.</td><td class="status s-ok">rilevata</td></tr>
+<tr><td class="function">logoutAdmin</td><td>Chiude la sessione amministrativa.</td><td class="status s-ok">rilevata</td></tr>
+<tr><td class="function">getCurrentSession</td><td>Recupera la sessione autenticata corrente.</td><td class="status s-ok">rilevata</td></tr>
+<tr><td class="function">setLoginState</td><td>Aggiorna lo stato visuale dell'accesso.</td><td class="status s-ok">rilevata</td></tr>
+<tr><td class="function">caricaTorneiAdmin</td><td>Carica i tornei destinati alla console amministrativa.</td><td class="status s-ok">rilevata</td></tr>
+<tr><td class="function">caricaTornei</td><td>Gestisce il caricamento dell'elenco tornei.</td><td class="status s-ok">rilevata</td></tr>
+<tr><td class="function">selezionaTorneoAdmin</td><td>Imposta il torneo corrente nell'area amministrativa.</td><td class="status s-ok">rilevata</td></tr>
+<tr><td class="function">creaTorneo</td><td>Avvia/gestisce la creazione del torneo dal flusso admin.</td><td class="status s-ok">rilevata</td></tr>
+<tr><td class="function">apriRegoleNuovoTorneo</td><td>Apre la configurazione delle regole del nuovo torneo.</td><td class="status s-ok">rilevata</td></tr>
+<tr><td class="function">eliminaTorneo</td><td>Elimina il torneo selezionato.</td><td class="status s-ok">rilevata</td></tr>
+<tr><td class="function">pubblicaTorneo</td><td>Pubblica il torneo.</td><td class="status s-ok">rilevata</td></tr>
+<tr><td class="function">chiudiTorneo</td><td>Chiude il torneo.</td><td class="status s-ok">rilevata</td></tr>
+<tr><td class="function">caricaIscrizioni</td><td>Carica le richieste di iscrizione.</td><td class="status s-ok">rilevata</td></tr>
+<tr><td class="function">cambiaStatoIscrizione</td><td>Cambia lo stato di una richiesta.</td><td class="status s-ok">rilevata</td></tr>
+<tr><td class="function">approvaIscrizione</td><td>Approva una richiesta di iscrizione.</td><td class="status s-ok">rilevata</td></tr>
+<tr><td class="function">rifiutaIscrizione</td><td>Rifiuta una richiesta di iscrizione.</td><td class="status s-ok">rilevata</td></tr>
+<tr><td class="function">caricaPartecipanti</td><td>Carica i partecipanti del torneo.</td><td class="status s-ok">rilevata</td></tr>
+<tr><td class="function">buildPairs / generaCoppie / generaCoppieLocali</td><td>Costruiscono le coppie del torneo secondo la logica disponibile.</td><td class="status s-check">verifica integrata consigliata</td></tr>
+<tr><td class="function">generaTabellone</td><td>Genera il tabellone dal contesto amministrativo.</td><td class="status s-ok">rilevata</td></tr>
+<tr><td class="function">caricaNewsAdmin / creaNews / modificaNews / eliminaNews</td><td>Gestiscono le news dall'area amministrativa.</td><td class="status s-ok">rilevate</td></tr>
+<tr><td class="function">caricaSponsorAdmin / creaSponsor / modificaSponsor / eliminaSponsor</td><td>Gestiscono gli sponsor.</td><td class="status s-ok">rilevate</td></tr>
+<tr><td class="function">inviaWhatsApp / inviaWhatsAppTutti / inviaWhatsAppApprovati</td><td>Gestiscono i flussi di comunicazione WhatsApp.</td><td class="status s-ok">rilevate</td></tr>
+<tr><td class="function">generaLink / setLinkInputs / generaLinkBoveMirror / copiaLinkBove / apriLinkBove</td><td>Gestiscono i collegamenti pubblici/Bove.</td><td class="status s-ok">rilevate</td></tr>
+<tr><td class="function">apriBoveConTorneo</td><td>Apre Bove con lo specifico torneo selezionato.</td><td class="status s-ok">rilevata</td></tr>
+<tr><td class="function">refreshAdmin / __adminRefresh</td><td>Aggiornano la console amministrativa.</td><td class="status s-ok">rilevate</td></tr>
+<tr><td class="function">avviaAdmin / setupAuthListener / exposeApi</td><td>Avvio, ascolto autenticazione ed esposizione delle API JS necessarie.</td><td class="status s-ok">rilevate</td></tr>
+</table>
+<h3>Moduli Admin specializzati</h3>
+<ul>
+<li><code>admin-access-guard-v1.js</code>: protezione/accesso.</li>
+<li><code>admin-supabase-singleton-v1.js</code>: gestione del client Supabase condiviso.</li>
+<li><code>admin-approval-sync-v1.js</code>: sincronizzazione delle approvazioni.</li>
+<li><code>admin-calendar-v1.js</code> e <code>admin-calendar-central-fix-v1.js</code>: calendario.</li>
+<li><code>admin-close-tournament-v1.js</code>: chiusura torneo.</li>
+<li><code>admin-archive-persistence-v1.js</code>, <code>admin-archive-restore-v1.js</code>, <code>admin-archived-lock-v1.js</code>, <code>admin-archivio-button-v1.js</code>: archivio e blocco.</li>
+<li><code>admin-torneo-management-v1.js</code>: controlli aggiuntivi sul torneo.</li>
+<li><code>admin-news-*.js</code>: news, AI, poster e pubblicazione.</li>
+<li><code>admin-sponsor-*.js</code>: sponsor e routing.</li>
+<li><code>admin-whatsapp-*.js</code>: comunicazioni.</li>
+</ul>
+</section>
+
+<section class="card" id="5">
+<h2>5. Bove — motore centrale dei tornei</h2>
+<p><code>Bove.html</code> è la macchina a stati del torneo. Il principio di manutenzione è che l'Admin alimenta Bove e non lo sostituisce.</p>
+<table><tr><th>Funzione</th><th>Funzione operativa</th></tr>
+<tr><td class="function">verifyAccess / bloccaGestionale</td><td>Controllo accesso e protezione del gestionale.</td></tr>
+<tr><td class="function">closeRules / openRules</td><td>Gestione dell'apertura/chiusura della configurazione delle regole.</td></tr>
+<tr><td class="function">apriArchivioTornei / caricaTorneoArchivio</td><td>Accesso all'archivio e caricamento di un torneo archiviato.</td></tr>
+<tr><td class="function">setFormat</td><td>Imposta il formato del torneo.</td></tr>
+<tr><td class="function">resetGirone</td><td>Resetta i dati del girone interessato.</td></tr>
+<tr><td class="function">generateTestTournament / generaRisultato</td><td>Generano dati/risultati di test.</td></tr>
+<tr><td class="function">aggiornaPannelloRegole</td><td>Aggiorna la UI della configurazione regole.</td></tr>
+<tr><td class="function">ensureRules</td><td>Completa le regole mancanti senza sovrascrivere quelle già impostate.</td></tr>
+<tr><td class="function">resetBoxTornei / checkRulesLocked</td><td>Gestiscono stato UI e blocco delle regole.</td></tr>
+<tr><td class="function">caricaRegolamentoTorneo / applyRules</td><td>Caricano e applicano il regolamento.</td></tr>
+<tr><td class="function">loadSavedTeams / saveTeams</td><td>Caricano e salvano le squadre.</td></tr>
+<tr><td class="function">creaPartite</td><td>Avvia la creazione delle partite.</td></tr>
+<tr><td class="function">updateAndSync</td><td>Aggiorna e sincronizza lo stato.</td></tr>
+<tr><td class="function">loadState / handleFile</td><td>Caricamento dello stato e gestione di eventuali file/import.</td></tr>
+<tr><td class="function">aggiornaNomeFormulaTorneo</td><td>Aggiorna la descrizione/nome formula del torneo.</td></tr>
+<tr><td class="function">reset</td><td>Reset esplicito dello stato operativo previsto.</td></tr>
+<tr><td class="function">formatCoppiaDisplay / giocatore</td><td>Formattazione e rappresentazione dei giocatori/coppie.</td></tr>
+<tr><td class="function">calc / renderClass</td><td>Calcolo e rendering delle classifiche.</td></tr>
+<tr><td class="function">updateRes</td><td>Registra/aggiorna i risultati delle partite.</td></tr>
+<tr><td class="function">salvaTorneoSupabase</td><td>Persistenza dello stato torneo su Supabase.</td></tr>
+<tr><td class="function">updateKOField / updateKOResult</td><td>Aggiornano campo/ora e risultato delle partite KO.</td></tr>
+<tr><td class="function">aggiornaVincitoreDinamico / getWinner / winner</td><td>Determinano e aggiornano il vincitore della fase.</td></tr>
+<tr><td class="function">creaFinale</td><td>Costruisce la finale.</td></tr>
+<tr><td class="function">renderSvizzero / renderAmericano / renderMexicano / renderKing / renderShort / renderEliminazione / renderPersonalizzato / renderItaliana</td><td>Rendering delle diverse formule.</td></tr>
+<tr><td class="function">generaPartiteGironi</td><td>Genera le partite dei gironi.</td></tr>
+<tr><td class="function">render / renderManuale / renderGironiFinale / renderTables</td><td>Rendering generale, manuale, gironi/fase finale e tabelle.</td></tr>
+<tr><td class="function">generaRoundRobin</td><td>Generazione del calendario round-robin.</td></tr>
+<tr><td class="function">getFinalQualified</td><td>Determina le squadre qualificate alla fase finale.</td></tr>
+<tr><td class="function">sincronizzaFaseFinale</td><td>Trasferisce/sincronizza i qualificati nella fase finale.</td></tr>
+<tr><td class="function">renderKO / renderMatchCard</td><td>Rendering del tabellone KO e delle singole partite.</td></tr>
+<tr><td class="function">applicaModelloTorneo / aggiornaDescrizioneTipoTorneo</td><td>Applica il modello e aggiorna la descrizione della formula.</td></tr>
+<tr><td class="function">toggleMenu / chiudiMenu</td><td>Gestione del menu Bove.</td></tr>
+<tr><td class="function">initDefaults</td><td>Inizializza solo valori mancanti.</td></tr>
+<tr><td class="function">aggiornaTabelloneUtente</td><td>Aggiorna il tabellone visualizzato.</td></tr>
+<tr><td class="function">stampaTabelloneGrafico / printableTable / matchCard / rowsFor / stage</td><td>Costruiscono il contenuto di stampa e le strutture grafiche.</td></tr>
+<tr><td class="function">eseguiResetLocale</td><td>Gestisce il reset locale.</td></tr>
+<tr><td class="function">crea</td><td>Avvia la creazione del torneo/stato secondo il flusso della pagina.</td></tr>
+</table>
+<div class="warn"><strong>Punto da certificare:</strong> la separazione tra dati dei gironi e dati della fase KO deve essere ricontrollata sul caso Girone C/D segnalato. La documentazione non considera questo punto definitivamente certificato finché il test non è superato.</div>
+</section>
+
+<section class="card" id="6">
+<h2>6. Formule di torneo</h2>
+<table><tr><th>Formula</th><th>Rendering rilevato</th><th>Nota</th></tr>
+<tr><td>Italiana</td><td><code>renderItaliana</code></td><td>Formula all'italiana.</td></tr>
+<tr><td>Gironi + fase finale</td><td><code>renderGironiFinale</code></td><td>Gironi con successiva fase KO.</td></tr>
+<tr><td>Eliminazione diretta</td><td><code>renderEliminazione</code></td><td>Struttura a eliminazione.</td></tr>
+<tr><td>Svizzero</td><td><code>renderSvizzero</code></td><td>Formula svizzera.</td></tr>
+<tr><td>Americano</td><td><code>renderAmericano</code></td><td>Formula americana.</td></tr>
+<tr><td>Mexicano</td><td><code>renderMexicano</code></td><td>Formula mexicana.</td></tr>
+<tr><td>King</td><td><code>renderKing</code></td><td>Nel Bove è presente un rendering dedicato; il King individuale amministrativo è inoltre gestito dal modulo di rotazione.</td></tr>
+<tr><td>Short</td><td><code>renderShort</code></td><td>Formato breve.</td></tr>
+<tr><td>Personalizzato</td><td><code>renderPersonalizzato</code></td><td>Configurazione personalizzata.</td></tr>
+</table>
+<p>I formati documentati sono 8, 12, 16, 20 e 24 squadre. Per un girone da 4 l'ordine previsto è <code>[0,1]</code>, <code>[2,3]</code>, <code>[0,3]</code>, <code>[1,2]</code>, <code>[0,2]</code>, <code>[1,3]</code>.</p>
+</section>
+
+<section class="card" id="7">
+<h2>7. Fase finale e KO</h2>
+<div class="flow"><span>Gironi</span><b class="arrow">→</b><span>Qualificate</span><b class="arrow">→</b><span>Quarti</span><b class="arrow">→</b><span>Semifinali</span><b class="arrow">→</b><span>Finale</span><b class="arrow">→</b><span>Campione</span></div>
+<table><tr><th>Funzione</th><th>Responsabilità</th></tr>
+<tr><td class="function">getFinalQualified</td><td>Seleziona le squadre che accedono alla fase finale.</td></tr>
+<tr><td class="function">sincronizzaFaseFinale</td><td>Sincronizza le qualificate con la struttura KO.</td></tr>
+<tr><td class="function">renderKO</td><td>Visualizza la fase KO.</td></tr>
+<tr><td class="function">updateKOField</td><td>Gestisce campo/ora delle partite KO.</td></tr>
+<tr><td class="function">updateKOResult</td><td>Registra il risultato KO.</td></tr>
+<tr><td class="function">getWinner / aggiornaVincitoreDinamico</td><td>Determina l'avanzamento e il vincitore.</td></tr>
+<tr><td class="function">creaFinale</td><td>Costruisce la finale a partire dalle semifinali.</td></tr>
+</table>
+<div class="ok"><strong>Verifica storica recente:</strong> salvataggio e ricaricamento di campo e ora della fase finale risultano corretti nel lavoro recente.</div>
+<div class="danger"><strong>Non certificato:</strong> il problema segnalato in cui Girone C/D mostra dati di quarti/semifinali deve essere considerato una criticità di separazione dati/rendering fino al superamento del test finale.</div>
+</section>
+
+<section class="card" id="8">
+<h2>8. 🏆 King Torneo Individuale a Coppie Variabili</h2>
+<p>Il King è una funzione distinta dai tornei standard, con classifica individuale e coppie rotanti.</p>
+<table><tr><th>Funzione</th><th>Responsabilità</th></tr>
+<tr><td class="function">isRotation</td><td>Riconosce la configurazione King/rotazione.</td></tr>
+<tr><td class="function">config</td><td>Recupera/normalizza la configurazione della rotazione.</td></tr>
+<tr><td class="function">save</td><td>Salva la configurazione King.</td></tr>
+<tr><td class="function">players</td><td>Gestisce l'elenco giocatori.</td></tr>
+<tr><td class="function">emptyStats</td><td>Prepara le statistiche individuali iniziali.</td></tr>
+<tr><td class="function">history</td><td>Gestisce lo storico delle giornate.</td></tr>
+<tr><td class="function">standings</td><td>Costruisce la classifica individuale.</td></tr>
+<tr><td class="function">dayName / calendarDayInputs / isoDate / parseDate / nextCalendarSlot</td><td>Gestiscono calendario e date delle giornate.</td></tr>
+<tr><td class="function">generateRound</td><td>Genera una giornata/round.</td></tr>
+<tr><td class="function">playerMap / pairKey / matchKey</td><td>Costruiscono chiavi e mappe per giocatori, coppie e partite.</td></tr>
+<tr><td class="function">daySquads / autoDaySquads</td><td>Gestiscono la composizione delle coppie, anche automatica.</td></tr>
+<tr><td class="function">validateDaySquads</td><td>Controlla la validità delle coppie di giornata.</td></tr>
+<tr><td class="function">rebuildDayMatches</td><td>Ricostruisce le partite della giornata.</td></tr>
+<tr><td class="function">inputScore</td><td>Gestisce l'inserimento del risultato.</td></tr>
+<tr><td class="function">previousRanking</td><td>Recupera la classifica precedente.</td></tr>
+<tr><td class="function">render / dayCard</td><td>Rendering della gestione King e delle singole giornate.</td></tr>
+<tr><td class="function">simulate</td><td>Simula/genera dati per test.</td></tr>
+<tr><td class="function">open / openSeparated / inject</td><td>Gestiscono apertura e inserimento dell'interfaccia King.</td></tr>
+</table>
+<h3>Regole funzionali</h3>
+<ul><li>Classifica individuale.</li><li>Vittoria 3 punti, pareggio 1, sconfitta 0.</li><li>PF, PS e differenza individuale.</li><li>Modifica manuale sempre disponibile.</li><li>Generazione automatica delle coppie.</li><li>Slot previsti: 6, 8, 10, 12 o manuale.</li><li>Giorni e orari dinamici.</li></ul>
+<div class="warn">Il test storico del King ha documentato 8 giocatori, 12 giornate, 4 coppie/giornata, 6 partite/giornata e 72 risultati; questi valori sono dati di test e non costituiscono da soli una certificazione del codice dopo modifiche successive.</div>
+</section>
+
+<section class="card" id="9">
+<h2>9. Calendario</h2>
+<table><tr><th>Funzione</th><th>Responsabilità</th></tr>
+<tr><td class="function">monthName</td><td>Formatta mese e anno.</td></tr>
+<tr><td class="function">tournamentsByDay</td><td>Raggruppa i tornei per giorno.</td></tr>
+<tr><td class="function">openTournament</td><td>Seleziona il torneo e apre la relativa area amministrativa.</td></tr>
+<tr><td class="function">renderCalendar</td><td>Costruisce il calendario e l'agenda del giorno.</td></tr>
+<tr><td class="function">tournamentCard</td><td>Rende la scheda del torneo selezionato.</td></tr>
+<tr><td class="function">tournamentRow</td><td>Rende una riga nell'agenda mensile.</td></tr>
+<tr><td class="function">bind</td><td>Collega controlli e interazioni del calendario.</td></tr>
+<tr><td class="function">openAdminCalendar</td><td>Apre il calendario con il torneo corrente o la data corrente.</td></tr>
+</table>
+</section>
+
+<section class="card" id="10">
+<h2>10. News e poster</h2>
+<table><tr><th>Modulo</th><th>Funzioni/ruolo</th></tr>
+<tr><td><code>admin-news-poster-premium-v2-stable.js</code></td><td><code>loadPhoto</code>, <code>defaults</code>, <code>addLayer</code>, <code>removeLayer</code>, <code>updateLayer</code>, <code>moveLayer</code>, <code>renderLayerList</code>, <code>drawPreview</code>, <code>drawLayer</code>, <code>generate</code>, <code>publishToVisitors</code>, <code>resetEditor</code>, <code>disableOldAutomaticButtons</code>, <code>panel</code>, <code>hook</code>. Gestisce editor manuale poster, anteprima, generazione e pubblicazione.</td></tr>
+<tr><td><code>admin-master.js</code></td><td><code>caricaNewsAdmin</code>, <code>creaNews</code>, <code>modificaNews</code>, <code>eliminaNews</code>.</td></tr>
+<tr><td><code>visitatore-news-preview-v1.js</code></td><td><code>sortNews</code>, <code>loadPublishedNews</code>, <code>watch</code>.</td></tr>
+<tr><td><code>visitatore-public-v2.js</code></td><td><code>news</code>: carica le news pubblicate e tollera l'assenza del contenitore opzionale <code>#npNews</code>.</td></tr>
+</table>
+</section>
+
+<section class="card" id="11">
+<h2>11. Sponsor</h2>
+<ul><li>Gestione admin tramite funzioni di caricamento, creazione, modifica ed eliminazione sponsor.</li><li><code>admin-sponsor-route-fix-v1.js</code>: <code>openSponsor</code> apre la destinazione sponsor; <code>bind</code> intercetta/gestisce il routing del menu.</li><li><code>sponsor-public-v2.js</code> e <code>sponsor-global-fix.js</code>: componenti della visualizzazione pubblica e delle correzioni globali.</li></ul>
+<p>La documentazione distingue gestione sponsor e routing per evitare che un fix di navigazione venga interpretato come funzionalità applicativa autonoma.</p>
+</section>
+
+<section class="card" id="12">
+<h2>12. WhatsApp e comunicazioni</h2>
+<table><tr><th>Funzione</th><th>Scopo</th></tr>
+<tr><td class="function">inviaWhatsApp</td><td>Invio/composizione della comunicazione per il destinatario previsto.</td></tr>
+<tr><td class="function">inviaWhatsAppTutti</td><td>Invio alla platea completa prevista.</td></tr>
+<tr><td class="function">inviaWhatsAppApprovati</td><td>Invio ai partecipanti approvati.</td></tr>
+<tr><td class="function">generaLink</td><td>Generazione di un link di comunicazione.</td></tr>
+<tr><td class="function">setLinkInputs</td><td>Imposta i dati necessari alla generazione del link.</td></tr>
+</table>
+<p>Sono presenti moduli aggiuntivi <code>admin-whatsapp-broadcast-v1.js</code>, <code>admin-whatsapp-final-v1.js</code>, <code>admin-whatsapp-help-v1.js</code> e <code>admin-whatsapp-poster-preview-v1.js</code>.</p>
+</section>
+
+<section class="card" id="13">
+<h2>13. Mercatino — fotografia verificata</h2>
+<p>Il Mercatino è una funzionalità reale e separata, con area amministrativa e pagina pubblica.</p>
+<h3>13.1 Admin Mercatino</h3>
+<p>Pagina: <code>admin-mercatino.html</code>. La pagina consente di inserire, modificare, pubblicare, ritirare, segnare come venduto, riaprire e cancellare articoli.</p>
+<table><tr><th>Funzione</th><th>Comportamento</th></tr>
+<tr><td class="function">label</td><td>Converte il codice categoria in etichetta leggibile: Racchette, Abbigliamento, Accessori, Altro.</td></tr>
+<tr><td class="function">apriFormMercatino</td><td>Apre il pannello di inserimento/modifica e, quando richiesto, porta il focus sul titolo.</td></tr>
+<tr><td class="function">nuovoContenuto</td><td>Resetta il form e prepara l'inserimento di un nuovo articolo.</td></tr>
+<tr><td class="function">guard</td><td>Verifica sessione Supabase e ruolo <code>admin</code>; in caso contrario reindirizza.</td></tr>
+<tr><td class="function">load</td><td>Carica tutti gli articoli della tabella <code>mercatino</code>, ordinati per creazione.</td></tr>
+<tr><td class="function">render</td><td>Visualizza elenco, categoria, prezzo, disponibilità, pubblicazione e azioni.</td></tr>
+<tr><td class="function">resetPhotoUI</td><td>Ripristina l'interfaccia di selezione/anteprima foto.</td></tr>
+<tr><td class="function">resetForm</td><td>Ripristina il form ai valori iniziali.</td></tr>
+<tr><td class="function">edit</td><td>Carica un articolo esistente nel form di modifica.</td></tr>
+<tr><td class="function">uploadPhoto</td><td>Valida JPG/PNG/WEBP fino a 5 MB, carica nel bucket <code>mercatino-images</code> e restituisce l'URL pubblico.</td></tr>
+<tr><td class="function">updateStatus</td><td>Aggiorna campi di stato/pubblicazione dell'articolo e ricarica l'elenco.</td></tr>
+<tr><td class="function">segnaVenduto</td><td>Imposta l'articolo come venduto e lo rimuove dalla pubblicazione.</td></tr>
+<tr><td class="function">riapriArticolo</td><td>Riporta un articolo venduto allo stato disponibile.</td></tr>
+<tr><td class="function">pubblicaRiga</td><td>Pubblica un articolo direttamente dalla lista.</td></tr>
+<tr><td class="function">ritiraArticolo</td><td>Ritira un articolo dalla bacheca pubblica senza eliminarlo.</td></tr>
+<tr><td class="function">removeItem</td><td>Elimina definitivamente l'articolo dalla tabella.</td></tr>
+<tr><td class="function">pubblicaArticolo</td><td>Forza stato disponibile e pubblicazione, quindi salva il form.</td></tr>
+<tr><td class="function">inserisciDatiTest</td><td>Inserisce articoli di prova per il test del Mercatino.</td></tr>
+</table>
+<h3>13.2 Dati gestiti</h3>
+<p>Titolo, nome/cognome, telefono, prezzo, categoria, condizioni, contatto email, anteprima, descrizione, foto, stato e pubblicazione. La foto viene gestita tramite storage Supabase.</p>
+<h3>13.3 Pubblico</h3>
+<p><code>mercatino.html</code> e <code>mercatino-public-v1.js</code> costituiscono la controparte pubblica. Il dettaglio delle funzioni pubbliche deve essere mantenuto sincronizzato con il codice corrente e non deve essere confuso con la gestione admin.</p>
+</section>
+
+<section class="card" id="14">
+<h2>14. Area Visitatore</h2>
+<p>Pagina principale: <code>visitatore.html</code>. Moduli: <code>visitatore-public-v2.js</code>, <code>visitatore-eventi-v1.js</code>, <code>visitatore-news-preview-v1.js</code>, <code>tornei-public-redesign-v1.js</code>, <code>torneo-flow-public-fix-v1.js</code> e moduli sponsor.</p>
+<h3>Funzioni di visitatore pubblico rilevate</h3>
+<table><tr><th>Funzione</th><th>Scopo</th></tr>
+<tr><td class="function">dateLabel</td><td>Formatta le date in italiano.</td></tr>
+<tr><td class="function">formula</td><td>Recupera la formula del torneo.</td></tr>
+<tr><td class="function">poster</td><td>Individua la locandina/immagine rappresentativa del torneo.</td></tr>
+<tr><td class="function">openT / closedT</td><td>Determinano rispettivamente tornei aperti e chiusi.</td></tr>
+<tr><td class="function">capacity</td><td>Calcola posti occupati, massimi e rimanenti.</td></tr>
+<tr><td class="function">vaiIscrizione</td><td>Porta alla pagina di iscrizione con l'ID torneo.</td></tr>
+<tr><td class="function">apriTorneoPubblico</td><td>Apre Bove con l'ID del torneo.</td></tr>
+<tr><td class="function">menu / apriMenu / chiudiMenu</td><td>Gestiscono il menu pubblico.</td></tr>
+<tr><td class="function">apriMercatino</td><td>Apre <code>mercatino.html</code>.</td></tr>
+<tr><td class="function">apriContatti</td><td>Apre <code>contatti.html</code>.</td></tr>
+<tr><td class="function">esciVisitatore</td><td>Esegue il logout e torna alla pagina iniziale.</td></tr>
+<tr><td class="function">styles</td><td>Installa gli stili della pagina pubblica.</td></tr>
+<tr><td class="function">loadData</td><td>Carica tornei e conteggi delle iscrizioni.</td></tr>
+<tr><td class="function">userBlock</td><td>Mostra lo stato dell'utente autenticato.</td></tr>
+<tr><td class="function">kingRanking</td><td>Calcola la classifica pubblica del King dai dati delle giornate.</td></tr>
+<tr><td class="function">apriClassificaKing</td><td>Visualizza la classifica King in overlay.</td></tr>
+<tr><td class="function">myTournament</td><td>Mostra il torneo associato all'utente autenticato.</td></tr>
+<tr><td class="function">news</td><td>Carica le news pubblicate e le visualizza.</td></tr>
+<tr><td class="function">installMenu</td><td>Costruisce il selettore dei tornei ancora da fare.</td></tr>
+<tr><td class="function">tournamentsView</td><td>Costruisce il blocco tornei aperti e archivio tornei chiusi.</td></tr>
+<tr><td class="function">card</td><td>Costruisce la scheda di un torneo.</td></tr>
+<tr><td class="function">renderHero</td><td>Costruisce l'immagine/locandina principale.</td></tr>
+<tr><td class="function">start</td><td>Avvia il modulo pubblico, inizializza Supabase e aggiorna periodicamente i dati.</td></tr>
+</table>
+<h3>Eventi pubblici</h3>
+<table><tr><th>Funzione</th><th>Scopo</th></tr>
+<tr><td class="function">isOpen / isVisible / formula</td><td>Filtrano e interpretano gli eventi/tornei.</td></tr>
+<tr><td class="function">monthLabel</td><td>Etichetta del mese.</td></tr>
+<tr><td class="function">tournamentPoster / tournamentTime</td><td>Recuperano locandina e orario.</td></tr>
+<tr><td class="function">openPoster</td><td>Apre la locandina.</td></tr>
+<tr><td class="function">closeTournamentDetail / openTournamentDetail</td><td>Gestiscono il dettaglio del torneo.</td></tr>
+<tr><td class="function">compactNavigation</td><td>Gestisce la navigazione compatta.</td></tr>
+<tr><td class="function">render / load / init</td><td>Rendering, caricamento e inizializzazione.</td></tr>
+</table>
+<h3>Stile e navigazione</h3>
+<p>La configurazione pubblica documentata utilizza Open Sans, layout glass e sfondo dedicato. La navigazione prevista comprende Home, Tornei, News, Mercatino, Eventi, Info e Contatti.</p>
+</section>
+
+<section class="card" id="15">
+<h2>15. Iscrizioni e partecipanti</h2>
+<div class="grid">
+<div class="mini"><h4>Iscrizione</h4><p>Il visitatore può essere indirizzato a <code>iscrizione.html?torneo=ID</code>. L'admin gestisce caricamento, approvazione, rifiuto e stato.</p></div>
+<div class="mini"><h4>Partecipante</h4><p>L'approvazione alimenta il contesto partecipanti del torneo.</p></div>
+<div class="mini"><h4>Coppia</h4><p>Le funzioni di costruzione coppie generano o organizzano le coppie in base alla formula.</p></div>
+<div class="mini"><h4>Bove</h4><p>Il torneo selezionato viene passato al motore Bove tramite il relativo ID.</p></div>
+</div>
+</section>
+
+<section class="card" id="16">
+<h2>16. Supabase, autenticazione e stato</h2>
+<h3>Stato amministrativo</h3>
+<p>È presente la chiave localStorage <code>padel_admin_state</code>. Rappresenta lo stato/UI dell'amministrazione e non sostituisce il database.</p>
+<h3>Singleton Supabase</h3>
+<p>La parte pubblica utilizza <code>window.sb</code> e, dove previsto, <code>__NP_SUPABASE_CLIENT__</code> per evitare client GoTrue duplicati.</p>
+<h3>Tabelle applicative rilevanti</h3>
+<table><tr><th>Tabella</th><th>Uso rilevato</th></tr>
+<tr><td><code>tornei</code></td><td>Dati e configurazione dei tornei.</td></tr>
+<tr><td><code>iscrizioni</code></td><td>Richieste e partecipanti/iscritti.</td></tr>
+<tr><td><code>iscritti</code></td><td>Contesto iscritti rilevato in progetto.</td></tr>
+<tr><td><code>news</code></td><td>News pubblicate e contenuti.</td></tr>
+<tr><td><code>sponsor</code></td><td>Sponsor.</td></tr>
+<tr><td><code>profili</code></td><td>Ruoli e profili utenti.</td></tr>
+<tr><td><code>mercatino</code></td><td>Articoli della bacheca Mercatino.</td></tr>
+</table>
+<div class="warn"><strong>Nota di consegna:</strong> schema SQL completo, RLS, trigger, viste e funzioni server-side devono essere dichiarati certificati solo dopo accesso diretto al progetto Supabase corretto. Il manuale non inventa tali dettagli.</div>
+</section>
+
+<section class="card" id="17">
+<h2>17. Funzioni di supporto, fix e compatibilità</h2>
+<table><tr><th>Modulo</th><th>Funzioni/ruolo</th></tr>
+<tr><td><code>bove-admin-flow-fix.js</code></td><td><code>restoreNeutralFormulaFromAdmin</code>, <code>preserveTournamentResults</code>, <code>preserveKOLegacyKeys</code>, <code>openRequestedRules</code>, <code>captureKOFieldsBeforeSave</code>, <code>salvaTorneoBove</code>, <code>archiviaTorneoBove</code>, <code>eliminaTorneoBove</code>, <code>leggiStatoRemoto</code>, <code>preservaStatoTorneo</code>, <code>neutralizeSaveButton</code>, <code>capture</code>, <code>snapshot</code>. Sono funzioni di integrazione/riparazione e non devono essere confuse con nuove funzionalità utente.</td></tr>
+<tr><td><code>tabellone-fix.js</code></td><td><code>installaFix</code>, <code>getClient</code>, <code>parseConfig</code>, <code>installaSponsor</code>.</td></tr>
+<tr><td><code>lingue.js</code></td><td><code>current</code>, <code>getText</code>, <code>flagHtml</code>, <code>setLanguage</code>, <code>init</code>.</td></tr>
+<tr><td><code>admin-torneo-management-v1.js</code></td><td><code>call</code>, <code>selected</code>, <code>sincronizzaPartecipanteApprovato</code>, <code>installApprovalBridge</code>, <code>install</code>, <code>ensure</code>, <code>start</code>. Inserisce i controlli di gestione torneo e sincronizza l'approvazione.</td></tr>
+<tr><td><code>admin-sponsor-route-fix-v1.js</code></td><td><code>openSponsor</code>, <code>bind</code>: routing dello sponsor.</td></tr>
+</table>
+</section>
+
+<section class="card" id="18">
+<h2>18. Legacy, backup e file di prova</h2>
+<p>Il repository contiene cartelle e file storici: <code>backup/</code>, <code>bck/</code>, pagine backup e numerosi trigger. Questi elementi sono importanti per la storia delle riparazioni ma non devono essere presentati come parte del runtime corrente senza una verifica dei riferimenti.</p>
+<table><tr><th>Categoria</th><th>Interpretazione</th></tr>
+<tr><td>Attivo</td><td>Richiamato dal flusso corrente della pagina.</td></tr>
+<tr><td>Fix/compatibilità</td><td>Interviene su un modulo esistente per correggere o integrare un comportamento.</td></tr>
+<tr><td>Legacy</td><td>Codice precedente non da assumere come percorso corrente.</td></tr>
+<tr><td>Backup</td><td>Copia storica, non runtime principale.</td></tr>
+<tr><td>Test</td><td>Pagina/script utilizzato per verifiche o simulazioni.</td></tr>
+</table>
+</section>
+
+<section class="card" id="19">
+<h2>19. Verifiche, criticità e stato di certificazione</h2>
+<table><tr><th>Area</th><th>Stato</th><th>Nota</th></tr>
+<tr><td>Admin → Bove</td><td class="status s-ok">verificato nel flusso</td><td>Il modello previsto è Admin che alimenta Bove.</td></tr>
+<tr><td>Salvataggio KO campo/ora</td><td class="status s-ok">corretto nel lavoro recente</td><td>Campo e ora della fase finale vengono salvati/ricaricati.</td></tr>
+<tr><td>Gironi A-F</td><td class="status s-check">da certificare</td><td>Problema segnalato: dati KO comparsi in Girone C/D.</td></tr>
+<tr><td>Formule</td><td class="status s-check">test dedicati necessari</td><td>La presenza nel selettore non certifica ogni combinazione.</td></tr>
+<tr><td>King</td><td class="status s-check">ricontrollo finale</td><td>Esiste un audit storico; eventuali modifiche successive richiedono nuovo controllo.</td></tr>
+<tr><td>Mercatino</td><td class="status s-ok">funzioni admin rilevate</td><td>Inserimento, modifica, foto, pubblicazione, venduto, riapertura, ritiro, eliminazione e test dati.</td></tr>
+<tr><td>Schema Supabase completo</td><td class="status s-check">da verificare</td><td>Non vengono inventati RLS/trigger/funzioni SQL non verificati direttamente.</td></tr>
+</table>
+<div class="note"><strong>Regola per la consegna:</strong> questo manuale separa deliberatamente ciò che è documentato dal codice da ciò che richiede una certificazione runtime o database. È preferibile una voce “DA VERIFICARE” onesta a una falsa dichiarazione di funzionamento.</div>
+</section>
+
+<section class="card" id="20">
+<h2>20. Indice funzionale rapido</h2>
+<table><tr><th>Se cerchi...</th><th>Vai a...</th></tr>
+<tr><td>Creazione torneo</td><td>§4 Admin + §5 Bove</td></tr>
+<tr><td>Regole</td><td>§5 Bove</td></tr>
+<tr><td>Formule</td><td>§6</td></tr>
+<tr><td>Gironi</td><td>§5 e §7</td></tr>
+<tr><td>Quarti / semifinali / finale</td><td>§7</td></tr>
+<tr><td>King</td><td>§8</td></tr>
+<tr><td>Calendario</td><td>§9</td></tr>
+<tr><td>News</td><td>§10</td></tr>
+<tr><td>Sponsor</td><td>§11</td></tr>
+<tr><td>WhatsApp</td><td>§12</td></tr>
+<tr><td>Mercatino</td><td>§13</td></tr>
+<tr><td>Visitatore</td><td>§14</td></tr>
+<tr><td>Iscrizioni</td><td>§15</td></tr>
+<tr><td>Supabase / stato</td><td>§16</td></tr>
+<tr><td>Fix e compatibilità</td><td>§17</td></tr>
+<tr><td>Backup / legacy</td><td>§18</td></tr>
+<tr><td>Criticità</td><td>§19</td></tr>
+</table>
+</section>
+
+<section class="card">
+<h2>Conclusione</h2>
+<p>Questo documento costituisce la fotografia tecnica e funzionale di riferimento del progetto alla data indicata. La sua funzione è permettere a un amministratore, sviluppatore o manutentore di comprendere l'organizzazione dell'applicazione, individuare le funzioni responsabili di ciascun comportamento e distinguere codice operativo, fix, test e storico.</p>
+<p><strong>Documento:</strong> NPPADEL-TECH-DOC-02<br><strong>Repository:</strong> torneirobertobove/torneirobertobove.github.io<br><strong>Branch:</strong> main<br><strong>Data:</strong> 20 settembre 2026</p>
+<p><a href="#top">↑ Torna all'inizio</a></p>
+</section>
+</main>
+</div>
+<footer class="footer wrap">NEXT POINT PADEL · Manuale tecnico e funzionale · NPPADEL-TECH-DOC-02</footer>
+</body>
+</html>
