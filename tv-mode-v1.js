@@ -13,6 +13,8 @@
   let currentId = null;
   let state = null;
   let reconnectTimer = null;
+  let pollTimer = null;
+  let lastUpdatedAt = null;
 
   const $ = (s,root=document) => root.querySelector(s);
 
@@ -173,8 +175,20 @@
     if(!data){ $("#status").textContent="TORNEO NON TROVATO"; loading=false; return; }
     const st=Object.assign({},data.configurazione||{});
     st.idTorneo=data.id; st.nomeTorneo=data.nome||st.nomeTorneo; st.dataTorneo=data.data||st.dataTorneo;
+    const newUpdatedAt = data.updated_at || null;
+    const changed = newUpdatedAt !== lastUpdatedAt;
+    lastUpdatedAt = newUpdatedAt;
     render(st);
+    if(changed) console.log("[TV] stato aggiornato:",newUpdatedAt||"senza updated_at");
     loading=false;
+  }
+
+  function startPolling(){
+    clearInterval(pollTimer);
+    pollTimer=setInterval(()=>{
+      load();
+    },2000);
+    console.log("[TV] fallback polling attivo: 2s");
   }
 
   function subscribe(){
@@ -230,8 +244,12 @@
     sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
     await load();
     subscribe();
+    startPolling();
   }
 
-  window.addEventListener("beforeunload",()=>{ if(channel&&sb) sb.removeChannel(channel); });
+  window.addEventListener("beforeunload",()=>{
+    clearInterval(pollTimer);
+    if(channel&&sb) sb.removeChannel(channel);
+  });
   start();
 })();
