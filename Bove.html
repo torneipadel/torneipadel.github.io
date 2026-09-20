@@ -6481,40 +6481,79 @@ async function updateAndSync(){
 
 
         const payloadSupabase = {
-            id:
-                snapshot.idTorneo,
-
             nome:
                 snapshot.nomeTorneo,
 
             data:
                 snapshot.dataTorneo || null,
 
-            stato:
-                "attivo",
-
             configurazione:
-                snapshot
+                snapshot,
+
+            updated_at:
+                new Date().toISOString()
         };
 
 
         console.log(
             "UPDATE AND SYNC: invio a Supabase:",
-            snapshot.idTorneo
+            snapshot.idTorneo,
+            remoto ? "UPDATE REMOTO" : "UPSERT"
         );
 
 
-        const {data:salvatoSupabase,error} =
-            await sb
-            .from("tornei")
-            .upsert(
-                payloadSupabase,
-                {
-                    onConflict:"id"
-                }
-            )
-            .select("id,nome,stato,updated_at")
-            .maybeSingle();
+        let salvatoSupabase = null;
+        let error = null;
+
+
+        if(remoto){
+
+            /*
+             * TORNEO REMOTO: aggiorniamo direttamente la riga esistente.
+             * Non cambiamo lo stato del torneo.
+             */
+
+            const resultUpdate =
+                await sb
+                .from("tornei")
+                .update(payloadSupabase)
+                .eq("id", snapshot.idTorneo)
+                .select("id,nome,stato,updated_at")
+                .maybeSingle();
+
+            salvatoSupabase = resultUpdate.data;
+            error = resultUpdate.error;
+
+        }else{
+
+            /*
+             * NUOVO TORNEO LOCALE: manteniamo l'upsert.
+             */
+
+            const resultUpsert =
+                await sb
+                .from("tornei")
+                .upsert(
+                    {
+                        id:
+                            snapshot.idTorneo,
+
+                        ...payloadSupabase,
+
+                        stato:
+                            "attivo"
+                    },
+                    {
+                        onConflict:"id"
+                    }
+                )
+                .select("id,nome,stato,updated_at")
+                .maybeSingle();
+
+            salvatoSupabase = resultUpsert.data;
+            error = resultUpsert.error;
+
+        }
 
 
         if(error){
