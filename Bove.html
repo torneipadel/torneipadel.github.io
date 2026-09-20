@@ -6757,7 +6757,7 @@ async function updateAndSync(){
 async function loadState(){
 
 const params = new URLSearchParams(window.location.search);
-const idParam = params.get("idTorneo");
+const idParam = params.get("idTorneo") || (window.__BOVE_TV_ID__ ? String(window.__BOVE_TV_ID__) : "");
 const torneoParam = params.get("torneo");
 const torneoRemoto = !!idParam;
 let configurazione = null;
