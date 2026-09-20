@@ -2589,7 +2589,7 @@ style="width:80px">
 </div>
 
 <div class="menu-container">
-<button id="adminSaveResultButton" class="admin-save-result-button" type="button" onclick="updateAndSync()">💾 Salva risultato</button>
+<button id="adminSaveResultButton" class="admin-save-result-button" type="button" onclick="updateAndSync(true)">💾 Salva risultato</button>
 <button class="menu-button" onclick="toggleMenu()"> ☰ </button> <div id="menuComandi" class="menu-dropdown"> <button onclick="document.getElementById('formatModal').style.display='block'"> ⚙️ Formato </button> <button onclick="openRules()"> 📖 Regole </button> <button onclick="document.getElementById('teamModal').style.display='block'"> 📝 Squadre </button> <button onclick="stampaTabelloneGrafico()"> 🖨️ Stampa </button> <!-- SALVA TORNEO --> <button type="button" onclick="updateAndSync()"> 💾 Salva </button> <!-- RESET COMPLETO --> <button type="button" onclick="reset()"> 🗑️ Reset completo </button> <button onclick="window.location.href='admin.html'"> ⬅️ Torna ad Admin </button> </div> </div> <div class="groups"> <div class="card" id="cardA">
    
 
@@ -6155,7 +6155,7 @@ state.rules.locked=false;
 }
 
                     
-async function updateAndSync(){
+async function updateAndSync(showSaveResult=false){
 
     try{
 
@@ -6784,6 +6784,37 @@ async function updateAndSync(){
             "STATO SALVATO:",
             snapshot
         );
+
+
+        /*
+        ==========================================
+        FEEDBACK PULSANTE SALVA RISULTATO
+        ==========================================
+        * Il feedback appare solo quando updateAndSync()
+        * è stato avviato dal pulsante dedicato dell'admin.
+        * Viene mostrato esclusivamente dopo la conferma
+        * effettiva del salvataggio su Supabase/localStorage.
+        */
+        if(showSaveResult){
+
+            const saveButton =
+                document.getElementById("adminSaveResultButton");
+
+            if(saveButton){
+
+                if(saveButton.__restoreSaveLabelTimer){
+                    clearTimeout(saveButton.__restoreSaveLabelTimer);
+                }
+
+                saveButton.textContent = "✅ Risultato salvato!";
+
+                saveButton.__restoreSaveLabelTimer =
+                    setTimeout(()=>{
+                        saveButton.textContent = "💾 Salva risultato";
+                        saveButton.__restoreSaveLabelTimer = null;
+                    },2000);
+            }
+        }
 
 
         return true;
