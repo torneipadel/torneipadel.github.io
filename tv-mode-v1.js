@@ -15,6 +15,7 @@
   let reconnectTimer = null;
   let pollTimer = null;
   let lastUpdatedAt = null;
+  let lastStateSignature = null;
 
   const $ = (s,root=document) => root.querySelector(s);
 
@@ -170,16 +171,16 @@
   async function load(){
     if(!sb||!currentId||loading) return;
     loading=true;
-    const {data,error}=await sb.from("tornei").select("id,nome,data,stato,configurazione,updated_at").eq("id",currentId).maybeSingle();
+    const {data,error}=await sb.from("tornei").select("id,nome,data,stato,configurazione").eq("id",currentId).maybeSingle();
     if(error){ console.error("[TV] load",error); $("#status").textContent="ERRORE"; loading=false; return; }
     if(!data){ $("#status").textContent="TORNEO NON TROVATO"; loading=false; return; }
     const st=Object.assign({},data.configurazione||{});
     st.idTorneo=data.id; st.nomeTorneo=data.nome||st.nomeTorneo; st.dataTorneo=data.data||st.dataTorneo;
-    const newUpdatedAt = data.updated_at || null;
-    const changed = newUpdatedAt !== lastUpdatedAt;
-    lastUpdatedAt = newUpdatedAt;
+    const signature = JSON.stringify({nome:data.nome||"",data:data.data||"",stato:data.stato||"",configurazione:data.configurazione||{}});
+    const changed = signature !== lastStateSignature;
+    lastStateSignature = signature;
     render(st);
-    if(changed) console.log("[TV] stato aggiornato:",newUpdatedAt||"senza updated_at");
+    console.log("[TV] lettura OK", changed ? "— DATI CAMBIATI" : "— nessuna modifica");
     loading=false;
   }
 
@@ -187,8 +188,8 @@
     clearInterval(pollTimer);
     pollTimer=setInterval(()=>{
       load();
-    },2000);
-    console.log("[TV] fallback polling attivo: 2s");
+    },1000);
+    console.log("[TV] fallback polling attivo: 1s");
   }
 
   function subscribe(){
