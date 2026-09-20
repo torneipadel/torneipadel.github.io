@@ -6168,6 +6168,86 @@ async function updateAndSync(){
         }
 
 
+        /*
+        ==========================================
+        ID REMOTO: LA URL È LA FONTE DI VERITÀ
+        ==========================================
+        */
+
+        if(remoto){
+
+            const idRemoto =
+                Number(idTorneoUrl);
+
+            if(
+                !Number.isFinite(idRemoto) ||
+                idRemoto <= 0
+            ){
+
+                console.error(
+                    "UPDATE AND SYNC: ID TORNEO NON VALIDO:",
+                    idTorneoUrl
+                );
+
+                return false;
+
+            }
+
+            state.idTorneo = idRemoto;
+
+
+            /*
+            * Se per qualunque motivo il nome non è presente
+            * nello stato, lo recuperiamo direttamente da Supabase
+            * invece di saltare il salvataggio.
+            */
+
+            if(
+                !state.nomeTorneo ||
+                String(state.nomeTorneo).trim()===""
+            ){
+
+                try{
+
+                    const {data:torneoBase,error:erroreNome} =
+                        await sb
+                        .from("tornei")
+                        .select("id,nome,data")
+                        .eq("id",idRemoto)
+                        .maybeSingle();
+
+                    if(
+                        !erroreNome &&
+                        torneoBase
+                    ){
+
+                        state.nomeTorneo =
+                            torneoBase.nome || "";
+
+                        if(!state.dataTorneo){
+
+                            state.dataTorneo =
+                                torneoBase.data || "";
+
+                        }
+
+                    }
+
+                }
+                catch(e){
+
+                    console.error(
+                        "UPDATE AND SYNC: errore recupero dati torneo:",
+                        e
+                    );
+
+                }
+
+            }
+
+        }
+
+
         if(!state.dataTorneo){
 
             state.dataTorneo =
@@ -6348,65 +6428,127 @@ async function updateAndSync(){
         ==========================================
         */
 
+        /*
+        ==========================================
+        SUPABASE — SALVATAGGIO REMOTO
+        ==========================================
+        */
+
         if(
-
-            typeof sb!=="undefined" &&
-
-            statoDaSalvare &&
-
-            snapshot.idTorneo &&
-
-            snapshot.nomeTorneo &&
-
-            String(
-                snapshot.nomeTorneo
-            ).trim()!==""
-
+            typeof sb==="undefined" ||
+            !sb
         ){
 
-            const {error} =
-                await sb
-                .from("tornei")
-                .upsert(
-                    {
-                        id:
-                            snapshot.idTorneo,
+            console.error(
+                "UPDATE AND SYNC: client Supabase non disponibile."
+            );
 
-                        nome:
-                            snapshot.nomeTorneo,
-
-                        data:
-                            snapshot.dataTorneo || null,
-
-                        stato:
-                            "attivo",
-
-                        /*
-                        * Salva tutto lo snapshot.
-                        */
-
-                        configurazione:
-                            snapshot
-
-                    },
-                    {
-                        onConflict:"id"
-                    }
-                );
-
-
-            if(error){
-
-                console.error(
-                    "Errore sincronizzazione Supabase:",
-                    error
-                );
-
-                return false;
-
-            }
+            return false;
 
         }
+
+
+        if(
+            !statoDaSalvare
+        ){
+
+            console.error(
+                "UPDATE AND SYNC: salvataggio bloccato dallo stato di protezione."
+            );
+
+            return false;
+
+        }
+
+
+        if(
+            !snapshot.idTorneo ||
+            !snapshot.nomeTorneo ||
+            String(snapshot.nomeTorneo).trim()===""
+        ){
+
+            console.error(
+                "UPDATE AND SYNC: dati torneo incompleti:",
+                {
+                    id:snapshot.idTorneo,
+                    nome:snapshot.nomeTorneo
+                }
+            );
+
+            return false;
+
+        }
+
+
+        const payloadSupabase = {
+            id:
+                snapshot.idTorneo,
+
+            nome:
+                snapshot.nomeTorneo,
+
+            data:
+                snapshot.dataTorneo || null,
+
+            stato:
+                "attivo",
+
+            configurazione:
+                snapshot
+        };
+
+
+        console.log(
+            "UPDATE AND SYNC: invio a Supabase:",
+            snapshot.idTorneo
+        );
+
+
+        const {data:salvatoSupabase,error} =
+            await sb
+            .from("tornei")
+            .upsert(
+                payloadSupabase,
+                {
+                    onConflict:"id"
+                }
+            )
+            .select("id,nome,stato,updated_at")
+            .maybeSingle();
+
+
+        if(error){
+
+            console.error(
+                "Errore sincronizzazione Supabase:",
+                error
+            );
+
+            return false;
+
+        }
+
+
+        if(
+            !salvatoSupabase ||
+            String(salvatoSupabase.id)!==
+            String(snapshot.idTorneo)
+        ){
+
+            console.error(
+                "UPDATE AND SYNC: Supabase non ha confermato il salvataggio:",
+                salvatoSupabase
+            );
+
+            return false;
+
+        }
+
+
+        console.log(
+            "UPDATE AND SYNC: SALVATAGGIO SUPABASE CONFERMATO:",
+            salvatoSupabase
+        );
 
 
         /*
