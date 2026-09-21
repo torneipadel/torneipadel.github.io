@@ -2,7 +2,7 @@
 (()=>{
 'use strict';
 const FORMULE=[
- ['italiana',"🇮🇹 Torneo all'italiana"],['gironiFinale','🏆 Gironi + Fase Finale'],['individualeCoppieVariabili','🏆 Torneo Individuale a Coppie Variabili'],['eliminazione','⚔️ Eliminazione Diretta'],['svizzero','🇨🇭 Torneo Svizzero'],['americano','🎾 Americano Padel'],['mexicano','🇲🇽 Mexicano Padel'],['king','👑 King of the Court'],['short','⏱ Short Format'],['manuale','⚙️ Torneo Personalizzato']
+ ['italiana',"🇮🇹 Torneo all'italiana"],['gironiFinale','🏆 Gironi + Fase Finale'],['eliminazione','⚔️ Eliminazione Diretta'],['svizzero','🇨🇭 Torneo Svizzero'],['americano','🎾 Americano Padel'],['mexicano','🇲🇽 Mexicano Padel'],['king','👑 King of the Court'],['short','⏱ Short Format'],['manuale','⚙️ Torneo Personalizzato']
 ];
 const CONFIG={
  italiana:{title:"Torneo all'italiana",desc:'Tutti contro tutti.',fields:[['turni','Turni','number',1,20,1],['campi','Campi','number',1,20,1]]},
