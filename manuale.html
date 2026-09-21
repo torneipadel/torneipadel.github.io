@@ -129,13 +129,15 @@ footer{max-width:1180px;margin:0 auto;padding:30px 18px 60px;color:var(--muted);
 <h3>Sicurezza</h3><p>RLS è attivo sulle tabelle applicative. Gli avvisi del Security Advisor sulle funzioni con search_path modificabile e sulla protezione password devono essere trattati come attività di sicurezza separate dalla normale manutenzione funzionale.</p>
 </section>
 
-<section id="monitor"><h2>13. Monitor risorse GitHub + Supabase</h2><p>In <code>admin.html</code>, nella sezione <b>Sistema</b>, è disponibile il pulsante <code>📊 Stato risorse</code>. Il monitor legge a richiesta la situazione reale e aggiorna la schermata senza modificare il flusso dei tornei.</p><ul><li><b>Supabase Database:</b> dimensione reale del database confrontata con la quota Free di 500 MB per progetto.</li><li><b>Supabase Storage:</b> spazio occupato dagli oggetti confrontato con la quota Free di 1 GB.</li><li><b>Supabase Auth:</b> numero attuale di utenti presenti; il dato non va confuso con i MAU del ciclo di fatturazione.</li><li><b>Dati applicativi:</b> conteggio dei record nelle tabelle principali <code>tornei</code>, <code>iscrizioni</code>, <code>profili</code>, <code>news</code>, <code>sponsor</code> e <code>mercatino</code>.</li><li><b>GitHub:</b> dimensione del repository, branch predefinito e data dell’ultimo push.</li></ul><div class="note"><b>Soglie:</b> database e Storage usano le quote Free reali; per GitHub il monitor usa 1 GB come soglia prudenziale interna, non come limite contrattuale del piano. Egress Supabase e MAU mensili richiedono la sezione Usage/Billing della piattaforma e non vengono stimati artificialmente.</div><p>Il pulsante <code>↻ Aggiorna</code> del monitor forza una nuova lettura. Questa è la schermata da consultare prima di aggiungere grandi quantità di dati o file.</p></section>\n\n<section id="github"><h2>13. GitHub, versioni e backup</h2>
+<section id="monitor"><h2>13. Monitor risorse GitHub + Supabase</h2><p>In <code>admin.html</code>, nella sezione <b>Sistema</b>, è disponibile il pulsante <code>📊 Stato risorse</code>. Il monitor legge la situazione reale senza modificare il flusso dei tornei.</p><ul><li><b>Supabase Database:</b> dimensione reale confrontata con la quota Free di 500 MB per progetto.</li><li><b>Supabase Storage:</b> spazio occupato confrontato con la quota Free di 1 GB.</li><li><b>Supabase Auth:</b> numero attuale di utenti presenti; il dato non va confuso con i MAU mensili.</li><li><b>Dati applicativi:</b> conteggio dei record nelle tabelle principali monitorate.</li><li><b>GitHub:</b> dimensione del repository, branch predefinito e data dell’ultimo push.</li></ul><div class="note"><b>Grafico “Limiti e massimi”:</b> mostra visivamente l'utilizzo reale rispetto al massimo monitorato per Database, Storage e soglia prudenziale GitHub. La barra raggiunge il 100% quando viene raggiunto il limite.</div><div class="note"><b>Soglie:</b> database e Storage usano le quote Free reali; per GitHub il monitor usa 1 GB come soglia prudenziale interna, non come limite contrattuale del piano. Egress Supabase e MAU mensili richiedono la sezione Usage/Billing della piattaforma e non vengono stimati artificialmente.</div><p>Il monitor si aggiorna automaticamente ogni <b>30 secondi</b> mentre la schermata è aperta. Il pulsante <code>↻ Aggiorna</code> rimane comunque sempre attivo per forzare immediatamente una nuova lettura. Uscendo dalla schermata, il ciclo automatico si arresta.</p></section>
+
+<section id="github"><h2>14. GitHub, versioni e backup</h2>
 <p>Repository operativo: <code>torneirobertobove/torneirobertobove.github.io</code>. Branch operativo: <code>main</code>.</p>
 <div class="card"><b>Snapshot di sicurezza</b><br>Branch <code>backup-2026-09-20-completo</code> creato sul commit <code>0dfdc190a70be28fce047bddda850d1abc49e360</code>. Il branch è uno snapshot GitHub del progetto a quel momento.</div>
 <h3>Regola di modifica</h3><ol><li>Identificare il file.</li><li>Leggere la versione corrente.</li><li>Modificare solo ciò che serve.</li><li>Commit descrittivo.</li><li>Verificare il diff.</li><li>Testare il flusso interessato.</li></ol>
 </section>
 
-<section id="diagnosi"><h2>14. Diagnosi rapida</h2>
+<section id="diagnosi"><h2>15. Diagnosi rapida</h2>
 <table><tr><th>Sintomo</th><th>Prima verifica</th><th>Non fare</th></tr>
 <tr><td>Bove perde regole</td><td>Caricamento stato → ensure regole → render; controllare che i default siano solo missing-only.</td><td>Riscrivere l'intero salvataggio.</td></tr>
 <tr><td>Campo/ora non restano</td><td>Controllare stato salvato e ricaricamento DB.</td><td>Modificare la UI senza verificare il dato.</td></tr>
@@ -146,13 +148,13 @@ footer{max-width:1180px;margin:0 auto;padding:30px 18px 60px;color:var(--muted);
 <h3>Audit browser</h3><p>Per problemi di runtime, usare la console per raccogliere errori, script caricati, stato Supabase e funzioni globali. L'audit deve essere usato per diagnosticare, non come sostituto della correzione permanente nel repository.</p>
 </section>
 
-<section id="checklist"><h2>15. Checklist operativa</h2>
+<section id="checklist"><h2>16. Checklist operativa</h2>
 <h3>Nuovo torneo</h3><ul><li>☐ Dati torneo</li><li>☐ Numero squadre</li><li>☐ Partecipanti/coppie</li><li>☐ Formula</li><li>☐ Regole</li><li>☐ Gironi</li><li>☐ Campi/orari</li><li>☐ Creazione</li><li>☐ Apertura Bove</li><li>☐ Salvataggio e ricaricamento</li><li>☐ Se si modifica un risultato da Admin, verificare il messaggio “✅ Risultato salvato!”</li></ul>
 <h3>Prima di dichiarare concluso un torneo</h3><ul><li>☐ Tutti i risultati presenti</li><li>☐ Classifica corretta</li><li>☐ Qualificate corrette</li><li>☐ Fase finale corretta</li><li>☐ Campi/orari finali salvati</li><li>☐ Ricaricamento verificato</li><li>☐ Stampa verificata</li><li>☐ Dati pubblici verificati</li></ul>
 <h3>Modifica tecnica</h3><ul><li>☐ Problema riprodotto</li><li>☐ File/funzione individuati</li><li>☐ Nessuna modifica non richiesta</li><li>☐ Commit eseguito</li><li>☐ Test di regressione eseguito</li><li>☐ Risultato documentato</li><li>☐ Manuale operativo aggiornato con la modifica</li></ul>
 </section>
 
-<section id="stato"><h2>16. Stato documentale e prossime verifiche</h2>
+<section id="stato"><h2>17. Stato documentale e prossime verifiche</h2>
 <p>Questo manuale descrive il funzionamento e le regole operative del progetto sulla base dello stato del repository e delle verifiche disponibili al 20/09/2026. Non sostituisce i test reali del browser.</p>
 <table><tr><th>Area</th><th>Stato documentato</th></tr>
 <tr><td>Macchina Bove</td><td class="ok">Operativa / in verifica di regressione</td></tr>
@@ -169,7 +171,7 @@ footer{max-width:1180px;margin:0 auto;padding:30px 18px 60px;color:var(--muted);
 <div class="danger note"><b>Nota:</b> le righe “in verifica” non sono dichiarazioni di errore: indicano che il comportamento deve essere ricontrollato dopo modifiche al codice prima di considerarlo definitivamente congelato.</div>
 </section>
 
-<section><h2>17. Principi di manutenzione</h2>
+<section><h2>18. Principi di manutenzione</h2>
 <ul><li>Una correzione deve risolvere il problema senza rompere funzioni già operative.</li><li>Prima di sostituire una logica, confrontarla con la versione precedente funzionante quando disponibile.</li><li>Non eliminare grandi porzioni di codice per risolvere un difetto locale.</li><li>Non introdurre nuove autenticazioni, menu o flussi se non richiesti.</li><li>Separare sempre diagnosi, correzione e verifica.</li><li>Ogni correzione importante deve avere un commit identificabile.</li><li>Il manuale deve essere aggiornato quando cambia un flusso operativo stabile.</li></ul>
 </section>
 </main>
