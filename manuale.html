@@ -195,20 +195,35 @@ footer{max-width:1180px;margin:0 auto;padding:30px 18px 60px;color:var(--muted);
 </section>
 
 <section id="stato"><h2>17. Stato documentale e prossime verifiche</h2>
-<p>Questo manuale descrive il funzionamento e le regole operative del progetto sulla base dello stato del repository e delle verifiche disponibili al 20/09/2026. Non sostituisce i test reali del browser.</p>
+<p>Questo manuale descrive il funzionamento e le regole operative del progetto sulla base dello stato del repository e delle verifiche disponibili al 22/09/2026. Non sostituisce i test reali del browser.</p>
 <table><tr><th>Area</th><th>Stato documentato</th></tr>
-<tr><td>Macchina Bove</td><td class="ok">Operativa / in verifica di regressione</td></tr>
+<tr><td>Macchina Bove</td><td class="warn">Corretta sui problemi rilevati dall’audit del 22/09/2026; test browser finale da eseguire</td></tr>
 <tr><td>Admin → Bove</td><td class="ok">Operativa</td></tr>
 <tr><td>Salvataggio torneo</td><td class="ok">Operativo</td></tr>
 <tr><td>Pulsante Admin “Salva risultato”</td><td class="ok">Operativo: feedback “Risultato salvato!” temporaneo</td></tr>
-<tr><td>Regole e configurazione</td><td class="warn">In verifica completa</td></tr>
-<tr><td>Formati 8/12/16/20/24</td><td class="warn">In verifica completa</td></tr>
+<tr><td>Regole e configurazione</td><td class="warn">Corretta sui problemi rilevati; test browser finale da eseguire</td></tr>
+<tr><td>Formati 8/12/16/20/24</td><td class="warn">Logica fase finale corretta; test browser finale da eseguire</td></tr>
 <tr><td>King</td><td class="warn">Operativo con verifiche UI da mantenere</td></tr>
 <tr><td>News globale</td><td class="ok">Implementata</td></tr>
 <tr><td>Sponsor</td><td class="warn">Route riparata; test browser finale da confermare</td></tr>
-<tr><td>Stampa fase finale</td><td class="warn">Rifinitura grafica da completare</td></tr>
+<tr><td>Stampa fase finale</td><td class="warn">Menu escluso dalla stampa; rifinitura grafica ancora da completare</td></tr>
 </table>
 <div class="danger note"><b>Nota:</b> le righe “in verifica” non sono dichiarazioni di errore: indicano che il comportamento deve essere ricontrollato dopo modifiche al codice prima di considerarlo definitivamente congelato.</div>
+</section>
+
+<section id="audit-22092026"><h2>18. Audit e correzioni del 22/09/2026</h2>
+<p>Audit statico completo del repository eseguito prima delle correzioni. Sono stati individuati e corretti i principali problemi di regressione del motore Bove e dell'Admin.</p>
+<ul>
+<li><b>Bove risultati KO:</b> l'inserimento del punteggio non ricostruisce più il DOM ad ogni cifra, evitando la perdita del focus.</li>
+<li><b>Fase finale:</b> al completamento di un risultato viene sincronizzata la catena Quarti → Semifinali → Finale → Campione.</li>
+<li><b>Qualificazioni:</b> la selezione non dipende più dall'ordine dei gironi e non tronca arbitrariamente i primi gironi.</li>
+<li><b>Formati gironi + fase finale:</b> 8/12 squadre usano 4 qualificate e semifinali; 16/20/24 usano 8 qualificate e quarti, semifinali e finale.</li>
+<li><b>Stampa Bove:</b> hamburger/menu e pulsante di salvataggio admin vengono nascosti in stampa.</li>
+<li><b>Admin:</b> il torneo speciale “King Torneo Individuale a Coppie Variabili” resta nella sezione dedicata e non viene proposto nel wizard normale.</li>
+<li><b>Admin mobile:</b> rimosso il duplicato “Inserisci contenuto”.</li>
+<li><b>Link pubblici:</b> i collegamenti “Tornei” di 2Page.html e informazioni.html puntano ora alla sezione Tornei di visitatore.html.</li>
+</ul>
+<p><b>Backup preventivo:</b> prima delle correzioni è stata creata la branch <code>backup-before-audit-repairs-2026-09-22</code>.</p>
 </section>
 
 <section><h2>18. Principi di manutenzione</h2>
