@@ -110,14 +110,16 @@ footer{max-width:1180px;margin:0 auto;padding:30px 18px 60px;color:var(--muted);
 <li><b>Costo:</b> il fallback locale non richiede API AI. Se è disponibile l'endpoint AI già presente nel progetto, il testo può usare il servizio AI; la generazione automatica di immagini AI non è necessaria per questo primo livello, perché la locandina è prodotta dal template fisso.</li>
 <li><b>WhatsApp:</b> resta manuale come stabilito. Questa automazione non invia messaggi WhatsApp.</li>
 </ul>
-<h3>Routing e ripristino operativo — verificato il 21 settembre 2026</h3>
-<div class="note"><b>Riparazione completata:</b> il pulsante normale <b>📰 News</b> apre l'editor completo delle comunicazioni e non viene più deviato verso l'editor AI. L'editor AI resta disponibile solo tramite il percorso esplicito <code>news-ai</code>. Sono stati verificati anche i moduli di locandina, pubblicazione, recupero immagine, dati automatici e Help.</div>
+<h3>Flusso News completo — riparazione verificata il 21 settembre 2026</h3>
+<div class="note"><b>Ripristino:</b> il pulsante normale <b>📰 News</b> apre nuovamente il flusso completo di creazione comunicazioni. Il torneo è <b>facoltativo</b>: con un torneo selezionato vengono utilizzati i dati del torneo; senza torneo si possono creare News generali, offerte, eventi e altre comunicazioni.</div>
 <ul>
-<li><b>News generale:</b> il collegamento al torneo è facoltativo; è possibile pubblicare una News con <code>torneo_id = null</code>.</li>
-<li><b>News di torneo:</b> se viene selezionato un torneo, titolo, dati e collegamento possono essere precompilati e modificati prima della pubblicazione.</li>
-<li><b>Routing:</b> <code>admin-comunicazioni-v1.js</code> gestisce l'editor News normale; <code>admin-news-ai-v1.js</code> gestisce esclusivamente il percorso AI.</li>
-<li><b>Cache:</b> le versioni degli script News in <code>admin.html</code> sono state aggiornate per evitare il caricamento di vecchi JavaScript nel browser.</li>
-<li><b>Verifica Git:</b> rispetto al riferimento stabile del routing, i moduli News risultano allineati; le sole differenze residue riguardano il modulo King e il numero di versione cache in <code>admin.html</code>, non la logica News.</li>
+<li><b>News di torneo:</b> il layout completo consente di inserire/modificare titolo, data, ora, luogo, coppie, livello, quota, scadenza, offerta/prodotto/argomento e CTA. I dati possono essere usati per generare la locandina automatica.</li>
+<li><b>Locandina automatica:</b> la sezione di generazione automatica costruisce l'anteprima sulla base dei dati inseriti e la locandina può essere pubblicata insieme alla News.</li>
+<li><b>Locandina manuale:</b> è possibile caricare una propria foto, aggiungere più testi, posizionarli, modificarne dimensione, colore, allineamento e peso, generare la locandina e pubblicarla.</li>
+<li><b>News generale:</b> senza torneo la stessa interfaccia resta utilizzabile per comunicazioni, offerte, eventi, prodotti, ricordi e articoli; la pubblicazione viene salvata nelle News globali con <code>torneo_id = null</code>.</li>
+<li><b>WhatsApp:</b> per una News/locandina collegata a un torneo, il flusso WhatsApp del medesimo torneo recupera la locandina pubblicata e prepara il messaggio/link per l'invio ai destinatari.</li>
+<li><b>Routing:</b> <code>admin-comunicazioni-v1.js</code> indirizza il pulsante normale verso il flusso News completo; <code>admin-news-ai-v1.js</code> fornisce l'editor completo e mantiene anche il percorso esplicito <code>news-ai</code>.</li>
+<li><b>Cache:</b> le versioni degli script News in <code>admin.html</code> sono state incrementate dopo la riparazione per impedire il caricamento di vecchi JavaScript.</li>
 </ul>
 <h3>Procedura manuale</h3><ol><li>Aprire News.</li><li>Creare o modificare il contenuto.</li><li>Se necessario, scegliere la locandina manuale.</li><li>Salvare/pubblicare.</li><li>Verificare l'elenco.</li><li>Controllare la visualizzazione pubblica.</li></ol>
 </section>
