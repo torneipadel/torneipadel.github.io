@@ -38,6 +38,20 @@
     '</div>';
   }
 
+  function limitGraph(items) {
+    return '<div class="asm-limit-graph">' +
+      items.map(x => {
+        const usedPct = pct(x.value, x.limit);
+        const s = status(usedPct);
+        return '<div class="asm-limit-row">' +
+          '<div class="asm-limit-head"><b>' + esc(x.label) + '</b><span>' + esc(fmtBytes(x.value)) + ' / ' + esc(fmtBytes(x.limit)) + '</span></div>' +
+          '<div class="asm-limit-track"><div class="asm-limit-used ' + s[1] + '" style="width:' + usedPct.toFixed(1) + '%"></div><div class="asm-limit-max"></div></div>' +
+          '<div class="asm-limit-foot"><span>Utilizzo ' + usedPct.toFixed(1) + '%</span><span>Massimo ' + esc(fmtBytes(x.limit)) + '</span></div>' +
+        '</div>';
+      }).join('') +
+    '</div>';
+  }
+
   async function readSupabase() {
     const c = window.supabaseClient || window.sb;
     if (!c || typeof c.rpc !== 'function') throw new Error('Client Supabase non disponibile');
@@ -74,6 +88,14 @@
       .asm-meter-fill.warning{background:#d97706}.asm-meter-fill.critical{background:#dc2626}
       .asm-card-foot{display:flex;justify-content:space-between;font-size:12px;margin-top:7px}
       .ok{color:#15803d}.warning{color:#b45309}.critical{color:#b91c1c}
+      .asm-limit-graph{display:grid;gap:15px}
+      .asm-limit-row{display:grid;gap:5px}
+      .asm-limit-head,.asm-limit-foot{display:flex;justify-content:space-between;gap:10px;font-size:12px;color:#475569}
+      .asm-limit-head b{font-size:13px;color:#0f172a}
+      .asm-limit-track{position:relative;height:18px;border-radius:99px;background:#e2e8f0;overflow:hidden;border:1px solid rgba(15,23,42,.08)}
+      .asm-limit-used{height:100%;border-radius:99px;background:#16a34a;min-width:2px}
+      .asm-limit-used.warning{background:#d97706}.asm-limit-used.critical{background:#dc2626}
+      .asm-limit-max{position:absolute;right:0;top:0;bottom:0;width:2px;background:#0f172a}
       .asm-section{margin-top:16px;background:rgba(255,255,255,.70);border:1px solid rgba(15,23,42,.10);border-radius:14px;padding:14px}
       .asm-section h3{margin:0 0 10px;font-size:15px}
       .asm-table{width:100%;border-collapse:collapse;font-size:13px}
@@ -135,6 +157,14 @@
           card('Supabase — Utenti Auth', String(Number(db.auth_users)||0), 'Quota Free: 50.000 MAU; conteggio utenti presenti, non MAU mensili', 0, 'ok') +
           card('Dati applicativi', String(totalRows), 'Record nelle 6 tabelle principali monitorate', 0, 'ok') +
           card('GitHub — Ultimo push', dateIt(git.pushed_at), 'Branch: ' + (git.default_branch || 'main'), 0, 'ok') +
+        '</div>' +
+        '<div class="asm-section"><h3>Limiti e massimi</h3>' +
+          '<div class="asm-note">Il grafico confronta l'utilizzo reale con il massimo monitorato: la barra arriva al 100% quando viene raggiunto il limite.</div>' +
+          limitGraph([
+            {label:'Supabase Database', value:dbBytes, limit:DB_LIMIT},
+            {label:'Supabase Storage', value:storageBytes, limit:STORAGE_LIMIT},
+            {label:'GitHub Repository — soglia prudenziale', value:gitBytes, limit:GIT_TARGET}
+          ]) +
         '</div>' +
         '<div class="asm-section"><h3>Dettaglio dati Supabase</h3><table class="asm-table"><thead><tr><th>Tabella</th><th>Record</th></tr></thead><tbody>' +
           [['tornei',db.tornei],['iscrizioni',db.iscrizioni],['profili',db.profili],['news',db.news],['sponsor',db.sponsor],['mercatino',db.mercatino]]
