@@ -36,9 +36,9 @@
         '<div class="asm-cost-card"><b>Supabase — piano attuale</b><strong>Free · $0/mese</strong><span>Database 500 MB · Storage 1 GB · Egress 5 GB · 50.000 MAU inclusi</span></div>' +
         '<div class="asm-cost-card"><b>Supabase — eventuale eccedenza</b><strong>' + (known > 0 ? known.toFixed(2) + '/mese' : '$0 misurabile') + '</strong><span>Database oltre quota: $0,125/GB · Storage oltre quota: $0,021/GB. Egress e MAU richiedono Usage/Billing.</span></div>' +
         '<div class="asm-cost-card"><b>Supabase — piano Pro</b><strong>$25/mese + eventuale uso eccedente</strong><span>Quota Pro: 8 GB database/progetto, 100 GB Storage, 250 GB egress e 100.000 MAU inclusi.</span></div>' +
-        '<div class="asm-cost-card"><b>GitHub</b><strong>$0 per il repository pubblico</strong><span>La dimensione del repository non viene trattata come costo. Actions/Packages/LFS hanno quote separate.</span></div>' +
+        '<div class="asm-cost-card"><b>GitHub — piano Free</b><strong>$0/mese per il repository pubblico</strong><span>Repository pubblico: la dimensione del codice non è una voce di costo. Actions: 500 MB storage + 2.000 minuti/mese inclusi; Packages: 500 MB + 1 GB trasferimento/mese; Git LFS: 10 GB storage + 10 GB banda/mese. Le eccedenze dei prodotti a consumo possono essere fatturate.</span></div>' +
       '</div>' +
-      '<div class="asm-note">⚠️ Stima delle sole eccedenze DB/Storage calcolabili dal monitor; non è una fattura reale. Egress, MAU, Actions, Packages e LFS non vengono inventati.</div>' +
+      '<div class="asm-note">⚠️ Stima delle sole eccedenze DB/Storage calcolabili dal monitor; non è una fattura reale. Il monitor mostra le quote GitHub ufficiali, ma non inventa i consumi reali di Actions, Packages o LFS finché non sono disponibili i dati di billing autenticati.</div>' +
     '</div>';
   }
 
