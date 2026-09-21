@@ -824,6 +824,12 @@ window.toggleMenu = function(){
 <style id="bove-print-bracket-style">
 @page{size:A4 landscape;margin:8mm}
 @media print{
+.menu-container,
+.menu-button,
+#menuComandi,
+#adminSaveResultButton{
+    display:none!important;
+}
 body{background:#fff!important;color:#1f2937!important;padding:0!important;margin:0!important;-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
 body>*:not(#bovePrintLayout){display:none!important}
 #bovePrintLayout{display:block!important;width:100%!important;background:#f5f7fa!important;color:#1f2937!important;font-family:Arial,Helvetica,sans-serif!important}
@@ -8956,6 +8962,8 @@ document.querySelectorAll('#finaleBox input').forEach(input => {
 
     valore = String(valore ?? "").trim();
 
+    let resultArray = null;
+
     if(type === "Q"){
 
         if(!Array.isArray(state.qRes))
@@ -8967,12 +8975,10 @@ document.querySelectorAll('#finaleBox input').forEach(input => {
             res = ["",""];
 
         res[pos] = valore;
-
         state.qRes[index] = res.join("-");
+        resultArray = state.qRes;
 
-    }
-
-    else if(type === "S"){
+    }else if(type === "S"){
 
         if(!Array.isArray(state.sTopRes))
             state.sTopRes = Array(2).fill("-");
@@ -8983,12 +8989,10 @@ document.querySelectorAll('#finaleBox input').forEach(input => {
             res = ["",""];
 
         res[pos] = valore;
-
         state.sTopRes[index] = res.join("-");
+        resultArray = state.sTopRes;
 
-    }
-
-    else if(type === "F"){
+    }else if(type === "F"){
 
         let res = String(state.fTopRes || "-").split("-");
 
@@ -8996,48 +9000,38 @@ document.querySelectorAll('#finaleBox input').forEach(input => {
             res = ["",""];
 
         res[pos] = valore;
-
         state.fTopRes = res.join("-");
-
     }
 
-    renderKO();
+    /*
+     * NON ricostruire il DOM ad ogni cifra digitata.
+     * Il campo deve mantenere il focus mentre l'admin inserisce
+     * il risultato. La fase successiva viene sincronizzata solo
+     * quando entrambe le cifre del risultato sono presenti.
+     */
+    const current =
+        type === "F"
+            ? String(state.fTopRes || "-")
+            : String((resultArray && resultArray[index]) || "-");
 
-    // === AGGIUNTA MIRATA SULLA STRUTTURA REALE DELLA FINALE ===
-    if(type === "F") {
-        const teamLines = document.querySelectorAll('#finaleBox .team-line');
-        const scoreCells = document.querySelectorAll('#finaleBox .score-cell input');
-        const winnerCard = document.getElementById('winnerCardKO');
+    const parti = current.split("-");
+    const completo =
+        parti.length === 2 &&
+        parti[0].trim() !== "" &&
+        parti[1].trim() !== "" &&
+        /^\\d+$/.test(parti[0].trim()) &&
+        /^\\d+$/.test(parti[1].trim());
 
-        if(teamLines.length >= 2 && scoreCells.length >= 2 && winnerCard) {
-            const team1 = teamLines[0].innerText.trim();
-            const team2 = teamLines[1].innerText.trim();
-            const gol1 = parseInt(scoreCells[0].value);
-            const gol2 = parseInt(scoreCells[1].value);
+    if(completo){
 
-            if(!isNaN(gol1) && !isNaN(gol2) && scoreCells[0].value.trim() !== "" && scoreCells[1].value.trim() !== "") {
-                let vincitore = gol1 > gol2 ? team1 : (gol2 > gol1 ? team2 : "");
-                if(vincitore) {
-                    winnerCard.style.display = "block";
-                    winnerCard.innerHTML = `
-                        <div class="winner-box top-win">
-                            🏆 CAMPIONE TORNEO:<br>
-                            <span style="font-size: 1.1em; font-weight: normal; color: #e2e8f0;">${vincitore}</span>
-                        </div>
-                    `;
-                } else {
-                    winnerCard.style.display = "none";
-                    winnerCard.innerHTML = "";
-                }
-            } else {
-                winnerCard.style.display = "none";
-                winnerCard.innerHTML = "";
-            }
-        }
+        sincronizzaFaseFinale();
+
+        if(typeof renderKO === "function")
+            renderKO();
     }
-    // ==========================================================
 
     updateAndSync();
+
 }
                     
 function getWinner(match,res){
@@ -10984,32 +10978,133 @@ oninput="updateRes('${tag}',${i},1,this.value)">
 
    
 function getFinalQualified(){
+
     ensureRules();
-    const qualificati=[];
-    const lettereGironi=["A","B","C","D","E","F","G"];
+
+    const qualificati = [];
+    const lettereGironi = ["A","B","C","D","E","F","G"];
+
     lettereGironi.forEach(tag=>{
-        const squadre=state[tag];
-        if(!Array.isArray(squadre)||squadre.length===0) return;
-        const risultati=Array.isArray(state[tag+"res"])?state[tag+"res"]:[];
-        const numeroPartite=squadre.length*(squadre.length-1)/2;
-        if(risultati.length<numeroPartite||risultati.slice(0,numeroPartite).some(r=>r==="-"||r===""||r==null)) return;
-        const classifica=calc(squadre,risultati);
-        if(!Array.isArray(classifica)||!classifica.length) return;
-        let q=Number(state.rules.qualificatePerGirone);
-        if(!Number.isFinite(q)||q<1) q=1;
-        if(state.rules.usaQuarti===true&&squadre.length===4) q=4;
-        classifica.slice(0,q).forEach((x,i)=>qualificati.push({nome:x.n,posizione:i+1,girone:tag,pt:x.pt,gf:x.gf,gs:x.gs,df:x.df}));
+
+        const squadre = state[tag];
+
+        if(!Array.isArray(squadre) || squadre.length === 0)
+            return;
+
+        const risultati =
+            Array.isArray(state[tag+"res"])
+                ? state[tag+"res"]
+                : [];
+
+        const numeroPartite =
+            squadre.length * (squadre.length - 1) / 2;
+
+        if(
+            risultati.length < numeroPartite ||
+            risultati.slice(0,numeroPartite).some(
+                r => r === "-" || r === "" || r == null
+            )
+        )
+            return;
+
+        const classifica = calc(squadre,risultati);
+
+        if(!Array.isArray(classifica) || !classifica.length)
+            return;
+
+        let q = Number(state.rules.qualificatePerGirone);
+
+        if(!Number.isFinite(q) || q < 1)
+            q = 1;
+
+        classifica.slice(0,q).forEach((x,i)=>{
+            qualificati.push({
+                nome:x.n,
+                posizione:i+1,
+                girone:tag,
+                pt:Number(x.pt)||0,
+                gf:Number(x.gf)||0,
+                gs:Number(x.gs)||0,
+                df:Number(x.df)||0
+            });
+        });
     });
-    if(qualificati.length===0&&Array.isArray(state.coppie)&&state.coppie.length){
-        state.coppie.forEach((x,i)=>qualificati.push({nome:x,posizione:i+1}));
+
+    if(
+        qualificati.length === 0 &&
+        Array.isArray(state.coppie) &&
+        state.coppie.length
+    ){
+        state.coppie.forEach((x,i)=>{
+            qualificati.push({
+                nome:x,
+                posizione:i+1,
+                girone:"",
+                pt:0,
+                gf:0,
+                gs:0,
+                df:0
+            });
+        });
     }
-    if(!qualificati.length) return [];
-    let richiesti=0;
-    if(state.rules.usaQuarti===true) richiesti=8;
-    else if(state.rules.usaSemifinali===true) richiesti=4;
-    else if(state.rules.usaFinale===true) richiesti=2;
-    return richiesti>0?qualificati.slice(0,richiesti).map(x=>x.nome):[];
+
+    if(!qualificati.length)
+        return [];
+
+    /*
+     * Il numero dei qualificati deve dipendere dalla fase realmente
+     * possibile per il numero di squadre, non dall'ordine dei gironi.
+     *
+     * 4 qualificati -> semifinali
+     * 8 qualificati -> quarti
+     * 2 qualificati -> finale
+     */
+    let richiesti = 0;
+
+    if(
+        state.rules.usaQuarti === true &&
+        qualificati.length >= 8
+    ){
+        richiesti = 8;
+
+    }else if(
+        state.rules.usaSemifinali === true &&
+        qualificati.length >= 4
+    ){
+        richiesti = 4;
+
+    }else if(
+        state.rules.usaFinale === true &&
+        qualificati.length >= 2
+    ){
+        richiesti = 2;
+    }
+
+    if(!richiesti)
+        return [];
+
+    /*
+     * Con più di 8 qualificati non si devono prendere solo i primi
+     * gironi. Si costruisce invece una graduatoria globale sui dati
+     * già calcolati dal motore.
+     */
+    const ordinati = [...qualificati].sort((a,b)=>{
+
+        if(b.pt !== a.pt) return b.pt - a.pt;
+        if(b.df !== a.df) return b.df - a.df;
+        if(b.gf !== a.gf) return b.gf - a.gf;
+
+        if(a.posizione !== b.posizione)
+            return a.posizione - b.posizione;
+
+        return String(a.girone).localeCompare(String(b.girone));
+    });
+
+    return ordinati
+        .slice(0,richiesti)
+        .map(x=>x.nome);
 }
+
 function sincronizzaFaseFinale(){
     ensureRules();
     const qualificati=getFinalQualified();
