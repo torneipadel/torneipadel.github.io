@@ -110,6 +110,15 @@ footer{max-width:1180px;margin:0 auto;padding:30px 18px 60px;color:var(--muted);
 <li><b>Costo:</b> il fallback locale non richiede API AI. Se è disponibile l'endpoint AI già presente nel progetto, il testo può usare il servizio AI; la generazione automatica di immagini AI non è necessaria per questo primo livello, perché la locandina è prodotta dal template fisso.</li>
 <li><b>WhatsApp:</b> resta manuale come stabilito. Questa automazione non invia messaggi WhatsApp.</li>
 </ul>
+<h3>Routing e ripristino operativo — verificato il 21 settembre 2026</h3>
+<div class="note"><b>Riparazione completata:</b> il pulsante normale <b>📰 News</b> apre l'editor completo delle comunicazioni e non viene più deviato verso l'editor AI. L'editor AI resta disponibile solo tramite il percorso esplicito <code>news-ai</code>. Sono stati verificati anche i moduli di locandina, pubblicazione, recupero immagine, dati automatici e Help.</div>
+<ul>
+<li><b>News generale:</b> il collegamento al torneo è facoltativo; è possibile pubblicare una News con <code>torneo_id = null</code>.</li>
+<li><b>News di torneo:</b> se viene selezionato un torneo, titolo, dati e collegamento possono essere precompilati e modificati prima della pubblicazione.</li>
+<li><b>Routing:</b> <code>admin-comunicazioni-v1.js</code> gestisce l'editor News normale; <code>admin-news-ai-v1.js</code> gestisce esclusivamente il percorso AI.</li>
+<li><b>Cache:</b> le versioni degli script News in <code>admin.html</code> sono state aggiornate per evitare il caricamento di vecchi JavaScript nel browser.</li>
+<li><b>Verifica Git:</b> rispetto al riferimento stabile del routing, i moduli News risultano allineati; le sole differenze residue riguardano il modulo King e il numero di versione cache in <code>admin.html</code>, non la logica News.</li>
+</ul>
 <h3>Procedura manuale</h3><ol><li>Aprire News.</li><li>Creare o modificare il contenuto.</li><li>Se necessario, scegliere la locandina manuale.</li><li>Salvare/pubblicare.</li><li>Verificare l'elenco.</li><li>Controllare la visualizzazione pubblica.</li></ol>
 </section>
 
