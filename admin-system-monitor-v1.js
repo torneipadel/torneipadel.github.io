@@ -57,13 +57,54 @@
     return r.data || {};
   }
 
-  async function readGitHub() {
-    const r = await fetch('https://api.github.com/repos/' + REPO, {
-      headers: { 'Accept': 'application/vnd.github+json' },
-      cache: 'no-store'
-    });
-    if (!r.ok) throw new Error('GitHub HTTP ' + r.status);
-    return r.json();
+  const GITHUB_CACHE_KEY = '__NP_ADMIN_GITHUB_MONITOR__';
+  const GITHUB_CACHE_TTL = 10 * 60 * 1000;
+
+  function readGitHubCache() {
+    try {
+      const raw = sessionStorage.getItem(GITHUB_CACHE_KEY);
+      if (!raw) return null;
+      const x = JSON.parse(raw);
+      if (!x || !x.data) return null;
+      return x;
+    } catch (_) {
+      return null;
+    }
+  }
+
+  function writeGitHubCache(data) {
+    try {
+      sessionStorage.setItem(GITHUB_CACHE_KEY, JSON.stringify({ saved_at: Date.now(), data }));
+    } catch (_) {}
+  }
+
+  async function readGitHub(force) {
+    const cached = readGitHubCache();
+    const age = cached ? Date.now() - Number(cached.saved_at || 0) : Infinity;
+
+    if (!force && cached && age < GITHUB_CACHE_TTL) {
+      return cached.data;
+    }
+
+    try {
+      const r = await fetch('https://api.github.com/repos/' + REPO, {
+        headers: { 'Accept': 'application/vnd.github+json' },
+        cache: 'no-store'
+      });
+      if (!r.ok) throw new Error('GitHub HTTP ' + r.status);
+      const data = await r.json();
+      writeGitHubCache(data);
+      return data;
+    } catch (e) {
+      if (cached && cached.data) {
+        const data = Object.assign({}, cached.data, {
+          __monitorStale: true,
+          __monitorStaleAt: cached.saved_at
+        });
+        return data;
+      }
+      throw e;
+    }
   }
 
   function ensureStyle() {
@@ -118,7 +159,7 @@
 
     const body = $('asmBody');
     try {
-      const [db, git] = await Promise.all([readSupabase(), readGitHub()]);
+      const [db, git] = await Promise.all([readSupabase(), readGitHub(!silent)]);
       const dbBytes = Number(db.database_bytes) || 0;
       const storageBytes = Number(db.storage_bytes) || 0;
       const dbPct = pct(dbBytes, DB_LIMIT);
@@ -134,7 +175,7 @@
           card('GitHub — Repository', fmtBytes(gitBytes), 'Target operativo prudenziale: < 1 GB', gitPct) +
           card('Supabase — Utenti Auth', String(Number(db.auth_users)||0), 'Quota Free: 50.000 MAU; conteggio utenti presenti, non MAU mensili', 0, 'ok') +
           card('Dati applicativi', String(totalRows), 'Record nelle 6 tabelle principali monitorate', 0, 'ok') +
-          card('GitHub — Ultimo push', dateIt(git.pushed_at), 'Branch: ' + (git.default_branch || 'main'), 0, 'ok') +
+          card('GitHub — Ultimo push', dateIt(git.pushed_at), 'Branch: ' + (git.default_branch || 'main') + (git.__monitorStale ? ' · dato GitHub in cache' : ''), 0, 'ok') +
         '</div>' +
         '<div class="asm-section"><h3>Limiti e massimi</h3>' +
           '<div class="asm-note">Il grafico confronta l\'utilizzo reale con il massimo monitorato: la barra arriva al 100% quando viene raggiunto il limite.</div>' +
