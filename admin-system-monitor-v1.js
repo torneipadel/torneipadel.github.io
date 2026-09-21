@@ -59,6 +59,14 @@
 
   const GITHUB_CACHE_KEY = '__NP_ADMIN_GITHUB_MONITOR__';
   const GITHUB_CACHE_TTL = 10 * 60 * 1000;
+  const GITHUB_FALLBACK = {
+    name: 'torneirobertobove.github.io',
+    full_name: REPO,
+    size: 65605,
+    default_branch: 'main',
+    pushed_at: null,
+    __monitorFallback: true
+  };
 
   function readGitHubCache() {
     try {
@@ -103,7 +111,10 @@
         });
         return data;
       }
-      throw e;
+      return Object.assign({}, GITHUB_FALLBACK, {
+        __monitorFallback: true,
+        __monitorError: e?.message || String(e)
+      });
     }
   }
 
@@ -175,7 +186,7 @@
           card('GitHub — Repository', fmtBytes(gitBytes), 'Target operativo prudenziale: < 1 GB', gitPct) +
           card('Supabase — Utenti Auth', String(Number(db.auth_users)||0), 'Quota Free: 50.000 MAU; conteggio utenti presenti, non MAU mensili', 0, 'ok') +
           card('Dati applicativi', String(totalRows), 'Record nelle 6 tabelle principali monitorate', 0, 'ok') +
-          card('GitHub — Ultimo push', dateIt(git.pushed_at), 'Branch: ' + (git.default_branch || 'main') + (git.__monitorStale ? ' · dato GitHub in cache' : ''), 0, 'ok') +
+          card('GitHub — Ultimo push', git.pushed_at ? dateIt(git.pushed_at) : (git.__monitorFallback ? 'Temporaneamente non disponibile' : '-'), 'Branch: ' + (git.default_branch || 'main') + (git.__monitorStale ? ' · dato GitHub in cache' : '') + (git.__monitorFallback ? ' · ultimo dato locale di sicurezza' : ''), 0, 'ok') +
         '</div>' +
         '<div class="asm-section"><h3>Limiti e massimi</h3>' +
           '<div class="asm-note">Il grafico confronta l\'utilizzo reale con il massimo monitorato: la barra arriva al 100% quando viene raggiunto il limite.</div>' +
