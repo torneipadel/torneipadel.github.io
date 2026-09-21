@@ -83,7 +83,6 @@ function build(){
   });
  })();
 }
-window.openAdminNewsComplete=build;
 function hook(){const old=window.openAdminComPage;window.openAdminComPage=(page,...args)=>{if(page==='news-ai'){build();return}return old?.(page,...args)};}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',hook,{once:true});else hook();
 })();
