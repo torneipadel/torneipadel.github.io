@@ -641,6 +641,19 @@ async function verifyAccess(){
     Lascia tutto disponibile.
     */
 
+    /*
+     * Se il controllo accessi ha temporaneamente bloccato il gestionale
+     * mentre Supabase recuperava la sessione, riabilita gli elementi
+     * bloccati da bloccaGestionale(). I campi KO volutamente disabilitati
+     * dai segnaposto vengono ricreati da renderKO() e restano quindi
+     * soggetti alla loro logica specifica.
+     */
+    document.querySelectorAll('[data-bove-gestionale-locked="1"]').forEach(el=>{
+        el.disabled=false;
+        el.style.removeProperty("opacity");
+        delete el.dataset.boveGestionaleLocked;
+    });
+
     const adminSaveResultButton =
         document.getElementById("adminSaveResultButton");
 
@@ -682,6 +695,7 @@ function bloccaGestionale(){
         ){
 
             el.disabled = true;
+            el.dataset.boveGestionaleLocked = "1";
             el.style.opacity = "0.6";
 
         }
