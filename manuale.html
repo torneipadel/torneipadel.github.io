@@ -213,7 +213,8 @@ footer{max-width:1180px;margin:0 auto;padding:30px 18px 60px;color:var(--muted);
 
 <section id="audit-22092026"><h2>
 
-<h3>Correzione 22/09/2026 — input risultati Bove</h3>
+<h3><p><b>Seconda verifica 22/09/2026:</b> il problema è stato ricondotto alla gestione congiunta degli input KO e del controllo accessi asincrono. Ripristinati input numerici con mantenimento del focus, corretto il riconoscimento del risultato completo e resa esplicita la modalità amministratore; dopo la conferma del profilo admin il tabellone viene ridisegnato senza lasciare i controlli risultati disabilitati.</p>
+Correzione 22/09/2026 — input risultati Bove</h3>
 <p>Corretto il blocco degli input del tabellone che poteva rimanere attivo dopo un controllo accessi temporaneamente negativo durante il caricamento della sessione admin. Gli elementi bloccati dal controllo accessi vengono ora marcati e riabilitati quando l'utente viene riconosciuto come amministratore. I campi della fase finale disabilitati intenzionalmente per segnaposto restano gestiti dalla logica del tabellone.</p>
 18. Audit e correzioni del 22/09/2026</h2>
 <p>Audit statico completo del repository eseguito prima delle correzioni. Sono stati individuati e corretti i principali problemi di regressione del motore Bove e dell'Admin.</p>
