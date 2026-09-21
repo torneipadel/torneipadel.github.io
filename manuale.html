@@ -211,7 +211,11 @@ footer{max-width:1180px;margin:0 auto;padding:30px 18px 60px;color:var(--muted);
 <div class="danger note"><b>Nota:</b> le righe “in verifica” non sono dichiarazioni di errore: indicano che il comportamento deve essere ricontrollato dopo modifiche al codice prima di considerarlo definitivamente congelato.</div>
 </section>
 
-<section id="audit-22092026"><h2>18. Audit e correzioni del 22/09/2026</h2>
+<section id="audit-22092026"><h2>
+
+<h3>Correzione 22/09/2026 — input risultati Bove</h3>
+<p>Corretto il blocco degli input del tabellone che poteva rimanere attivo dopo un controllo accessi temporaneamente negativo durante il caricamento della sessione admin. Gli elementi bloccati dal controllo accessi vengono ora marcati e riabilitati quando l'utente viene riconosciuto come amministratore. I campi della fase finale disabilitati intenzionalmente per segnaposto restano gestiti dalla logica del tabellone.</p>
+18. Audit e correzioni del 22/09/2026</h2>
 <p>Audit statico completo del repository eseguito prima delle correzioni. Sono stati individuati e corretti i principali problemi di regressione del motore Bove e dell'Admin.</p>
 <ul>
 <li><b>Bove risultati KO:</b> l'inserimento del punteggio non ricostruisce più il DOM ad ogni cifra, evitando la perdita del focus.</li>
