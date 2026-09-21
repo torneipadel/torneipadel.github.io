@@ -100,9 +100,17 @@ footer{max-width:1180px;margin:0 auto;padding:30px 18px 60px;color:var(--muted);
 </section>
 
 <section id="news"><h2>9. News</h2>
-<p>La gestione News è stata portata alla tabella globale <code>public.news</code>. Una news può essere globale oppure associata a uno specifico torneo tramite <code>torneo_id</code>.</p>
-<p>Campi principali: titolo, testo, immagine, pubblicata, tipo, link, evidenza, ordine e associazione torneo.</p>
-<h3>Procedura</h3><ol><li>Aprire News.</li><li>Creare o modificare il contenuto.</li><li>Decidere se è globale o collegato a un torneo.</li><li>Salvare.</li><li>Verificare l'elenco.</li><li>Controllare la visualizzazione pubblica.</li></ol>
+<p>La gestione News mantiene i contenuti dei tornei nella configurazione del torneo e supporta anche la tabella globale <code>public.news</code>. Il modulo pubblico aggrega le News del torneo, le News globali, i tornei pubblicati e i contenuti del Mercatino.</p>
+<h3>News automatica dei tornei — attiva</h3>
+<div class="note"><b>Automazione introdotta il 21 settembre 2026:</b> quando un torneo risulta <b>pubblicato/attivo</b>, Admin controlla automaticamente ogni 15 secondi se esiste già la News automatica. Se manca, viene creata una sola volta.</div>
+<ul>
+<li><b>Testo:</b> prova a usare l'endpoint AI <code>news-ai</code>; se l'AI non è disponibile, usa un template locale senza bloccare la pubblicazione.</li>
+<li><b>Locandina:</b> viene generata automaticamente con un <b>template fisso deterministico</b> e dati reali del torneo: nome, data, ora, luogo, coppie, livello, quota e scadenza quando presenti.</li>
+<li><b>Duplicati:</b> la chiave <code>auto-news-torneo-&lt;id&gt;</code> impedisce la creazione ripetuta della stessa News.</li>
+<li><b>Costo:</b> il fallback locale non richiede API AI. Se è disponibile l'endpoint AI già presente nel progetto, il testo può usare il servizio AI; la generazione automatica di immagini AI non è necessaria per questo primo livello, perché la locandina è prodotta dal template fisso.</li>
+<li><b>WhatsApp:</b> resta manuale come stabilito. Questa automazione non invia messaggi WhatsApp.</li>
+</ul>
+<h3>Procedura manuale</h3><ol><li>Aprire News.</li><li>Creare o modificare il contenuto.</li><li>Se necessario, scegliere la locandina manuale.</li><li>Salvare/pubblicare.</li><li>Verificare l'elenco.</li><li>Controllare la visualizzazione pubblica.</li></ol>
 </section>
 
 <section id="sponsor"><h2>10. Sponsor</h2>
