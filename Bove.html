@@ -290,6 +290,16 @@ span.trend-down, i.fa-arrow-down, .fa-caret-down {
     color: #ef4444 !important;
 }
 
+.qual-arrow-up {
+    color: #22c55e !important;
+    font-weight: 900 !important;
+}
+
+.qual-arrow-down {
+    color: #ef4444 !important;
+    font-weight: 900 !important;
+}
+
 .standing-table .trend-up, .standing-table .trend-down,
 table.standing .trend-up, table.standing .trend-down,
 .classifica-table .trend-up, .classifica-table .trend-down,
@@ -308,6 +318,34 @@ table.standing .trend-up, table.standing .trend-down,
     right: 20px;
     left: auto;
     z-index: 9999;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.admin-save-result-button {
+    display: none;
+    width: auto;
+    height: 36px;
+    padding: 0 10px;
+    border-radius: 8px;
+    border: 1px solid #334155;
+    background: #166534;
+    color: #fff;
+    font-size: 12px;
+    font-family: system-ui;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+    box-sizing: border-box;
+}
+
+.admin-save-result-button:hover {
+    background: #15803d;
+}
+
+body.user-mode .admin-save-result-button {
+    display: none !important;
 }
 
 .menu-button {
@@ -603,6 +641,27 @@ async function verifyAccess(){
     Lascia tutto disponibile.
     */
 
+    const adminSaveResultButton =
+        document.getElementById("adminSaveResultButton");
+
+    if(adminSaveResultButton){
+        adminSaveResultButton.style.setProperty(
+            "display",
+            "inline-flex",
+            "important"
+        );
+        adminSaveResultButton.style.setProperty(
+            "align-items",
+            "center",
+            "important"
+        );
+        adminSaveResultButton.style.setProperty(
+            "justify-content",
+            "center",
+            "important"
+        );
+    }
+
     console.log(
         "ACCESSO ADMIN:",
         profilo.nome
@@ -761,6 +820,88 @@ window.toggleMenu = function(){
     menu.classList.toggle("show");
 };
 </script>
+
+<style id="bove-print-bracket-style">
+@page{size:A4 landscape;margin:8mm}
+@media print{
+body{background:#fff!important;color:#1f2937!important;padding:0!important;margin:0!important;-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
+body>*:not(#bovePrintLayout){display:none!important}
+#bovePrintLayout{display:block!important;width:100%!important;background:#f5f7fa!important;color:#1f2937!important;font-family:Arial,Helvetica,sans-serif!important}
+.bpl-page{width:100%;height:180mm;min-height:180mm;page-break-after:always;padding:4mm;box-sizing:border-box;position:relative;overflow:hidden;background-color:#eef2f6;background-image:radial-gradient(circle at 12% 18%,rgba(255,255,255,.95) 0,rgba(255,255,255,0) 28%),radial-gradient(circle at 88% 82%,rgba(148,163,184,.18) 0,rgba(148,163,184,0) 32%),linear-gradient(135deg,rgba(255,255,255,.72),rgba(226,232,240,.48));background-size:auto,auto,100% 100%;background-repeat:no-repeat}.bpl-watermark{position:absolute!important;left:0!important;top:0!important;width:100%!important;height:100%!important;transform:none!important;opacity:.075!important;pointer-events:none!important;z-index:1!important;display:block!important;visibility:visible!important}.bpl-watermark img{display:block;width:100%!important;height:100%!important;object-fit:contain!important;object-position:center!important;visibility:visible!important}.bpl-organization{position:absolute!important;top:2.5mm;left:0;right:0;text-align:center;font-size:7.5px;font-weight:800;letter-spacing:.18em;color:#64748b;text-transform:uppercase;z-index:6;padding:0 4mm}.bpl-bracket-page .bpl-title{font-size:22px;font-weight:900;letter-spacing:.1em;color:#172033;text-shadow:0 1px 0 rgba(255,255,255,.85);margin:7mm 0 1.5mm!important;transform:none!important}.bpl-bracket-page .bpl-subtitle{font-size:9px;font-weight:700;letter-spacing:.1em;color:#64748b;margin-bottom:3mm!important;transform:none!important}.bpl-bracket-page .bpl-stage-title{font-size:11px;font-weight:900;letter-spacing:.1em;color:#1e293b;background:rgba(255,255,255,.82);border:1px solid rgba(148,163,184,.55);border-radius:999px;padding:1.5mm 2.5mm;box-shadow:0 1px 4px rgba(15,23,42,.08)}.bpl-bracket-page .bpl-match{background:rgba(255,255,255,.94);border:1.5px solid #64748b;border-left:5px solid #334155;box-shadow:0 3px 9px rgba(15,23,42,.14)}.bpl-bracket-page .bpl-winner{background:linear-gradient(135deg,rgba(255,253,245,.98),rgba(248,243,223,.96));border:1.5px solid #b99b3e;box-shadow:0 4px 12px rgba(120,90,20,.16)}.bpl-bracket-page .bpl-note{font-weight:600;letter-spacing:.03em}.bpl-page>*:not(.bpl-watermark){position:relative;z-index:2}.bpl-page:first-child .bpl-title{margin-bottom:1.5mm}
+.bpl-page:first-child .bpl-subtitle{margin-bottom:3mm}
+.bpl-bracket-page::before{content:"";position:absolute;inset:10mm;border:1.2px solid rgba(255,255,255,.78);border-radius:3mm;z-index:0;pointer-events:none;background:
+linear-gradient(90deg,transparent 49.6%,rgba(255,255,255,.58) 49.6%,rgba(255,255,255,.58) 50.4%,transparent 50.4%),
+linear-gradient(0deg,transparent 31.8%,rgba(255,255,255,.58) 31.8%,rgba(255,255,255,.58) 32.5%,transparent 32.5%,transparent 67.5%,rgba(255,255,255,.58) 67.5%,rgba(255,255,255,.58) 68.2%,transparent 68.2%),
+linear-gradient(0deg,transparent 49.6%,rgba(255,255,255,.72) 49.6%,rgba(255,255,255,.72) 50.4%,transparent 50.4%)}
+.bpl-bracket-page::after{content:"";position:absolute;left:50%;top:10mm;bottom:10mm;width:18mm;transform:translateX(-50%);border-left:1px solid rgba(255,255,255,.28);border-right:1px solid rgba(255,255,255,.28);z-index:0;pointer-events:none}
+.bpl-page:last-child{page-break-after:auto}
+.bpl-title{text-align:center;font-size:20px;font-weight:800;letter-spacing:.08em;margin:0 0 2mm;color:#172033}
+.bpl-subtitle{text-align:center;font-size:10px;color:#64748b;margin-bottom:5mm}
+.bpl-groups{display:grid;grid-template-columns:repeat(3,1fr);gap:3mm;align-items:start}
+.bpl-groups.bpl-groups-4{grid-template-columns:repeat(2,minmax(0,1fr));grid-template-rows:repeat(2,minmax(0,1fr));gap:3mm;height:158mm;min-height:158mm;align-items:stretch;overflow:hidden}
+.bpl-groups.bpl-groups-4 .bpl-group{padding:2mm;min-height:0;height:100%;break-inside:avoid;overflow:hidden}
+.bpl-groups.bpl-groups-4 .bpl-group h3{font-size:11px;margin-bottom:1.5mm}
+.bpl-groups.bpl-groups-4 .bpl-group table{font-size:8.5px;margin-top:4px}.bpl-groups.bpl-groups-4 .bpl-group table td{font-size:8.5px;font-weight:800}.bpl-groups.bpl-groups-4 .bpl-group table td:nth-child(1){font-weight:900}.bpl-groups.bpl-groups-4 .bpl-group table .match-cell .team-line{font-size:11px!important;font-weight:700!important;line-height:1.2!important;font-family:Arial,sans-serif!important;-webkit-text-stroke:0!important;text-shadow:none!important}
+.bpl-groups.bpl-groups-4 .bpl-group th,.bpl-groups.bpl-groups-4 .bpl-group td{padding:.75mm .6mm}
+.bpl-group{background:rgba(255,255,255,.94);border:1px solid #d9e0e8;border-radius:7px;padding:3mm;box-shadow:0 2px 7px rgba(30,41,59,.07);break-inside:avoid}
+.bpl-group h3{margin:0 0 2mm;text-align:center;font-size:12px;color:#334155;letter-spacing:.05em}
+.bpl-group table{width:100%;border-collapse:collapse;font-size:7.5px;font-weight:800}
+.bpl-group th{background:#eef2f6;color:#334155;font-weight:900}
+.bpl-group th,.bpl-group td{padding:1.3mm 1mm;border-bottom:1.5px solid #64748b;text-align:center;font-weight:800}.bpl-group tbody tr{border-bottom:1.5px solid #64748b}.bpl-group td:first-child{font-weight:900}.bpl-group h3{font-weight:900}
+.bpl-group td:first-child{text-align:left;font-weight:600}
+.bpl-bracket-page{background:linear-gradient(135deg,#f7f8fa 0%,#eef2f6 100%)}
+.bpl-bracket{position:relative;display:grid;grid-template-columns:1.35fr 10mm 1.35fr 10mm 1.15fr 10mm 1fr;grid-template-rows:repeat(8,1fr);column-gap:0;row-gap:0;min-height:142mm;padding:8mm 2mm 3mm}
+.bpl-stage{position:relative;display:contents}
+.bpl-stage-title{position:absolute;top:0;text-align:center;font-size:11px;font-weight:800;letter-spacing:.06em;color:#334155;z-index:5}
+.bpl-stage[data-stage="q"] .bpl-stage-title{left:0;width:calc((100% - 30mm) * 1.35 / 4.85)}
+.bpl-stage[data-stage="s"] .bpl-stage-title{left:calc((100% - 30mm) * 1.35 / 4.85 + 10mm);width:calc((100% - 30mm) * 1.35 / 4.85)}
+.bpl-stage[data-stage="f"] .bpl-stage-title{left:calc((100% - 30mm) * 2.7 / 4.85 + 20mm);width:calc((100% - 30mm) * 1.15 / 4.85)}
+.bpl-stage[data-stage="w"] .bpl-stage-title{left:calc((100% - 30mm) * 3.85 / 4.85 + 30mm);width:calc((100% - 30mm) / 4.85)}
+.bpl-stage-body{display:contents}
+.bpl-match{position:relative;align-self:center;justify-self:stretch;background:#fff;border:2px solid #475569;border-left:5px solid #334155;border-radius:5px;box-shadow:0 2px 7px rgba(15,23,42,.16);padding:2mm 7mm 2mm 2.8mm;min-height:17mm;display:flex;flex-direction:column;justify-content:center;z-index:3}
+.bpl-match-name{font-size:13px;font-weight:900;line-height:1.25;color:#172033}.bpl-vs{font-size:10px;font-weight:900;line-height:1.15;color:#475569;margin:1mm 0}.bpl-score,.bpl-time{font-size:9px;font-weight:900;line-height:1.15;color:#334155}
+.bpl-q-match.bpl-index-1{grid-column:1;grid-row:1}
+.bpl-q-match.bpl-index-2{grid-column:1;grid-row:3}
+.bpl-q-match.bpl-index-3{grid-column:1;grid-row:5}
+.bpl-q-match.bpl-index-4{grid-column:1;grid-row:7}
+.bpl-s-match.bpl-index-1{grid-column:3;grid-row:2}
+.bpl-s-match.bpl-index-2{grid-column:3;grid-row:6}
+.bpl-f-match.bpl-index-1{grid-column:5;grid-row:4}
+.bpl-bracket-connector{position:relative;z-index:1;pointer-events:none;align-self:stretch;min-width:10mm}
+.bpl-bracket-connector span{position:absolute;display:block;background:#334155;border:0;box-sizing:border-box;print-color-adjust:exact;-webkit-print-color-adjust:exact}
+.bpl-bracket-connector .h-left-top{left:0;right:50%;height:2px}
+.bpl-bracket-connector .h-left-bottom{left:0;right:50%;height:2px}
+.bpl-bracket-connector .h-right-mid{left:50%;right:0;height:2px}
+.bpl-bracket-connector .v-mid{left:50%;width:2px}
+.bpl-conn-q1{grid-column:2;grid-row:1 / 4}
+.bpl-conn-q1 .h-left-top{top:16.666%}
+.bpl-conn-q1 .h-left-bottom{top:83.333%}
+.bpl-conn-q1 .h-right-mid{top:50%}
+.bpl-conn-q1 .v-mid{top:16.666%;bottom:16.666%}
+.bpl-conn-q2{grid-column:2;grid-row:5 / 8}
+.bpl-conn-q2 .h-left-top{top:16.666%}
+.bpl-conn-q2 .h-left-bottom{top:83.333%}
+.bpl-conn-q2 .h-right-mid{top:50%}
+.bpl-conn-q2 .v-mid{top:16.666%;bottom:16.666%}
+.bpl-conn-s1{grid-column:4;grid-row:2 / 7}
+.bpl-conn-s1 .h-left-top{top:10%}
+.bpl-conn-s1 .h-left-bottom{top:90%}
+.bpl-conn-s1 .h-right-mid{top:50%}
+.bpl-conn-s1 .v-mid{top:10%;bottom:10%}
+.bpl-conn-f1{grid-column:6;grid-row:4}
+.bpl-conn-f1 .h-right-mid{left:0;right:0;top:50%}
+.bpl-winner{position:relative;grid-column:7;grid-row:4;align-self:center;justify-self:stretch;background:linear-gradient(135deg,#fffdf5,#f8f3df);border:1.5px solid #c8ae55;border-radius:7px;box-shadow:0 3px 10px rgba(120,90,20,.12);padding:5mm 3mm;text-align:center;z-index:3}
+.bpl-match-name{font-size:11px;font-weight:800;line-height:1.22;color:#1f2937;text-align:left;white-space:normal;padding-right:8mm}
+.bpl-vs{font-size:7px;font-weight:700;color:#64748b;text-align:center;margin:.8mm 0}
+.bpl-score{position:absolute;right:2mm;top:50%;transform:translateY(-50%);font-size:20px;font-weight:900;line-height:1;color:#111827;letter-spacing:.03em}
+.bpl-time{font-size:6px;color:#64748b;text-align:right;margin-top:1mm}
+.bpl-winner-label{font-size:9px;font-weight:800;letter-spacing:.06em;color:#8a6b1f}
+.bpl-winner-name{font-size:14px;font-weight:900;margin-top:2mm;color:#4b3a0f}
+.bpl-match,.bpl-winner{z-index:20!important}
+.bpl-note{text-align:center;font-size:7px;color:#94a3b8;margin-top:2mm}
+}
+@media screen{#bovePrintLayout{display:none!important}}
+</style>
 </head>
 
 
@@ -2447,7 +2588,9 @@ style="width:80px">
 
 </div>
 
-<div class="menu-container"> <button class="menu-button" onclick="toggleMenu()"> ☰ </button> <div id="menuComandi" class="menu-dropdown"> <button onclick="document.getElementById('formatModal').style.display='block'"> ⚙️ Formato </button> <button onclick="openRules()"> 📖 Regole </button> <button onclick="document.getElementById('teamModal').style.display='block'"> 📝 Squadre </button> <button onclick="window.print()"> 🖨️ Stampa </button> <!-- SALVA TORNEO --> <button type="button" onclick="updateAndSync()"> 💾 Salva </button> <!-- RESET COMPLETO --> <button type="button" onclick="reset()"> 🗑️ Reset completo </button> <button onclick="window.location.href='admin.html'"> ⬅️ Torna ad Admin </button> </div> </div> <div class="groups"> <div class="card" id="cardA">
+<div class="menu-container">
+<button id="adminSaveResultButton" class="admin-save-result-button" type="button" onclick="updateAndSync(true)">💾 Salva risultato</button>
+<button class="menu-button" onclick="toggleMenu()"> ☰ </button> <div id="menuComandi" class="menu-dropdown"> <button onclick="document.getElementById('formatModal').style.display='block'"> ⚙️ Formato </button> <button onclick="openRules()"> 📖 Regole </button> <button onclick="document.getElementById('teamModal').style.display='block'"> 📝 Squadre </button> <button onclick="stampaTabelloneGrafico()"> 🖨️ Stampa </button> <!-- SALVA TORNEO --> <button type="button" onclick="updateAndSync()"> 💾 Salva </button> <!-- RESET COMPLETO --> <button type="button" onclick="reset()"> 🗑️ Reset completo </button> <button onclick="window.location.href='admin.html'"> ⬅️ Torna ad Admin </button> </div> </div> <div class="groups"> <div class="card" id="cardA">
    
 
       <table id="A"><thead><tr><th>Campo</th><th>Ora</th><th>Match</th><th>Ris</th></tr></thead><tbody id="Arows"></tbody></table>
@@ -2779,7 +2922,7 @@ let state = {
 
         tipoTorneo:"gironi",
 
-        formatoTorneo:"gironi",
+        formatoTorneo:8,
 
 
 
@@ -4114,12 +4257,28 @@ function setFormat(n){
 
     state.formato=n;
 
+    state.rules.formatoTorneo=n;
+
     state.rules.numeroSquadre=n;
 
     state.rules.squadrePerGirone=4;
 
     state.rules.numeroGironi =
         n / 4;
+
+    const numeroGironiInput =
+        document.getElementById("numeroGironi");
+
+    if(numeroGironiInput)
+        numeroGironiInput.value =
+            String(state.rules.numeroGironi);
+
+    const squadrePerGironeInput =
+        document.getElementById("squadrePerGirone");
+
+    if(squadrePerGironeInput)
+        squadrePerGironeInput.value =
+            String(state.rules.squadrePerGirone);
 
 
 
@@ -4618,23 +4777,17 @@ function generateTestTournament(){
 }
 function aggiornaPannelloRegole(){
 
-    const tipo=document.getElementById("tipoTorneo")?.value;
     const fase=document.getElementById("faseEliminazioneBox");
     if(!fase) return;
 
-    const noKO=["svizzero","americano","mexicano","king"];
-    fase.style.display=noKO.includes(tipo) ? "none" : "block";
-
-    const q=document.getElementById("usaQuarti");
-    const semi=document.getElementById("usaSemifinali");
-    const finale=document.getElementById("usaFinale");
-
-    if(noKO.includes(tipo)){
-        if(q) q.checked=false;
-        if(semi) semi.checked=false;
-        if(finale) finale.checked=false;
-    }
+    /*
+     * I controlli della fase finale sono sempre disponibili.
+     * La formula selezionata imposta solo i valori iniziali:
+     * l'organizzatore può poi modificarli.
+     */
+    fase.style.display="block";
 }
+
 
 function ensureRules(){
 
@@ -4669,10 +4822,19 @@ function ensureRules(){
         state.rules.tipoTorneo="gironi";
 
 
-    if(state.rules.formatoTorneo===undefined)
+    const formatoSalvato =
+        Number(state.rules.formatoTorneo);
 
-        state.rules.formatoTorneo =
-            state.rules.tipoTorneo;
+    let formato =
+        [8,12,16,20,24].includes(formatoSalvato)
+        ? formatoSalvato
+        : Number(state.rules.numeroSquadre);
+
+    if(![8,12,16,20,24].includes(formato))
+        formato=8;
+
+    state.rules.formatoTorneo=formato;
+    state.rules.numeroSquadre=formato;
 
 
 
@@ -4683,19 +4845,10 @@ function ensureRules(){
     */
 
 
-    state.rules.numeroSquadre =
-        Number(state.rules.numeroSquadre) || 8;
-
-
-
     /*
         FORMATI SUPPORTATI
         8-12-16-20-24
     */
-
-
-    let formato =
-        state.rules.numeroSquadre;
 
 
 
@@ -4714,6 +4867,9 @@ function ensureRules(){
     }
 
 
+
+    state.rules.formatoTorneo =
+        formato;
 
     state.rules.numeroSquadre =
         formato;
@@ -4777,23 +4933,11 @@ function ensureRules(){
 
 
 
-    if(
+    state.rules.numeroGironi =
+        strutturaCorretta.gironi;
 
-        !gironi ||
-        !perGirone ||
-        gironi * perGirone !== formato
-
-    ){
-
-        state.rules.numeroGironi =
-            strutturaCorretta.gironi;
-
-
-        state.rules.squadrePerGirone =
-            strutturaCorretta.perGirone;
-
-
-    }
+    state.rules.squadrePerGirone =
+        strutturaCorretta.perGirone;
 
 
 
@@ -5339,7 +5483,8 @@ function applyRules(){
 
     state.rules.numeroSquadre=n;
     state.rules.tipoTorneo=tipo;
-    state.rules.formatoTorneo=String(n);
+    state.rules.formatoTorneo=n;
+    state.rules.numeroSquadre=n;
 
     const struttura={
         8:{gironi:2,perGirone:4},
@@ -5422,23 +5567,12 @@ function applyRules(){
             Number(document.getElementById("numeroQualificateFinali")?.value)||0;
     }
 
-    if(groupTypes.includes(tipo)){
-        state.rules.usaQuarti=document.getElementById("usaQuarti")?.checked===true;
-        state.rules.usaSemifinali=document.getElementById("usaSemifinali")?.checked===true;
-        state.rules.usaFinale=document.getElementById("usaFinale")?.checked===true;
-    }else if(tipo==="eliminazione"){
-        state.rules.usaQuarti=document.getElementById("usaQuarti")?.checked===true;
-        state.rules.usaSemifinali=document.getElementById("usaSemifinali")?.checked===true;
-        state.rules.usaFinale=document.getElementById("usaFinale")?.checked===true;
-    }else if(noKO.includes(tipo)){
-        state.rules.usaQuarti=false;
-        state.rules.usaSemifinali=false;
-        state.rules.usaFinale=false;
-    }else{
-        state.rules.usaQuarti=document.getElementById("usaQuarti")?.checked===true;
-        state.rules.usaSemifinali=document.getElementById("usaSemifinali")?.checked===true;
-        state.rules.usaFinale=document.getElementById("usaFinale")?.checked===true;
-    }
+    state.rules.usaQuarti=document.getElementById("usaQuarti")?.checked===true;
+    state.rules.usaSemifinali=document.getElementById("usaSemifinali")?.checked===true;
+    state.rules.usaFinale=document.getElementById("usaFinale")?.checked===true;
+
+    if(state.rules.usaQuarti) state.rules.usaSemifinali=true;
+    if(state.rules.usaSemifinali) state.rules.usaFinale=true;
 
     state.rules.ripescaggio=document.getElementById("ripescaggio")?.checked===true;
     state.rules.numeroRipescate=
@@ -6021,9 +6155,29 @@ state.rules.locked=false;
 }
 
                     
-async function updateAndSync(){
+async function updateAndSync(showSaveResult=false){
 
     try{
+
+        /*
+        ==========================================
+        MODALITÀ TV — SOLA LETTURA
+        ==========================================
+        *
+        * La TV deve soltanto leggere e visualizzare
+        * il torneo. Non deve mai riscrivere Supabase
+        * durante render/loadState, altrimenti un refresh
+        * Realtime potrebbe generare un ciclo di aggiornamenti.
+        */
+        const tvMode =
+            new URLSearchParams(window.location.search).get("tv") === "1";
+
+        if(tvMode){
+            console.log(
+                "BOVE TV: updateAndSync ignorato — modalità sola lettura."
+            );
+            return true;
+        }
 
         /*
         ==========================================
@@ -6081,6 +6235,86 @@ async function updateAndSync(){
 
             state.nomeTorneo =
                 inputNome.value.trim();
+
+        }
+
+
+        /*
+        ==========================================
+        ID REMOTO: LA URL È LA FONTE DI VERITÀ
+        ==========================================
+        */
+
+        if(remoto){
+
+            const idRemoto =
+                Number(idTorneoUrl);
+
+            if(
+                !Number.isFinite(idRemoto) ||
+                idRemoto <= 0
+            ){
+
+                console.error(
+                    "UPDATE AND SYNC: ID TORNEO NON VALIDO:",
+                    idTorneoUrl
+                );
+
+                return false;
+
+            }
+
+            state.idTorneo = idRemoto;
+
+
+            /*
+            * Se per qualunque motivo il nome non è presente
+            * nello stato, lo recuperiamo direttamente da Supabase
+            * invece di saltare il salvataggio.
+            */
+
+            if(
+                !state.nomeTorneo ||
+                String(state.nomeTorneo).trim()===""
+            ){
+
+                try{
+
+                    const {data:torneoBase,error:erroreNome} =
+                        await sb
+                        .from("tornei")
+                        .select("id,nome,data")
+                        .eq("id",idRemoto)
+                        .maybeSingle();
+
+                    if(
+                        !erroreNome &&
+                        torneoBase
+                    ){
+
+                        state.nomeTorneo =
+                            torneoBase.nome || "";
+
+                        if(!state.dataTorneo){
+
+                            state.dataTorneo =
+                                torneoBase.data || "";
+
+                        }
+
+                    }
+
+                }
+                catch(e){
+
+                    console.error(
+                        "UPDATE AND SYNC: errore recupero dati torneo:",
+                        e
+                    );
+
+                }
+
+            }
 
         }
 
@@ -6265,23 +6499,143 @@ async function updateAndSync(){
         ==========================================
         */
 
+        /*
+        ==========================================
+        SUPABASE — SALVATAGGIO REMOTO
+        ==========================================
+        */
+
         if(
-
-            typeof sb!=="undefined" &&
-
-            statoDaSalvare &&
-
-            snapshot.idTorneo &&
-
-            snapshot.nomeTorneo &&
-
-            String(
-                snapshot.nomeTorneo
-            ).trim()!==""
-
+            typeof sb==="undefined" ||
+            !sb
         ){
 
-            const {error} =
+            console.error(
+                "UPDATE AND SYNC: client Supabase non disponibile."
+            );
+
+            return false;
+
+        }
+
+
+        if(
+            !statoDaSalvare
+        ){
+
+            console.error(
+                "UPDATE AND SYNC: salvataggio bloccato dallo stato di protezione."
+            );
+
+            return false;
+
+        }
+
+
+        if(
+            !snapshot.idTorneo ||
+            !snapshot.nomeTorneo ||
+            String(snapshot.nomeTorneo).trim()===""
+        ){
+
+            console.error(
+                "UPDATE AND SYNC: dati torneo incompleti:",
+                {
+                    id:snapshot.idTorneo,
+                    nome:snapshot.nomeTorneo
+                }
+            );
+
+            return false;
+
+        }
+
+
+        const payloadSupabase = {
+            nome:
+                snapshot.nomeTorneo,
+
+            data:
+                snapshot.dataTorneo || null,
+
+            configurazione:
+                snapshot,
+
+            updated_at:
+                new Date().toISOString()
+        };
+
+
+        console.log(
+            "UPDATE AND SYNC: invio a Supabase:",
+            snapshot.idTorneo,
+            remoto ? "UPDATE REMOTO" : "UPSERT"
+        );
+
+
+        let salvatoSupabase = null;
+        let error = null;
+
+
+        if(remoto){
+
+            /*
+             * TORNEO REMOTO: aggiorniamo direttamente la riga esistente.
+             * Non cambiamo lo stato del torneo.
+             */
+
+            /*
+             * UPDATE remoto in due passaggi:
+             * 1) scrittura pura, senza .select(), così una eventuale
+             *    anomalia sulla rappresentazione REST non può bloccare il save;
+             * 2) lettura immediata della stessa riga per VERIFICARE davvero
+             *    che Supabase abbia scritto configurazione e updated_at.
+             */
+            const resultUpdate =
+                await sb
+                .from("tornei")
+                .update(payloadSupabase)
+                .eq("id", snapshot.idTorneo);
+
+            error = resultUpdate.error;
+
+            if(!error){
+
+                const verificaRemota =
+                    await sb
+                    .from("tornei")
+                    .select("id,nome,stato,updated_at,configurazione")
+                    .eq("id", snapshot.idTorneo)
+                    .maybeSingle();
+
+                if(verificaRemota.error){
+
+                    error = verificaRemota.error;
+
+                }else{
+
+                    salvatoSupabase = verificaRemota.data;
+
+                }
+
+            }
+
+            console.log(
+                "UPDATE REMOTO VERIFICA:",
+                {
+                    id:snapshot.idTorneo,
+                    errore:error || null,
+                    risultato:salvatoSupabase || null
+                }
+            );
+
+        }else{
+
+            /*
+             * NUOVO TORNEO LOCALE: manteniamo l'upsert.
+             */
+
+            const resultUpsert =
                 await sb
                 .from("tornei")
                 .upsert(
@@ -6289,41 +6643,56 @@ async function updateAndSync(){
                         id:
                             snapshot.idTorneo,
 
-                        nome:
-                            snapshot.nomeTorneo,
-
-                        data:
-                            snapshot.dataTorneo || null,
+                        ...payloadSupabase,
 
                         stato:
-                            "attivo",
-
-                        /*
-                        * Salva tutto lo snapshot.
-                        */
-
-                        configurazione:
-                            snapshot
-
+                            "attivo"
                     },
                     {
                         onConflict:"id"
                     }
-                );
+                )
+                .select("id,nome,stato,updated_at")
+                .maybeSingle();
 
-
-            if(error){
-
-                console.error(
-                    "Errore sincronizzazione Supabase:",
-                    error
-                );
-
-                return false;
-
-            }
+            salvatoSupabase = resultUpsert.data;
+            error = resultUpsert.error;
 
         }
+
+
+        if(error){
+
+            console.error(
+                "Errore sincronizzazione Supabase:",
+                error
+            );
+
+            return false;
+
+        }
+
+
+        if(
+            !salvatoSupabase ||
+            String(salvatoSupabase.id)!==
+            String(snapshot.idTorneo)
+        ){
+
+            console.error(
+                "UPDATE AND SYNC: Supabase non ha confermato il salvataggio:",
+                salvatoSupabase
+            );
+
+            return false;
+
+        }
+
+
+        console.log(
+            "UPDATE AND SYNC: SALVATAGGIO SUPABASE CONFERMATO:",
+            salvatoSupabase
+        );
 
 
         /*
@@ -6417,6 +6786,37 @@ async function updateAndSync(){
         );
 
 
+        /*
+        ==========================================
+        FEEDBACK PULSANTE SALVA RISULTATO
+        ==========================================
+        * Il feedback appare solo quando updateAndSync()
+        * è stato avviato dal pulsante dedicato dell'admin.
+        * Viene mostrato esclusivamente dopo la conferma
+        * effettiva del salvataggio su Supabase/localStorage.
+        */
+        if(showSaveResult){
+
+            const saveButton =
+                document.getElementById("adminSaveResultButton");
+
+            if(saveButton){
+
+                if(saveButton.__restoreSaveLabelTimer){
+                    clearTimeout(saveButton.__restoreSaveLabelTimer);
+                }
+
+                saveButton.textContent = "✅ Risultato salvato!";
+
+                saveButton.__restoreSaveLabelTimer =
+                    setTimeout(()=>{
+                        saveButton.textContent = "💾 Salva risultato";
+                        saveButton.__restoreSaveLabelTimer = null;
+                    },2000);
+            }
+        }
+
+
         return true;
 
 
@@ -6439,7 +6839,7 @@ async function updateAndSync(){
 async function loadState(){
 
 const params = new URLSearchParams(window.location.search);
-const idParam = params.get("idTorneo");
+const idParam = params.get("idTorneo") || (window.__BOVE_TV_ID__ ? String(window.__BOVE_TV_ID__) : "");
 const torneoParam = params.get("torneo");
 const torneoRemoto = !!idParam;
 let configurazione = null;
@@ -8019,9 +8419,7 @@ function renderClass(){
 
         "C",
 
-        "D",
-        "E",
-        "F"
+        "D"
 
     ].forEach(tag=>{
 
@@ -8176,12 +8574,6 @@ function updateRes(g,i,pos,val){
 
     else if(g==="D")
         s=state.Dres;
-
-    else if(g==="E")
-        s=state.Eres;
-
-    else if(g==="F")
-        s=state.Fres;
 
     else
         return;
@@ -9758,7 +10150,6 @@ function generaPartiteGironi(){
         if(!Array.isArray(girone) || girone.length !== 4)
             return partite;
 
-
         const coppie = [
             [0,1],
             [2,3],
@@ -9768,97 +10159,91 @@ function generaPartiteGironi(){
             [1,2]
         ];
 
-
         coppie.forEach(x=>{
-
             partite.push({
-
                 casa:x[0],
-
                 ospite:x[1]
-
             });
-
         });
 
-
         return partite;
-
     };
 
+    /*
+     * IMPORTANTE:
+     * la funzione viene richiamata anche durante il refresh TV.
+     * Non deve mai cancellare risultati, campi o orari già salvati.
+     */
+    const vecchi = {};
+
+    ["A","B","C","D","E","F"].forEach(tag=>{
+        vecchi[tag+"res"] =
+            Array.isArray(state[tag+"res"])
+                ? [...state[tag+"res"]]
+                : [];
+
+        vecchi[tag+"time"] =
+            Array.isArray(state[tag+"time"])
+                ? [...state[tag+"time"]]
+                : [];
+
+        vecchi[tag+"camp"] =
+            Array.isArray(state[tag+"camp"])
+                ? [...state[tag+"camp"]]
+                : [];
+    });
 
     state.partiteGironi = {};
 
-
-    [
-        "A",
-        "B",
-        "C",
-        "D",
-        "E",
-        "F"
-    ].forEach(tag=>{
+    ["A","B","C","D","E","F"].forEach(tag=>{
 
         if(
             Array.isArray(state[tag]) &&
             state[tag].length===4
         ){
-
             state.partiteGironi[tag] =
                 crea(state[tag]);
-
         }
 
     });
 
+    ["A","B","C","D","E","F"].forEach(tag=>{
 
+        if(!state.partiteGironi[tag])
+            return;
 
-    [
-        "A",
-        "B",
-        "C",
-        "D",
-        "E",
-        "F"
-    ].forEach(tag=>{
+        const numeroPartite =
+            state.partiteGironi[tag].length;
 
+        state[tag+"res"] =
+            vecchi[tag+"res"]
+                .slice(0,numeroPartite);
 
-        if(state.partiteGironi[tag]){
+        state[tag+"time"] =
+            vecchi[tag+"time"]
+                .slice(0,numeroPartite);
 
+        state[tag+"camp"] =
+            vecchi[tag+"camp"]
+                .slice(0,numeroPartite);
 
-            state[tag+"res"] =
-                Array(
-                    state.partiteGironi[tag].length
-                )
-                .fill("-");
+        while(state[tag+"res"].length < numeroPartite)
+            state[tag+"res"].push("-");
 
+        while(state[tag+"time"].length < numeroPartite)
+            state[tag+"time"].push("");
 
-            state[tag+"time"] =
-                Array(
-                    state.partiteGironi[tag].length
-                )
-                .fill("");
-
-
-            state[tag+"camp"] =
-                Array(
-                    state.partiteGironi[tag].length
-                )
-                .fill("");
-
-        }
-
+        while(state[tag+"camp"].length < numeroPartite)
+            state[tag+"camp"].push("");
     });
-
-
 
     console.log(
-        "PARTITE GENERATE:",
+        "PARTITE GENERATE SENZA PERDITA RISULTATI:",
         state.partiteGironi
     );
-
 }
- function render(){
+
+function render(){
     ensureRules();
 
     if(
@@ -10026,43 +10411,41 @@ function nascondiFormuleTorneo(){
 }
 function renderItaliana(){
 
-    let box =
-        document.getElementById("finaleBox");
+    const box =
+        document.getElementById("formulaTorneoBox");
 
+    const titolo =
+        document.getElementById("formulaTorneoTitolo");
 
-    if(!box)
+    const contenuto =
+        document.getElementById("formulaTorneoContenuto");
+
+    if(!box || !titolo || !contenuto)
         return;
 
-
-
-    if(
-        state.rules.tipoTorneo !== "italiana"
-    )
+    if(state.rules.tipoTorneo !== "italiana")
         return;
 
+    box.style.display="block";
 
+    titolo.innerHTML =
+        "🇮🇹 Torneo all'italiana";
 
-    box.innerHTML = `
-
+    contenuto.innerHTML = `
         <div class="match-card">
 
             <h3>
-                🇮🇹 Torneo all'italiana
+                Formula torneo
             </h3>
 
-
             <p>
-                <b>Formula:</b><br>
-                Round Robin - Tutti contro tutti.
+                <b>Round Robin - Tutti contro tutti.</b>
             </p>
 
-
             <p>
-                <b>Regola:</b><br>
                 Ogni squadra affronta tutte le altre
                 squadre del proprio girone.
             </p>
-
 
             <p>
                 <b>Classifica:</b><br>
@@ -10070,7 +10453,6 @@ function renderItaliana(){
                 • Pareggio = ${state.rules.d} punti<br>
                 • Sconfitta = ${state.rules.l} punti
             </p>
-
 
             <p>
                 <b>Criteri spareggio:</b><br>
@@ -10080,7 +10462,6 @@ function renderItaliana(){
                 • Game subiti
             </p>
 
-
             <p>
                 <b>Qualificazione:</b><br>
                 Passano le migliori
@@ -10088,21 +10469,20 @@ function renderItaliana(){
                 squadre per girone.
             </p>
 
-
             <p>
                 <b>Fase finale:</b><br>
                 ${
                     state.rules.usaQuarti
-                    ?
-                    "Quarti → Semifinali → Finale"
-                    :
-                    "Accesso diretto alla fase successiva"
+                    ? "Quarti → Semifinali → Finale"
+                    : state.rules.usaSemifinali
+                    ? "Semifinali → Finale"
+                    : state.rules.usaFinale
+                    ? "Finale"
+                    : "Solo classifica"
                 }
             </p>
 
-
         </div>
-
     `;
 
 }
@@ -10254,9 +10634,7 @@ function renderTables(){
         A:[2,3],
         B:[4,5],
         C:[6,7],
-        D:[8,9],
-        E:[10,11],
-        F:[12,13]
+        D:[8,9]
     };
 
     let durata=Number(state.rules.duration||30);
@@ -10275,7 +10653,7 @@ function renderTables(){
 
     let calendario=[];
 
-    ["A","B","C","D","E","F"].forEach(tag=>{
+    ["A","B","C","D"].forEach(tag=>{
 
         let squadre=state[tag];
 
@@ -10414,7 +10792,7 @@ function renderTables(){
 
     });
 
-    ["A","B","C","D","E","F"].forEach(tag=>{
+    ["A","B","C","D"].forEach(tag=>{
 
         let box=
             document.getElementById(
@@ -10587,7 +10965,7 @@ oninput="updateRes('${tag}',${i},1,this.value)">
                 Number(state.rules.numeroGironi)||2;
 
             const indiceGirone =
-                ["A","B","C","D","E","F"].indexOf(tag);
+                ["A","B","C","D"].indexOf(tag);
 
             card.style.display =
                 indiceGirone>=0 &&
@@ -10606,395 +10984,61 @@ oninput="updateRes('${tag}',${i},1,this.value)">
 
    
 function getFinalQualified(){
-
     ensureRules();
-
-    const qualificate = [];
-    const lettereGironi = ["A","B","C","D","E","F","G"];
-
-    lettereGironi.forEach(tag => {
-
-        const squadre = state[tag];
-
-        if(!Array.isArray(squadre) || squadre.length === 0)
-            return;
-
-        const risultati =
-            Array.isArray(state[tag+"res"])
-                ? state[tag+"res"]
-                : [];
-
-        /*
-         * NON qualificare nessuno finché non sono stati
-         * inseriti tutti i risultati del girone.
-         */
-        const numeroPartite =
-            squadre.length * (squadre.length - 1) / 2;
-
-        if(
-            risultati.length < numeroPartite ||
-            risultati.slice(0, numeroPartite).some(r => 
-                r === "-" ||
-                r === "" ||
-                r == null
-            )
-        ){
-            console.log(
-                "Girone", tag,
-                "non ancora completato: nessuna qualificata."
-            );
-            return;
-        }
-
-        const classifica = calc(
-            squadre,
-            risultati
-        );
-
-        if(!Array.isArray(classifica) || classifica.length === 0)
-            return;
-
-        let q = Number(state.rules.qualificatePerGirone);
-
-        if(!Number.isFinite(q) || q < 1)
-            q = 1;
-
-        /*
-         * Con i quarti attivi e girone da 4,
-         * tutte le 4 squadre vengono considerate
-         * SOLO DOPO che il girone è completo.
-         */
-        if(
-            state.rules.usaQuarti === true &&
-            squadre.length === 4
-        ){
-            q = 4;
-        }
-
-        classifica.forEach((x,i) => {
-
-            if(i < q){
-
-                qualificate.push({
-                    nome:x.n,
-                    pt:x.pt,
-                    gf:x.gf,
-                    gs:x.gs,
-                    df:x.df,
-                    girone:tag,
-                    posizione:i+1
-                });
-
-            }
-
-        });
-
+    const qualificati=[];
+    const lettereGironi=["A","B","C","D","E","F","G"];
+    lettereGironi.forEach(tag=>{
+        const squadre=state[tag];
+        if(!Array.isArray(squadre)||squadre.length===0) return;
+        const risultati=Array.isArray(state[tag+"res"])?state[tag+"res"]:[];
+        const numeroPartite=squadre.length*(squadre.length-1)/2;
+        if(risultati.length<numeroPartite||risultati.slice(0,numeroPartite).some(r=>r==="-"||r===""||r==null)) return;
+        const classifica=calc(squadre,risultati);
+        if(!Array.isArray(classifica)||!classifica.length) return;
+        let q=Number(state.rules.qualificatePerGirone);
+        if(!Number.isFinite(q)||q<1) q=1;
+        if(state.rules.usaQuarti===true&&squadre.length===4) q=4;
+        classifica.slice(0,q).forEach((x,i)=>qualificati.push({nome:x.n,posizione:i+1,girone:tag,pt:x.pt,gf:x.gf,gs:x.gs,df:x.df}));
     });
-
-    let limite =
-        Number(state.rules.numeroQualificateFinali);
-
-    if(
-        state.rules.usaQuarti === true &&
-        qualificate.length >= 8
-    ){
-        limite = 8;
+    if(qualificati.length===0&&Array.isArray(state.coppie)&&state.coppie.length){
+        state.coppie.forEach((x,i)=>qualificati.push({nome:x,posizione:i+1}));
     }
-
-    if(!limite || limite < 1)
-        limite = qualificate.length;
-
-    return qualificate
-        .slice(0,limite)
-        .map(x => x.nome);
+    if(!qualificati.length) return [];
+    let richiesti=0;
+    if(state.rules.usaQuarti===true) richiesti=8;
+    else if(state.rules.usaSemifinali===true) richiesti=4;
+    else if(state.rules.usaFinale===true) richiesti=2;
+    return richiesti>0?qualificati.slice(0,richiesti).map(x=>x.nome):[];
 }
-
-
 function sincronizzaFaseFinale(){
-
     ensureRules();
-
-    /*
-    ==================================================
-    FASE FINALE: RICOSTRUZIONE COERENTE
-    ==================================================
-    */
-
-    const qualificati = getFinalQualified();
-
-    /*
-     * Se i gironi non sono completati,
-     * NON devono esistere quarti, semifinali o finale.
-     */
-
-    if(!Array.isArray(qualificati) || qualificati.length < 2){
-
-        state.quarti = [];
-        state.semiTop = [];
-        state.finalTop = [];
-
-        state.qRes = Array(4).fill("-");
-        state.qCamp = [];
-        state.qTime = [];
-
-        state.sTopRes = Array(2).fill("-");
-        state.sTopCamp = [];
-        state.sTopTime = [];
-
-        state.fTopRes = "-";
-        state.fTopCamp = "";
-        state.fTopTime = "";
-
-        state.campioneTop = null;
-
-        console.log(
-            "FASE FINALE AZZERATA: gironi non completati."
-        );
-
-        return;
+    const qualificati=getFinalQualified();
+    state.quarti=[]; state.semiTop=[]; state.finalTop=[];
+    if(!Array.isArray(qualificati)||qualificati.length<2){
+        state.qRes=Array(4).fill("-"); state.qCamp=[]; state.qTime=[];
+        state.sTopRes=Array(2).fill("-"); state.sTopCamp=[]; state.sTopTime=[];
+        state.fTopRes="-"; state.fTopCamp=""; state.fTopTime=""; state.campioneTop=null; return;
     }
-
-
-    /*
-    ==================================================
-    QUARTI
-    ==================================================
-    */
-
-    if(
-        state.rules.usaQuarti === true &&
-        qualificati.length >= 8
-    ){
-
-        /*
-         * Abbinamento standard:
-         *
-         * 1A vs 4B
-         * 2A vs 3B
-         * 1B vs 4A
-         * 2B vs 3A
-         *
-         * Se i qualificati arrivano già ordinati
-         * da getFinalQualified(), utilizziamo comunque
-         * blocchi da 4.
-         */
-
-        const q = [];
-
-        for(let i=0; i<8; i+=2){
-
-            if(
-                qualificati[i] &&
-                qualificati[i+1]
-            ){
-
-                q.push([
-                    qualificati[i],
-                    qualificati[i+1]
-                ]);
-
-            }
-
-        }
-
-        state.quarti = q;
-
-        /*
-         * Mantiene i risultati esistenti SOLO se
-         * esiste realmente la partita corrispondente.
-         */
-
-        if(!Array.isArray(state.qRes))
-            state.qRes = Array(4).fill("-");
-
-        while(state.qRes.length < 4)
-            state.qRes.push("-");
-
-        state.qRes = state.qRes.slice(0,4);
-
+    if(state.rules.usaQuarti===true){
+        if(qualificati.length<8) return;
+        state.quarti=[[qualificati[0],qualificati[7]],[qualificati[3],qualificati[4]],[qualificati[1],qualificati[6]],[qualificati[2],qualificati[5]]];
+        if(!Array.isArray(state.qRes)) state.qRes=Array(4).fill("-");
+        const v=[]; state.quarti.forEach((m,i)=>{const w=getWinner(m,state.qRes[i]); if(w)v.push(w);});
+        if(v.length<4) return;
+        if(state.rules.usaSemifinali===true) state.semiTop=[[v[0],v[1]],[v[2],v[3]]];
+        else state.finalTop=v.slice(0,2);
+    }else if(state.rules.usaSemifinali===true){
+        if(qualificati.length<4) return;
+        state.semiTop=[[qualificati[0],qualificati[3]],[qualificati[1],qualificati[2]]];
+    }else if(state.rules.usaFinale===true){
+        state.finalTop=qualificati.slice(0,2);
+    }else return;
+    if(state.rules.usaSemifinali===true){
+        const v=[]; state.semiTop.forEach((m,i)=>{const w=getWinner(m,Array.isArray(state.sTopRes)?state.sTopRes[i]:"-"); if(w)v.push(w);});
+        if(v.length===2) state.finalTop=v; else if(state.rules.usaFinale===true) return;
     }
-    else{
-
-        state.quarti = [];
-        state.qRes = Array(4).fill("-");
-        state.qCamp = [];
-        state.qTime = [];
-
-    }
-
-
-    /*
-    ==================================================
-    VINCITORI QUARTI
-    ==================================================
-    */
-
-    const vincitoriQuarti = [];
-
-    if(Array.isArray(state.quarti)){
-
-        state.quarti.forEach((match,index)=>{
-
-            const risultato =
-                Array.isArray(state.qRes)
-                    ? state.qRes[index]
-                    : "-";
-
-            const vincitore =
-                getWinner(match,risultato);
-
-            if(vincitore)
-                vincitoriQuarti.push(vincitore);
-
-        });
-
-    }
-
-
-    /*
-    ==================================================
-    SEMIFINALI
-    ==================================================
-    */
-
-    if(vincitoriQuarti.length === 4){
-
-        state.semiTop = [
-
-            [
-                vincitoriQuarti[0],
-                vincitoriQuarti[1]
-            ],
-
-            [
-                vincitoriQuarti[2],
-                vincitoriQuarti[3]
-            ]
-
-        ];
-
-    }
-    else{
-
-        state.semiTop = [];
-
-        /*
-         * Se non esistono quattro vincitori dei quarti,
-         * i risultati delle semifinali non possono essere
-         * considerati validi.
-         */
-
-        state.sTopRes = Array(2).fill("-");
-        state.sTopCamp = [];
-        state.sTopTime = [];
-
-        state.finalTop = [];
-
-        state.fTopRes = "-";
-        state.fTopCamp = "";
-        state.fTopTime = "";
-
-        state.campioneTop = null;
-
-        console.log(
-            "SEMIFINALI NON RICOSTRUITE: quarti incompleti."
-        );
-
-        return;
-    }
-
-
-    /*
-    ==================================================
-    VINCITORI SEMIFINALI
-    ==================================================
-    */
-
-    const vincitoriSemi = [];
-
-    state.semiTop.forEach((match,index)=>{
-
-        const risultato =
-            Array.isArray(state.sTopRes)
-                ? state.sTopRes[index]
-                : "-";
-
-        const vincitore =
-            getWinner(match,risultato);
-
-        if(vincitore)
-            vincitoriSemi.push(vincitore);
-
-    });
-
-
-    /*
-    ==================================================
-    FINALE
-    ==================================================
-    */
-
-    if(vincitoriSemi.length === 2){
-
-        state.finalTop = [
-
-            vincitoriSemi[0],
-            vincitoriSemi[1]
-
-        ];
-
-    }
-    else{
-
-        state.finalTop = [];
-
-        state.fTopRes = "-";
-        state.fTopCamp = "";
-        state.fTopTime = "";
-
-        state.campioneTop = null;
-
-        console.log(
-            "FINALE NON RICOSTRUITA: semifinali incomplete."
-        );
-
-        return;
-    }
-
-
-    /*
-    ==================================================
-    CAMPIONE
-    ==================================================
-    */
-
-    const campione =
-        getWinner(
-            state.finalTop,
-            state.fTopRes
-        );
-
-    state.campioneTop =
-        campione || null;
-
-
-    console.log(
-        "FASE FINALE SINCRONIZZATA:",
-        {
-            qualificati: qualificati,
-            quarti: state.quarti,
-            qRes: state.qRes,
-            semiTop: state.semiTop,
-            sTopRes: state.sTopRes,
-            finalTop: state.finalTop,
-            fTopRes: state.fTopRes,
-            campioneTop: state.campioneTop
-        }
-    );
+    state.campioneTop=(state.rules.usaFinale===true&&Array.isArray(state.finalTop)&&state.finalTop.length===2)?(getWinner(state.finalTop,state.fTopRes)||null):null;
 }
-
-
-
 function renderKO(){
     ensureRules();
 
@@ -11022,32 +11066,42 @@ function renderKO(){
     if(!Array.isArray(state.finalTop)) state.finalTop=[];
     if(state.campioneTop===undefined) state.campioneTop=null;
 
-    q.style.display=state.rules.usaQuarti===true ? "table-row-group" : "none";
-    s.style.display=state.rules.usaSemifinali===true ? "table-row-group" : "none";
+    const usaQ=state.rules.usaQuarti===true;
+    const usaS=state.rules.usaSemifinali===true;
+    const usaF=state.rules.usaFinale===true;
 
+    q.style.display=usaQ ? "table-row-group" : "none";
+    s.style.display=usaS ? "table-row-group" : "none";
+
+    /*
+     * La struttura della fase finale viene mostrata subito.
+     * Le squadre reali sostituiscono i segnaposto quando le
+     * qualificazioni/risultati diventano disponibili.
+     */
     const teams=getFinalQualified();
-    if(!Array.isArray(teams) || teams.length<2) return;
+    const validTeams=Array.isArray(teams) ? teams : [];
 
     let semifinali=[];
+    let finalisti=[];
 
-    if(state.rules.usaQuarti===true){
-
-        if(teams.length<8){
-            q.innerHTML=`<tr><td colspan="5">Servono 8 squadre qualificate per i Quarti di Finale.</td></tr>`;
-            return;
-        }
-
-        const quarti=[
-            [teams[0],teams[7]],
-            [teams[3],teams[4]],
-            [teams[1],teams[6]],
-            [teams[2],teams[5]]
-        ];
+    if(usaQ){
+        const quarti = validTeams.length>=8
+            ? [
+                [validTeams[0],validTeams[7]],
+                [validTeams[3],validTeams[4]],
+                [validTeams[1],validTeams[6]],
+                [validTeams[2],validTeams[5]]
+              ]
+            : [
+                ["1ª qualificata","8ª qualificata"],
+                ["4ª qualificata","5ª qualificata"],
+                ["2ª qualificata","7ª qualificata"],
+                ["3ª qualificata","6ª qualificata"]
+              ];
 
         const vincitori=[];
 
         quarti.forEach((match,index)=>{
-
             q.innerHTML+=renderMatchCard(
                 "QUARTO "+(index+1),
                 match,
@@ -11056,43 +11110,50 @@ function renderKO(){
                 state.qRes[index]
             );
 
-            const vincitore=getWinner(
-                match,
-                state.qRes[index]
-            );
+            const reale =
+                validTeams.length>=8 &&
+                !/qualificat/i.test(String(match[0])) &&
+                !/qualificat/i.test(String(match[1]));
+
+            const vincitore=reale
+                ? getWinner(match,state.qRes[index])
+                : null;
 
             if(vincitore) vincitori.push(vincitore);
         });
 
-        if(vincitori.length===4){
-            semifinali=[
-                [vincitori[0],vincitori[1]],
-                [vincitori[2],vincitori[3]]
-            ];
+        if(usaS){
+            semifinali = vincitori.length===4
+                ? [
+                    [vincitori[0],vincitori[1]],
+                    [vincitori[2],vincitori[3]]
+                  ]
+                : [
+                    ["Vincente Quarto 1","Vincente Quarto 2"],
+                    ["Vincente Quarto 3","Vincente Quarto 4"]
+                  ];
+        }else if(vincitori.length===4 && usaF){
+            finalisti=vincitori.slice(0,2);
         }
 
-    }else{
-
-        if(teams.length>=4){
-
-            semifinali=[
-                [teams[0],teams[3]],
-                [teams[1],teams[2]]
-            ];
-
-        }else if(teams.length===2){
-
-            semifinali=[teams];
-
-        }
+    }else if(usaS){
+        semifinali = validTeams.length>=4
+            ? [
+                [validTeams[0],validTeams[3]],
+                [validTeams[1],validTeams[2]]
+              ]
+            : [
+                ["1ª qualificata","4ª qualificata"],
+                ["2ª qualificata","3ª qualificata"]
+              ];
+    }else if(usaF){
+        finalisti = validTeams.length>=2
+            ? validTeams.slice(0,2)
+            : ["1ª qualificata","2ª qualificata"];
     }
 
-    let finalisti=[];
-
-    if(state.rules.usaSemifinali===true && semifinali.length>0){
-
+    if(usaS){
         semifinali.forEach((match,index)=>{
-
             s.innerHTML+=renderMatchCard(
                 "SEMIFINALE "+(index+1),
                 match,
@@ -11101,82 +11162,101 @@ function renderKO(){
                 state.sTopRes[index]
             );
 
-            const vincitore=getWinner(
-                match,
-                state.sTopRes[index]
-            );
+            const isPlaceholder =
+                /qualificat|vincente/i.test(String(match[0])) ||
+                /qualificat|vincente/i.test(String(match[1]));
+
+            const vincitore=isPlaceholder
+                ? null
+                : getWinner(match,state.sTopRes[index]);
 
             if(vincitore) finalisti.push(vincitore);
         });
-
-    }else{
-
-        finalisti=semifinali.flat();
-
     }
 
-    if(finalisti.length===2){
-        state.finalTop=[...finalisti];
-    }
-
-    if(state.rules.usaFinale!==true || finalisti.length!==2)
-        return;
-
-    f.innerHTML=renderMatchCard(
-        "🏆 FINALE",
-        finalisti,
-        "F",
-        0,
-        state.fTopRes
-    );
-
-    /* --- GESTIONE CAMPIONE E POSIZIONAMENTO SICURO SOTTO LA FINALE --- */
-    let campione = getWinner(finalisti, state.fTopRes);
-    
-    if (!campione && finalisti.length === 2) {
-        const resSplit = String(state.fTopRes || "").split("-");
-        if(resSplit.length === 2) {
-            const g1 = parseInt(resSplit[0]);
-            const g2 = parseInt(resSplit[1]);
-            if(!isNaN(g1) && !isNaN(g2)) {
-                if(g1 > g2) campione = finalisti[0];
-                else if(g2 > g1) campione = finalisti[1];
+    if(usaF){
+        if(finalisti.length!==2){
+            if(usaS){
+                finalisti=[
+                    "Vincente Semifinale 1",
+                    "Vincente Semifinale 2"
+                ];
+            }else if(usaQ){
+                finalisti=[
+                    "Vincente Quarto 1",
+                    "Vincente Quarto 2"
+                ];
+            }else if(validTeams.length>=2){
+                finalisti=validTeams.slice(0,2);
+            }else{
+                finalisti=[
+                    "1ª qualificata",
+                    "2ª qualificata"
+                ];
             }
         }
-    }
 
-    let winnerCard = document.getElementById("winnerCardKO");
+        state.finalTop=[...finalisti];
 
-    // Se non esiste, lo creiamo e lo posizioniamo subito sotto la finale (f)
-    if (!winnerCard && f.parentNode) {
-        winnerCard = document.createElement("div");
-        winnerCard.id = "winnerCardKO";
-        winnerCard.className = "card winner-card-ko";
-        f.parentNode.insertBefore(winnerCard, f.nextSibling);
-    } else if (winnerCard && f.parentNode && winnerCard.previousElementSibling !== f) {
-        // Se esiste già ma è altrove, lo spostiamo nel posto giusto
-        f.parentNode.insertBefore(winnerCard, f.nextSibling);
-    }
+        f.innerHTML=renderMatchCard(
+            "🏆 FINALE",
+            finalisti,
+            "F",
+            0,
+            state.fTopRes
+        );
 
-    if(campione){
-        state.campioneTop=campione;
+        const finalPlaceholder =
+            /qualificat|vincente/i.test(String(finalisti[0])) ||
+            /qualificat|vincente/i.test(String(finalisti[1]));
 
-        if(winnerCard){
-            winnerCard.style.cssText = "display: block !important; margin-top: 15px;";
-            winnerCard.innerHTML=`
-                <div class="winner-box top-win" style="background: rgba(251,191,36,.2); color: #fbbf24; padding: 15px; border-radius: 8px; text-align: center; font-weight: bold; font-size: 1.3em;">
-                    🏆 CAMPIONE TORNEO:<br>
-                    <span style="font-size: 1.1em; font-weight: normal; color: #e2e8f0;">${formatCoppiaDisplay(campione)}</span>
-                </div>
-            `;
+        let campione =
+            finalPlaceholder
+            ? null
+            : getWinner(finalisti,state.fTopRes);
+
+        if(!campione){
+            const resSplit=String(state.fTopRes || "").split("-");
+            if(!finalPlaceholder && resSplit.length===2){
+                const g1=parseInt(resSplit[0]);
+                const g2=parseInt(resSplit[1]);
+                if(!isNaN(g1) && !isNaN(g2)){
+                    if(g1>g2) campione=finalisti[0];
+                    else if(g2>g1) campione=finalisti[1];
+                }
+            }
         }
 
-    }else{
-        state.campioneTop=null;
+        let winnerCard=document.getElementById("winnerCardKO");
 
-        if(winnerCard){
-            winnerCard.style.cssText = "display: none !important;";
-            winnerCard.innerHTML="";
+        if(!winnerCard && f.parentNode){
+            winnerCard=document.createElement("div");
+            winnerCard.id="winnerCardKO";
+            winnerCard.className="card winner-card-ko";
+            f.parentNode.insertBefore(winnerCard,f.nextSibling);
+        }else if(winnerCard && f.parentNode && winnerCard.previousElementSibling!==f){
+            f.parentNode.insertBefore(winnerCard,f.nextSibling);
+        }
+
+        if(campione){
+            state.campioneTop=campione;
+
+            if(winnerCard){
+                winnerCard.style.cssText="display: block !important; margin-top: 15px;";
+                winnerCard.innerHTML=`
+                    <div class="winner-box top-win" style="background: rgba(251,191,36,.2); color: #fbbf24; padding: 15px; border-radius: 8px; text-align: center; font-weight: bold; font-size: 1.3em;">
+                        🏆 CAMPIONE TORNEO:<br>
+                        <span style="font-size: 1.1em; font-weight: normal; color: #e2e8f0;">${formatCoppiaDisplay(campione)}</span>
+                    </div>
+                `;
+            }
+        }else{
+            state.campioneTop=null;
+
+            if(winnerCard){
+                winnerCard.style.cssText="display: none !important;";
+                winnerCard.innerHTML="";
+            }
         }
     }
 }
@@ -11207,13 +11287,30 @@ function renderMatchCard(titolo, match, type, index, risultato) {
         ? (state[timeKey][index] || "")
         : "";
 
-    const winner = getWinner(match, risultato);
-    const stato = winner ? "Terminata" : "Da giocare";
+    /*
+     * NON convertire qui le squadre in String().
+     * Le squadre provenienti da classifica/gironi possono essere
+     * oggetti {nome, ...}: String(oggetto) produce "[object Object]"
+     * e impedisce a formatCoppiaDisplay() di mostrarle correttamente.
+     */
+    const rawTeam1 = match && match[0] != null ? match[0] : "Da determinare";
+    const rawTeam2 = match && match[1] != null ? match[1] : "Da determinare";
+
+    const displayTeam1 = formatCoppiaDisplay(rawTeam1) || "Da determinare";
+    const displayTeam2 = formatCoppiaDisplay(rawTeam2) || "Da determinare";
+
+    const placeholder =
+        /^(da determinare|vincente |qualificat[ao] |[0-9]+[ªa°]? qualificat[ao])/i;
+
+    const isPlaceholder =
+        placeholder.test(displayTeam1.trim()) ||
+        placeholder.test(displayTeam2.trim());
+
+    const winner = isPlaceholder ? null : getWinner(match, risultato);
 
     return `
 <tr>
 
-    <!-- COLONNA CAMPO -->
     <td class="campo-cell">
         <input
             value="${camp}"
@@ -11222,7 +11319,6 @@ function renderMatchCard(titolo, match, type, index, risultato) {
         >
     </td>
 
-    <!-- COLONNA ORA / MINUTI -->
     <td class="orario-cell">
         <input
             type="time"
@@ -11231,11 +11327,10 @@ function renderMatchCard(titolo, match, type, index, risultato) {
         >
     </td>
 
-    <!-- COLONNA MATCHES -->
     <td class="match-cell">
 
         <div class="team-line">
-            ${formatCoppiaDisplay(match[0])}
+            ${displayTeam1}
         </div>
 
         <div class="vs-line">
@@ -11243,31 +11338,29 @@ function renderMatchCard(titolo, match, type, index, risultato) {
         </div>
 
         <div class="team-line">
-            ${formatCoppiaDisplay(match[1])}
+            ${displayTeam2}
         </div>
 
     </td>
 
-    <!-- RISULTATO SQUADRA 1 -->
     <td class="score-cell">
         <input
             value="${risultato1}"
             oninput="updateKOResult('${type}', ${index}, this.value, 0)"
+            ${isPlaceholder ? "disabled" : ""}
         >
     </td>
 
-    <!-- RISULTATO SQUADRA 2 -->
     <td class="score-cell">
         <input
             value="${risultato2}"
             oninput="updateKOResult('${type}', ${index}, this.value, 1)"
+            ${isPlaceholder ? "disabled" : ""}
         >
     </td>
 
 </tr>`;
 }
-
-
 
 function applicaModelloTorneo(){
 
@@ -11279,7 +11372,22 @@ function applicaModelloTorneo(){
     const tipo=select.value;
     if(!tipo) return;
 
-    const n=Number(state.rules.numeroSquadre)||8;
+    const formatoInput=document.getElementById("formatoTorneo");
+
+    const nSelezionato =
+        formatoInput
+        ? Number(formatoInput.value)
+        : Number(state.rules.formatoTorneo);
+
+    const n =
+        [8,12,16,20,24].includes(nSelezionato)
+        ? nSelezionato
+        : (Number(state.rules.numeroSquadre) || 8);
+
+    state.rules.numeroSquadre=n;
+    state.rules.formatoTorneo=n;
+    state.formato=n;
+
     const struttura={
         8:{gironi:2,perGirone:4},
         12:{gironi:3,perGirone:4},
@@ -11289,7 +11397,8 @@ function applicaModelloTorneo(){
     }[n] || {gironi:2,perGirone:4};
 
     state.rules.tipoTorneo=tipo;
-    state.rules.formatoTorneo=String(n);
+    state.rules.formatoTorneo=n;
+    state.rules.numeroSquadre=n;
 
     state.qRes=Array(4).fill("-");
     state.sTopRes=Array(2).fill("-");
@@ -11316,9 +11425,9 @@ function applicaModelloTorneo(){
             state.rules.qualificatePerGirone=2;
             state.rules.numeroQualificateFinali=
                 state.rules.numeroGironi*state.rules.qualificatePerGirone;
-            state.rules.usaQuarti=true;
-            state.rules.usaSemifinali=true;
-            state.rules.usaFinale=true;
+            state.rules.usaQuarti=false;
+            state.rules.usaSemifinali=false;
+            state.rules.usaFinale=false;
         break;
 
         case "gironiFinale":
@@ -11354,8 +11463,8 @@ function applicaModelloTorneo(){
             state.rules.qualificatePerGirone=0;
             state.rules.numeroQualificateFinali=4;
             state.rules.usaQuarti=false;
-            state.rules.usaSemifinali=true;
-            state.rules.usaFinale=true;
+            state.rules.usaSemifinali=false;
+            state.rules.usaFinale=false;
             if(!state.svizzero){
                 state.svizzero={
                     turno:1,
@@ -11459,7 +11568,6 @@ function applicaModelloTorneo(){
         break;
     }
 
-    const formatoInput=document.getElementById("formatoTorneo");
     if(formatoInput) formatoInput.value=String(n);
 
     const numeroGironiInput=document.getElementById("numeroGironi");
@@ -12454,6 +12562,389 @@ window.addEventListener("load", async()=>{
 </script>
     
 <script src="bove-admin-flow-fix.js?v=20260906-flow4"></script>
+\n<script id="bove-print-bracket-script">
+function stampaTabelloneGrafico(){
+let root=document.getElementById("bovePrintLayout");
+if(!root){root=document.createElement("div");root.id="bovePrintLayout";document.body.appendChild(root)}
+const esc=v=>String(v==null?"":v).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+const textOf=el=>el?String(el.textContent||"").replace(/\s+/g," ").trim():"";
+function printableTable(table){
+if(!table)return "";
+const clone=table.cloneNode(true);
+clone.querySelectorAll("input,select,textarea,button").forEach(el=>{
+const span=document.createElement("span");
+span.textContent=el.value!=null&&el.value!==""?el.value:(el.textContent||"");
+el.replaceWith(span);
+});
+clone.querySelectorAll("[style]").forEach(el=>el.removeAttribute("style"));
+return clone.outerHTML;
+}
+const gironiContainer=[...document.querySelectorAll(".groups")].find(g=>g.querySelector("#cardA,#cardB,#cardC,#cardD,#cardE,#cardF"))||null;
+const groupCards=gironiContainer?[...gironiContainer.children].filter(card=>card.matches(".card")&&/^card[A-F]$/i.test(card.id||"")&&getComputedStyle(card).display!=="none"):[];
+let groupsHtml="";
+groupCards.forEach((card,index)=>{
+const letter=(card.id||"card"+String.fromCharCode(65+index)).replace(/^card/i,"").toUpperCase();
+const matchTable=card.querySelector(`table#${letter}`);
+const classTable=card.querySelector(`table tbody#${letter}class`)?.closest("table");
+groupsHtml+=`<section class="bpl-group"><h3>GIRONE ${esc(letter||String.fromCharCode(65+index))}</h3>${printableTable(classTable||matchTable)}${classTable&&matchTable?`<div class="bpl-calendar-title">CALENDARIO</div>${printableTable(matchTable)}`:""}</section>`;
+});
+function matchCard(row){
+if(!row)return '<div class="bpl-match"><div class="bpl-match-name">Da determinare</div></div>';
+const match=row.querySelector(".match-cell");
+const teams=match?[...match.querySelectorAll(".team-line")].map(textOf):[];
+const inputs=[...row.querySelectorAll("input")];
+const score=[...row.querySelectorAll(".score-cell input")].map(x=>String(x.value||"").trim()).filter(v=>v!=="");
+const time=inputs.find(x=>x.type==="time");
+return `<div class="bpl-match"><div class="bpl-match-name">${esc(teams[0]||"Da determinare")}</div><div class="bpl-vs">VS</div><div class="bpl-match-name">${esc(teams[1]||"Da determinare")}</div>${score.length?`<div class="bpl-score">${esc(score[0]||"")} ${score[1]!==undefined?"– "+esc(score[1]):""}</div>`:""}${time?.value?`<div class="bpl-time">${esc(time.value)}</div>`:""}</div>`;
+}
+function rowsFor(id){
+const body=document.getElementById(id);
+return body?[...body.querySelectorAll(":scope > tr")].filter(r=>getComputedStyle(r).display!=="none"&&!r.querySelector("th")):[];
+}
+function stage(id,title,mode){
+const rows=rowsFor(id);
+return `<section class="bpl-stage" data-stage="${esc(mode)}"><div class="bpl-stage-title">${esc(title)}</div><div class="bpl-stage-body">${rows.length?rows.map((r,i)=>matchCard(r).replace("bpl-match",`bpl-match bpl-${mode}-match bpl-index-${i+1}`)).join(""):'<div class="bpl-match"><div class="bpl-match-name">Fase non attiva</div></div>'}</div></section>`;
+}
+const winner=(()=>{
+const card=document.getElementById("winnerCardKO");
+const span=card?.querySelector(".winner-box.top-win span");
+const domWinner=String(span?.textContent||"").replace(/\\s+/g," ").trim();
+if(domWinner)return domWinner;
+const st=window.state;
+if(st?.campioneTop){
+try{
+const formatted=typeof formatCoppiaDisplay==="function"?formatCoppiaDisplay(st.campioneTop):String(st.campioneTop);
+if(formatted&&formatted!=="Da determinare"&&formatted!=="Da verificare")return formatted;
+}catch(e){}
+}
+return "";
+})();
+root.innerHTML=`<section class="bpl-page"><div class="bpl-watermark" aria-hidden="true"><img src="loghi/logo_senza_scritte.jpg" alt=""></div><h1 class="bpl-title">${esc(state?.nomeTorneo||"TABELLONE TORNEO")}</h1><div class="bpl-subtitle">GIRONI — CLASSIFICHE E CALENDARIO</div><div class="bpl-groups ${groupCards.length===4 ? "bpl-groups-4" : ""}">${groupsHtml||'<div class="bpl-group"><h3>Nessun girone</h3></div>'}</div></section><section class="bpl-page bpl-bracket-page"><div class="bpl-watermark" aria-hidden="true"><img src="loghi/logo_con_scritta.jpg" alt=""></div><div class="bpl-organization">NEXT POINT PADEL</div><h1 class="bpl-title">TABELLONE FINALE</h1><div class="bpl-subtitle">QUARTI DI FINALE → SEMIFINALI → FINALE → CAMPIONE</div><div class="bpl-bracket">${stage("Q","QUARTI DI FINALE","q")}<div class="bpl-bracket-connector bpl-conn-q1" aria-hidden="true"><span class="h-left-top"></span><span class="h-left-bottom"></span><span class="h-right-mid"></span><span class="v-mid"></span></div><div class="bpl-bracket-connector bpl-conn-q2" aria-hidden="true"><span class="h-left-top"></span><span class="h-left-bottom"></span><span class="h-right-mid"></span><span class="v-mid"></span></div>${stage("S","SEMIFINALI","s")}<div class="bpl-bracket-connector bpl-conn-s1" aria-hidden="true"><span class="h-left-top"></span><span class="h-left-bottom"></span><span class="h-right-mid"></span><span class="v-mid"></span></div>${stage("finaleBox","FINALE","f")}<div class="bpl-bracket-connector bpl-conn-f1" aria-hidden="true"><span class="h-right-mid"></span></div><section class="bpl-stage" data-stage="w"><div class="bpl-stage-title">CAMPIONE</div><div class="bpl-stage-body"><div class="bpl-winner"><div class="bpl-winner-label">🏆 CAMPIONE TORNEO</div><div class="bpl-winner-name">${esc(winner||"Da determinare")}</div></div></div></section></div><div class="bpl-note">Tabellone generato dai dati correnti del torneo.</div></section>`;
+window.print();
+}
+</script>
+
+  <script>
+/* BOVE_TV_SYNC_V8
+   Smart TV: aggiornamento leggero.
+   Realtime riceve gia' la riga aggiornata di Supabase e la applica
+   direttamente allo stato, evitando il caricamento completo di
+   loadState() e le letture aggiuntive di iscrizioni.
+*/
+(function(){
+    "use strict";
+
+    var search = window.location.search || "";
+    var isTV = /(?:^|&)tv=1(?:&|$)/.test(search.replace(/^\?/,""));
+    if(!isTV) return;
+
+    function getParam(name){
+        try{
+            if(window.URLSearchParams){
+                return new URLSearchParams(window.location.search).get(name) || "";
+            }
+        }catch(e){}
+
+        var m = new RegExp("[?&]"+name+"=([^&]*)").exec(window.location.search||"");
+        return m ? decodeURIComponent(m[1].replace(/\+/g," ")) : "";
+    }
+
+    function getId(){
+        var id = getParam("idTorneo");
+        if(id) return String(id);
+
+        var torneo = getParam("torneo");
+        if(!torneo) return "";
+
+        if(/^\d+$/.test(torneo)) return torneo;
+
+        try{
+            var obj = JSON.parse(torneo);
+            if(obj && obj.idTorneo) return String(obj.idTorneo);
+            if(obj && obj.id) return String(obj.id);
+            if(obj && obj.configurazione && obj.configurazione.idTorneo){
+                return String(obj.configurazione.idTorneo);
+            }
+        }catch(e){}
+
+        return "";
+    }
+
+    var idTorneo = getId();
+    if(!idTorneo){
+        console.error("BOVE TV V8: ID TORNEO ASSENTE");
+        return;
+    }
+
+    if(!getParam("idTorneo")){
+        try{
+            var u = new URL(window.location.href);
+            u.searchParams.set("idTorneo", idTorneo);
+            u.searchParams.set("tv","1");
+            history.replaceState(null,"",u.toString());
+        }catch(e){}
+    }
+
+    var busy = false;
+    var lastUpdatedAt = "";
+    var channel = null;
+    var pollTimer = null;
+
+    function applicaSnapshot(row){
+        if(!row || !row.configurazione) return false;
+        if(typeof state === "undefined" || !state) return false;
+
+        var cfg = row.configurazione || {};
+        var nested = cfg.configurazione || {};
+        var source = Object.assign({}, cfg, nested);
+
+        var keys = [
+            "A","B","C","D","E","F","G",
+            "Ares","Bres","Cres","Dres","Eres","Fres","Gres",
+            "Atime","Btime","Ctime","Dtime","Etime","Ftime","Gtime",
+            "Acamp","Bcamp","Ccamp","Dcamp","Ecamp","Fcamp",
+            "Gcamp","qRes","qCamp","qTime",
+            "sTopRes","sTopCamp","sTopTime",
+            "fTopRes","fTopCamp","fTopTime",
+            "finalTop"
+        ];
+
+        state.idTorneo = row.id != null ? row.id : Number(idTorneo);
+        state.nomeTorneo = row.nome != null ? row.nome : "";
+        state.dataTorneo = row.data != null ? row.data : "";
+
+        if(source.rules){
+            state.rules = Object.assign({}, state.rules || {}, source.rules);
+        }
+
+        if(Array.isArray(source.coppie)){
+            state.coppie = source.coppie;
+        }else{
+            state.coppie = [];
+        }
+
+        if(Array.isArray(source.partecipanti)){
+            state.partecipanti = source.partecipanti;
+        }else{
+            state.partecipanti = [];
+        }
+
+        keys.forEach(function(k){
+            if(Object.prototype.hasOwnProperty.call(source,k)){
+                if(Array.isArray(source[k]) || k === "fTopRes"){
+                    state[k] = source[k];
+                }
+            }
+        });
+
+        if(typeof ensureRules === "function"){
+            ensureRules();
+        }
+
+        var numeroCoppie = Array.isArray(state.coppie)
+            ? state.coppie.length
+            : 0;
+
+        var strutture = {
+            8:{numeroGironi:2,squadrePerGirone:4},
+            12:{numeroGironi:3,squadrePerGirone:4},
+            16:{numeroGironi:4,squadrePerGirone:4},
+            20:{numeroGironi:5,squadrePerGirone:4},
+            24:{numeroGironi:6,squadrePerGirone:4}
+        };
+
+        if(strutture[numeroCoppie]){
+            state.rules.numeroSquadre = numeroCoppie;
+            state.rules.numeroGironi = strutture[numeroCoppie].numeroGironi;
+            state.rules.squadrePerGirone = strutture[numeroCoppie].squadrePerGirone;
+            state.formato = numeroCoppie;
+            state.rules.formatoTorneo = String(numeroCoppie);
+        }
+
+        if(typeof render === "function"){
+            render();
+        }
+
+        window.__BOVE_TV_LAST_STATE__ = JSON.stringify(state);
+        window.__BOVE_TV_LAST_RENDER_AT__ = Date.now();
+
+        return true;
+    }
+
+    function caricaSnapshotREST(){
+        var xhr;
+
+        try{
+            xhr = new XMLHttpRequest();
+
+            xhr.open(
+                "GET",
+                "https://iybjvtmfaupgthqqsngd.supabase.co/rest/v1/tornei?id=eq."+
+                encodeURIComponent(idTorneo)+
+                "&select=id,nome,data,configurazione,updated_at&_="+Date.now(),
+                true
+            );
+
+            xhr.setRequestHeader(
+                "apikey",
+                "sb_publishable_oLLML3_ne0I1dWKIinSRNA_K1Ao5SOl"
+            );
+
+            xhr.setRequestHeader(
+                "Authorization",
+                "Bearer sb_publishable_oLLML3_ne0I1dWKIinSRNA_K1Ao5SOl"
+            );
+
+            xhr.setRequestHeader("Cache-Control","no-cache");
+            xhr.timeout = 5000;
+
+            xhr.onreadystatechange=function(){
+                if(xhr.readyState!==4) return;
+
+                if(xhr.status<200 || xhr.status>=300){
+                    console.warn("BOVE TV V8 REST HTTP:",xhr.status);
+                    return;
+                }
+
+                try{
+                    var rows = JSON.parse(xhr.responseText);
+                    var row = rows && rows.length ? rows[0] : null;
+                    if(!row) return;
+
+                    var stamp = String(row.updated_at || "");
+
+                    if(!lastUpdatedAt){
+                        lastUpdatedAt = stamp;
+                        applicaSnapshot(row);
+                        return;
+                    }
+
+                    if(stamp !== lastUpdatedAt){
+                        lastUpdatedAt = stamp;
+                        applicaSnapshot(row);
+                    }
+                }catch(e){
+                    console.warn("BOVE TV V8 REST PARSE:",e);
+                }
+            };
+
+            xhr.onerror=function(){
+                console.warn("BOVE TV V8 REST NETWORK");
+            };
+
+            xhr.ontimeout=function(){
+                console.warn("BOVE TV V8 REST TIMEOUT");
+            };
+
+            xhr.send(null);
+
+        }catch(e){
+            console.warn("BOVE TV V8 REST:",e);
+        }
+    }
+
+    function aggiornaDaRealtime(payload){
+        if(busy) return;
+
+        var row = payload && payload.new ? payload.new : null;
+        if(!row) return;
+
+        busy = true;
+
+        try{
+            var stamp = String(row.updated_at || "");
+
+            if(stamp && stamp === lastUpdatedAt){
+                busy = false;
+                return;
+            }
+
+            if(stamp) lastUpdatedAt = stamp;
+
+            if(!applicaSnapshot(row)){
+                caricaSnapshotREST();
+            }
+        }catch(e){
+            console.error("BOVE TV V8 APPLY:",e);
+            caricaSnapshotREST();
+        }finally{
+            busy = false;
+        }
+    }
+
+    function avviaRealtime(){
+        if(typeof sb === "undefined" || !sb || !sb.channel){
+            console.warn("BOVE TV V8: client Supabase non disponibile");
+            return;
+        }
+
+        try{
+            channel = sb
+                .channel("bove-tv-"+idTorneo)
+                .on(
+                    "postgres_changes",
+                    {
+                        event:"UPDATE",
+                        schema:"public",
+                        table:"tornei",
+                        filter:"id=eq."+idTorneo
+                    },
+                    function(payload){
+                        aggiornaDaRealtime(payload);
+                    }
+                )
+                .subscribe(function(status,err){
+                    console.log(
+                        "BOVE TV V8 REALTIME STATUS:",
+                        status,
+                        err || ""
+                    );
+                });
+        }catch(e){
+            console.error("BOVE TV V8 REALTIME:",e);
+        }
+    }
+
+    var adminSaveButton = document.getElementById("adminSaveResultButton");
+    if(adminSaveButton){
+        adminSaveButton.style.setProperty("display","none","important");
+    }
+
+    window.__BOVE_TV_V8_ACTIVE__ = true;
+    window.__BOVE_TV_ID__ = idTorneo;
+
+    /* Prima lettura completa dello snapshot. */
+    caricaSnapshotREST();
+
+    /* Da qui in poi gli aggiornamenti arrivano direttamente da Realtime. */
+    avviaRealtime();
+
+    /* Sicurezza: una verifica completa ogni 5 secondi, non ogni secondo. */
+    pollTimer = window.setInterval(
+        caricaSnapshotREST,
+        5000
+    );
+
+    window.addEventListener("beforeunload",function(){
+        if(pollTimer){
+            clearInterval(pollTimer);
+            pollTimer=null;
+        }
+
+        if(
+            channel &&
+            typeof sb !== "undefined" &&
+            sb &&
+            typeof sb.removeChannel === "function"
+        ){
+            try{
+                sb.removeChannel(channel);
+            }catch(e){}
+        }
+    });
+
+})();
+</script>
   <script src="sponsor-public-v2.js?v=8"></script>
 </body>
 </html>
