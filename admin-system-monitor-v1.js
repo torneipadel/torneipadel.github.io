@@ -1,7 +1,4 @@
-/* admin-system-monitor-v1.js
- * Monitor operativo GitHub + Supabase per admin.html.
- * Lettura soltanto: non modifica il flusso dei tornei.
- */
+/* admin-system-monitor-v1.js */
 (function () {
   'use strict';
 
@@ -9,8 +6,8 @@
   const DB_LIMIT = 500 * 1024 * 1024;
   const STORAGE_LIMIT = 1024 * 1024 * 1024;
   const GIT_TARGET = 1024 * 1024 * 1024;
-
   const $ = (id) => document.getElementById(id);
+
   const fmtBytes = (bytes) => {
     const n = Number(bytes) || 0;
     if (n < 1024) return n + ' B';
@@ -77,33 +74,19 @@
       .asm-wrap{font-family:inherit;color:#334155;max-width:1100px}
       .asm-head{display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap;margin-bottom:14px}
       .asm-title{font-size:22px;font-weight:800}.asm-sub{font-size:13px;color:#64748b;margin-top:3px}
-      .asm-actions{display:flex;gap:8px;flex-wrap:wrap}
-      .asm-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+      .asm-actions{display:flex;gap:8px;flex-wrap:wrap}.asm-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
       .asm-card{background:rgba(255,255,255,.78);border:1px solid rgba(15,23,42,.10);border-radius:14px;padding:14px;box-sizing:border-box}
-      .asm-card-title{font-size:13px;font-weight:700;color:#64748b}
-      .asm-card-value{font-size:24px;font-weight:850;margin:5px 0 2px;color:#0f172a}
-      .asm-card-sub{font-size:12px;color:#64748b;min-height:30px}
-      .asm-meter{height:8px;background:#e2e8f0;border-radius:99px;overflow:hidden;margin-top:10px}
-      .asm-meter-fill{height:100%;border-radius:99px;background:#16a34a}
-      .asm-meter-fill.warning{background:#d97706}.asm-meter-fill.critical{background:#dc2626}
-      .asm-card-foot{display:flex;justify-content:space-between;font-size:12px;margin-top:7px}
-      .ok{color:#15803d}.warning{color:#b45309}.critical{color:#b91c1c}
-      .asm-limit-graph{display:grid;gap:15px}
-      .asm-limit-row{display:grid;gap:5px}
-      .asm-limit-head,.asm-limit-foot{display:flex;justify-content:space-between;gap:10px;font-size:12px;color:#475569}
-      .asm-limit-head b{font-size:13px;color:#0f172a}
-      .asm-limit-track{position:relative;height:18px;border-radius:99px;background:#e2e8f0;overflow:hidden;border:1px solid rgba(15,23,42,.08)}
-      .asm-limit-used{height:100%;border-radius:99px;background:#16a34a;min-width:2px}
-      .asm-limit-used.warning{background:#d97706}.asm-limit-used.critical{background:#dc2626}
-      .asm-limit-max{position:absolute;right:0;top:0;bottom:0;width:2px;background:#0f172a}
-      .asm-section{margin-top:16px;background:rgba(255,255,255,.70);border:1px solid rgba(15,23,42,.10);border-radius:14px;padding:14px}
-      .asm-section h3{margin:0 0 10px;font-size:15px}
-      .asm-table{width:100%;border-collapse:collapse;font-size:13px}
-      .asm-table th,.asm-table td{text-align:left;padding:7px 5px;border-bottom:1px solid rgba(15,23,42,.08)}
-      .asm-note{font-size:12px;color:#64748b;line-height:1.45;margin-top:10px}
-      .asm-error{padding:12px;border-radius:10px;background:#fee2e2;color:#991b1b;font-size:13px}
-      @media(max-width:800px){.asm-grid{grid-template-columns:1fr 1fr}}
-      @media(max-width:520px){.asm-grid{grid-template-columns:1fr}.asm-card-value{font-size:21px}}
+      .asm-card-title{font-size:13px;font-weight:700;color:#64748b}.asm-card-value{font-size:24px;font-weight:850;margin:5px 0 2px;color:#0f172a}
+      .asm-card-sub{font-size:12px;color:#64748b;min-height:30px}.asm-meter{height:8px;background:#e2e8f0;border-radius:99px;overflow:hidden;margin-top:10px}
+      .asm-meter-fill{height:100%;border-radius:99px;background:#16a34a}.asm-meter-fill.warning{background:#d97706}.asm-meter-fill.critical{background:#dc2626}
+      .asm-card-foot{display:flex;justify-content:space-between;font-size:12px;margin-top:7px}.ok{color:#15803d}.warning{color:#b45309}.critical{color:#b91c1c}
+      .asm-limit-graph{display:grid;gap:15px}.asm-limit-row{display:grid;gap:5px}.asm-limit-head,.asm-limit-foot{display:flex;justify-content:space-between;gap:10px;font-size:12px;color:#475569}
+      .asm-limit-head b{font-size:13px;color:#0f172a}.asm-limit-track{position:relative;height:18px;border-radius:99px;background:#e2e8f0;overflow:hidden;border:1px solid rgba(15,23,42,.08)}
+      .asm-limit-used{height:100%;border-radius:99px;background:#16a34a;min-width:2px}.asm-limit-used.warning{background:#d97706}.asm-limit-used.critical{background:#dc2626}
+      .asm-limit-max{position:absolute;right:0;top:0;bottom:0;width:2px;background:#0f172a}.asm-section{margin-top:16px;background:rgba(255,255,255,.70);border:1px solid rgba(15,23,42,.10);border-radius:14px;padding:14px}
+      .asm-section h3{margin:0 0 10px;font-size:15px}.asm-table{width:100%;border-collapse:collapse;font-size:13px}.asm-table th,.asm-table td{text-align:left;padding:7px 5px;border-bottom:1px solid rgba(15,23,42,.08)}
+      .asm-note{font-size:12px;color:#64748b;line-height:1.45;margin-top:10px}.asm-error{padding:12px;border-radius:10px;background:#fee2e2;color:#991b1b;font-size:13px}
+      @media(max-width:800px){.asm-grid{grid-template-columns:1fr 1fr}}@media(max-width:520px){.asm-grid{grid-template-columns:1fr}.asm-card-value{font-size:21px}}
     `;
     document.head.appendChild(s);
   }
@@ -112,19 +95,13 @@
   let renderBusy = false;
 
   function stopAutoRefresh() {
-    if (monitorTimer) {
-      clearInterval(monitorTimer);
-      monitorTimer = null;
-    }
+    if (monitorTimer) { clearInterval(monitorTimer); monitorTimer = null; }
   }
 
   function startAutoRefresh() {
     stopAutoRefresh();
     monitorTimer = setInterval(() => {
-      if (!$('asmBody') || !$('asmRefresh')) {
-        stopAutoRefresh();
-        return;
-      }
+      if (!$('asmBody') || !$('asmRefresh')) { stopAutoRefresh(); return; }
       render(true);
     }, 30000);
   }
@@ -134,12 +111,10 @@
     renderBusy = true;
     ensureStyle();
     const root = $('appContent');
-    if (!root) {
-      renderBusy = false;
-      return;
-    }
+    if (!root) { renderBusy = false; return; }
+
     root.innerHTML = '<div class="asm-wrap"><div class="asm-head"><div><div class="asm-title">📊 Stato reale GitHub + Supabase</div><div class="asm-sub">Lettura diretta al momento dell\'aggiornamento.</div></div><div class="asm-actions"><button type="button" class="btn" id="asmRefresh">↻ Aggiorna</button></div></div><div id="asmBody">Caricamento dati reali…</div></div>';
-    $('asmRefresh')?.addEventListener('click', render);
+    $('asmRefresh')?.addEventListener('click', () => render(false));
 
     const body = $('asmBody');
     try {
@@ -153,7 +128,7 @@
       const totalRows = ['tornei','iscrizioni','profili','news','sponsor','mercatino'].reduce((a, k) => a + (Number(db[k]) || 0), 0);
 
       body.innerHTML =
-        '<div class="asm-grid">'
+        '<div class="asm-grid">' +
           card('Supabase — Database', fmtBytes(dbBytes), 'Limite Free: 500 MB per progetto', dbPct) +
           card('Supabase — Storage', fmtBytes(storageBytes), (Number(db.storage_objects)||0) + ' oggetti · quota Free 1 GB', storagePct) +
           card('GitHub — Repository', fmtBytes(gitBytes), 'Target operativo prudenziale: < 1 GB', gitPct) +
@@ -162,7 +137,7 @@
           card('GitHub — Ultimo push', dateIt(git.pushed_at), 'Branch: ' + (git.default_branch || 'main'), 0, 'ok') +
         '</div>' +
         '<div class="asm-section"><h3>Limiti e massimi</h3>' +
-          '<div class="asm-note">Il grafico confronta l'utilizzo reale con il massimo monitorato: la barra arriva al 100% quando viene raggiunto il limite.</div>' +
+          '<div class="asm-note">Il grafico confronta l\'utilizzo reale con il massimo monitorato: la barra arriva al 100% quando viene raggiunto il limite.</div>' +
           limitGraph([
             {label:'Supabase Database', value:dbBytes, limit:DB_LIMIT},
             {label:'Supabase Storage', value:storageBytes, limit:STORAGE_LIMIT},
