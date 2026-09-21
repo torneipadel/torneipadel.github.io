@@ -113,6 +113,11 @@ footer{max-width:1180px;margin:0 auto;padding:30px 18px 60px;color:var(--muted);
 <h3>Procedura manuale</h3><ol><li>Aprire News.</li><li>Creare o modificare il contenuto.</li><li>Se necessario, scegliere la locandina manuale.</li><li>Salvare/pubblicare.</li><li>Verificare l'elenco.</li><li>Controllare la visualizzazione pubblica.</li></ol>
 </section>
 
+<section id="backup-news-auto"><h2>9.1 Backup operativo — automazione News</h2>
+<div class="note"><b>Backup aggiornato al 21 settembre 2026:</b> prima delle attività successive è disponibile il branch <code>backup-news-automation-updated-2026-09-21</code>, creato dall'ultimo commit stabile della branch <code>main</code>.</div>
+<ul><li>Il backup comprende l'automazione News torneo, il caricamento del modulo in <code>admin.html</code> e la documentazione aggiornata.</li><li>Il backup non sostituisce <code>main</code> e può essere usato per ripristinare lo stato precedente alle modifiche successive.</li><li>Prima di nuove modifiche strutturali al flusso News o al backend, creare un nuovo backup.</li></ul>
+</section>
+
 <section id="sponsor"><h2>10. Sponsor</h2>
 <p>La tabella <code>public.sponsor</code> contiene nome, immagine, video, link e data di creazione. La gestione deve essere accessibile dalla sezione Comunicazioni/Sponsor.</p>
 <div class="note"><b>Diagnosi route:</b> se il pulsante Sponsor non apre la sezione, controllare prima il caricamento di <code>admin-comunicazioni-v1.js</code> e il routing <code>openAdminSponsor</code>; non modificare il database per un problema di apertura della pagina.</div>
