@@ -35,7 +35,7 @@ root.innerHTML=`<div class="page-head"><div><h1>${title}</h1><p>${sub}</p></div>
 $('comBack')?.addEventListener('click',()=>window.openAdminPage?.('torneo'))
 }
 
-async function news(){return newsEditor()}
+async function news(){if(typeof window.openAdminNewsComplete==='function')return window.openAdminNewsComplete();return newsEditor()}
 
 async function sponsor(){
 const items=await loadGlobalSponsors();
