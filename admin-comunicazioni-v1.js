@@ -151,6 +151,6 @@ list.querySelectorAll('[data-del]').forEach(b=>b.onclick=async()=>{if(!confirm('
 render();
 }
 const oldOpenAdminComPage=window.openAdminComPage;
-window.openAdminComPage=p=>p==='news'?newsEditor():oldOpenAdminComPage?.(p);
-document.addEventListener('click',e=>{const b=e.target?.closest?.('[data-com-page="news"]');if(!b)return;e.preventDefault();e.stopImmediatePropagation();document.getElementById('mobileOverlay')?.classList.remove('open');newsEditor()},true);
+window.openAdminComPage=p=>(p==='news'||p==='news-ai')?window.__NP_OPEN_NEWS_AI__?.()||window.openAdminNewsAI?.():oldOpenAdminComPage?.(p);
+document.addEventListener('click',e=>{const b=e.target?.closest?.('[data-com-page="news"]');if(!b)return;e.preventDefault();e.stopImmediatePropagation();document.getElementById('mobileOverlay')?.classList.remove('open');window.__NP_OPEN_NEWS_AI__?.()||window.openAdminNewsAI?.()},true);
 })();
