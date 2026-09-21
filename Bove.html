@@ -11114,8 +11114,7 @@ function sincronizzaFaseFinale(){
         state.sTopRes=Array(2).fill("-"); state.sTopCamp=[]; state.sTopTime=[];
         state.fTopRes="-"; state.fTopCamp=""; state.fTopTime=""; state.campioneTop=null; return;
     }
-    if(state.rules.usaQuarti===true){
-        if(qualificati.length<8) return;
+    if(state.rules.usaQuarti===true && qualificati.length>=8){
         state.quarti=[[qualificati[0],qualificati[7]],[qualificati[3],qualificati[4]],[qualificati[1],qualificati[6]],[qualificati[2],qualificati[5]]];
         if(!Array.isArray(state.qRes)) state.qRes=Array(4).fill("-");
         const v=[]; state.quarti.forEach((m,i)=>{const w=getWinner(m,state.qRes[i]); if(w)v.push(w);});
@@ -11531,11 +11530,24 @@ function applicaModelloTorneo(){
             state.rules.formulaGironi="tuttiControTutti";
             state.rules.formulaFinale="eliminazioneDiretta";
             state.rules.qualificatePerGirone=2;
-            state.rules.numeroQualificateFinali=
-                state.rules.numeroGironi*state.rules.qualificatePerGirone;
-            state.rules.usaQuarti=true;
-            state.rules.usaSemifinali=true;
-            state.rules.usaFinale=true;
+
+            /*
+             * La fase finale deve essere compatibile con il numero
+             * reale di squadre:
+             * 8/12 squadre -> 4 qualificate -> semifinali
+             * 16/20/24 squadre -> 8 qualificate -> quarti
+             */
+            if(n <= 12){
+                state.rules.numeroQualificateFinali=4;
+                state.rules.usaQuarti=false;
+                state.rules.usaSemifinali=true;
+                state.rules.usaFinale=true;
+            }else{
+                state.rules.numeroQualificateFinali=8;
+                state.rules.usaQuarti=true;
+                state.rules.usaSemifinali=true;
+                state.rules.usaFinale=true;
+            }
         break;
 
         case "eliminazione":
