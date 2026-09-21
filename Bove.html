@@ -515,6 +515,7 @@ async function verifyAccess(){
             "Nessun utente autenticato"
         );
 
+        window.__BOVE_ADMIN_ACCESS__ = false;
         bloccaGestionale();
 
         return;
@@ -553,6 +554,7 @@ async function verifyAccess(){
             "Profilo non trovato"
         );
 
+        window.__BOVE_ADMIN_ACCESS__ = false;
         bloccaGestionale();
 
         return;
@@ -674,6 +676,14 @@ async function verifyAccess(){
             "important"
         );
     }
+
+    window.__BOVE_ADMIN_ACCESS__ = true;
+
+    document.querySelectorAll('[data-bove-gestionale-locked="1"]').forEach(el=>{
+        el.disabled = false;
+        el.style.removeProperty("opacity");
+        delete el.dataset.boveGestionaleLocked;
+    });
 
     console.log(
         "ACCESSO ADMIN:",
@@ -8976,78 +8986,58 @@ document.querySelectorAll('#finaleBox input').forEach(input => {
 
     valore = String(valore ?? "").trim();
 
-    let resultArray = null;
+    const aggiorna = (arr,i) => {
+        let res = String(arr[i] || "-").split("-");
+        if(res.length !== 2) res = ["",""];
+        res[pos] = valore;
+        arr[i] = res.join("-");
+    };
 
     if(type === "Q"){
-
         if(!Array.isArray(state.qRes))
             state.qRes = Array(4).fill("-");
-
-        let res = String(state.qRes[index] || "-").split("-");
-
-        if(res.length !== 2)
-            res = ["",""];
-
-        res[pos] = valore;
-        state.qRes[index] = res.join("-");
-        resultArray = state.qRes;
+        aggiorna(state.qRes,index);
 
     }else if(type === "S"){
-
         if(!Array.isArray(state.sTopRes))
             state.sTopRes = Array(2).fill("-");
-
-        let res = String(state.sTopRes[index] || "-").split("-");
-
-        if(res.length !== 2)
-            res = ["",""];
-
-        res[pos] = valore;
-        state.sTopRes[index] = res.join("-");
-        resultArray = state.sTopRes;
+        aggiorna(state.sTopRes,index);
 
     }else if(type === "F"){
-
         let res = String(state.fTopRes || "-").split("-");
-
-        if(res.length !== 2)
-            res = ["",""];
-
+        if(res.length !== 2) res = ["",""];
         res[pos] = valore;
         state.fTopRes = res.join("-");
+
+    }else{
+        return;
     }
 
     /*
-     * NON ricostruire il DOM ad ogni cifra digitata.
-     * Il campo deve mantenere il focus mentre l'admin inserisce
-     * il risultato. La fase successiva viene sincronizzata solo
-     * quando entrambe le cifre del risultato sono presenti.
+     * NON ridisegnare il tabellone mentre l'admin sta digitando.
+     * Il DOM viene ricreato soltanto quando entrambi i punteggi
+     * sono numeri completi.
      */
     const current =
         type === "F"
-            ? String(state.fTopRes || "-")
-            : String((resultArray && resultArray[index]) || "-");
+            ? String(state.fTopRes || "")
+            : String(
+                type === "Q"
+                    ? state.qRes[index]
+                    : state.sTopRes[index]
+              );
 
-    const parti = current.split("-");
-    const completo =
-        parti.length === 2 &&
-        parti[0].trim() !== "" &&
-        parti[1].trim() !== "" &&
-        /^\\d+$/.test(parti[0].trim()) &&
-        /^\\d+$/.test(parti[1].trim());
+    const risultatoCompleto = /^\d+-\d+$/.test(current);
 
-    if(completo){
-
+    if(risultatoCompleto){
         sincronizzaFaseFinale();
-
         if(typeof renderKO === "function")
             renderKO();
     }
 
     updateAndSync();
-
 }
-                    
+
 function getWinner(match,res){
 
     ensureRules();
@@ -11375,32 +11365,12 @@ function renderMatchCard(titolo, match, type, index, risultato) {
     const risultato1 = res[0] === "-" ? "" : (res[0] || "");
     const risultato2 = res[1] || "";
 
-    const campKey = {
-        Q: "qCamp",
-        S: "sTopCamp",
-        F: "fTopCamp"
-    }[type];
+    const campKey = { Q:"qCamp", S:"sTopCamp", F:"fTopCamp" }[type];
+    const timeKey = { Q:"qTime", S:"sTopTime", F:"fTopTime" }[type];
 
-    const timeKey = {
-        Q: "qTime",
-        S: "sTopTime",
-        F: "fTopTime"
-    }[type];
+    const camp = Array.isArray(state[campKey]) ? (state[campKey][index] || "") : "";
+    const time = Array.isArray(state[timeKey]) ? (state[timeKey][index] || "") : "";
 
-    const camp = Array.isArray(state[campKey])
-        ? (state[campKey][index] || "")
-        : "";
-
-    const time = Array.isArray(state[timeKey])
-        ? (state[timeKey][index] || "")
-        : "";
-
-    /*
-     * NON convertire qui le squadre in String().
-     * Le squadre provenienti da classifica/gironi possono essere
-     * oggetti {nome, ...}: String(oggetto) produce "[object Object]"
-     * e impedisce a formatCoppiaDisplay() di mostrarle correttamente.
-     */
     const rawTeam1 = match && match[0] != null ? match[0] : "Da determinare";
     const rawTeam2 = match && match[1] != null ? match[1] : "Da determinare";
 
@@ -11414,7 +11384,15 @@ function renderMatchCard(titolo, match, type, index, risultato) {
         placeholder.test(displayTeam1.trim()) ||
         placeholder.test(displayTeam2.trim());
 
-    const winner = isPlaceholder ? null : getWinner(match, risultato);
+    /*
+     * I risultati sono input numerici reali.
+     * Vengono disabilitati soltanto quando la partita contiene
+     * ancora un qualificato/vincente da determinare.
+     */
+    const disabledAttr =
+        isPlaceholder && window.__BOVE_ADMIN_ACCESS__ !== true
+            ? "disabled"
+            : "";
 
     return `
 <tr>
@@ -11436,34 +11414,30 @@ function renderMatchCard(titolo, match, type, index, risultato) {
     </td>
 
     <td class="match-cell">
-
-        <div class="team-line">
-            ${displayTeam1}
-        </div>
-
-        <div class="vs-line">
-            <b>VS</b>
-        </div>
-
-        <div class="team-line">
-            ${displayTeam2}
-        </div>
-
+        <div class="team-line">${displayTeam1}</div>
+        <div class="vs-line"><b>VS</b></div>
+        <div class="team-line">${displayTeam2}</div>
     </td>
 
     <td class="score-cell">
         <input
+            type="number"
+            min="0"
+            inputmode="numeric"
             value="${risultato1}"
             oninput="updateKOResult('${type}', ${index}, this.value, 0)"
-            ${isPlaceholder ? "disabled" : ""}
+            ${disabledAttr}
         >
     </td>
 
     <td class="score-cell">
         <input
+            type="number"
+            min="0"
+            inputmode="numeric"
             value="${risultato2}"
             oninput="updateKOResult('${type}', ${index}, this.value, 1)"
-            ${isPlaceholder ? "disabled" : ""}
+            ${disabledAttr}
         >
     </td>
 
