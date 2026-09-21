@@ -8951,91 +8951,54 @@ document.querySelectorAll('#finaleBox input').forEach(input => {
                     
 
  function updateKOResult(type,index,valore,pos){
-
     ensureRules();
 
     valore = String(valore ?? "").trim();
 
+    const aggiorna = (arr, i) => {
+        let res = String(arr[i] || "-").split("-");
+        if(res.length !== 2) res = ["",""];
+        res[pos] = valore;
+        arr[i] = res.join("-");
+    };
+
     if(type === "Q"){
-
-        if(!Array.isArray(state.qRes))
-            state.qRes = Array(4).fill("-");
-
-        let res = String(state.qRes[index] || "-").split("-");
-
-        if(res.length !== 2)
-            res = ["",""];
-
-        res[pos] = valore;
-
-        state.qRes[index] = res.join("-");
-
-    }
-
-    else if(type === "S"){
-
-        if(!Array.isArray(state.sTopRes))
-            state.sTopRes = Array(2).fill("-");
-
-        let res = String(state.sTopRes[index] || "-").split("-");
-
-        if(res.length !== 2)
-            res = ["",""];
-
-        res[pos] = valore;
-
-        state.sTopRes[index] = res.join("-");
-
-    }
-
-    else if(type === "F"){
-
+        if(!Array.isArray(state.qRes)) state.qRes = Array(4).fill("-");
+        aggiorna(state.qRes,index);
+    }else if(type === "S"){
+        if(!Array.isArray(state.sTopRes)) state.sTopRes = Array(2).fill("-");
+        aggiorna(state.sTopRes,index);
+    }else if(type === "F"){
         let res = String(state.fTopRes || "-").split("-");
-
-        if(res.length !== 2)
-            res = ["",""];
-
+        if(res.length !== 2) res = ["",""];
         res[pos] = valore;
-
         state.fTopRes = res.join("-");
-
+    }else{
+        return;
     }
 
-    renderKO();
+    /*
+     * Il campo risultato NON deve ricostruire il DOM mentre l'utente
+     * sta compilando il punteggio: altrimenti il focus viene perso e
+     * il secondo valore non può essere inserito normalmente.
+     * La fase finale viene invece ridisegnata quando il risultato è
+     * completo oppure quando si usa il normale salvataggio.
+     */
+    const risultatoCompleto =
+        type === "F"
+            ? /^\d+\-\d+$/.test(String(state.fTopRes || ""))
+            : /^\d+\-\d+$/.test(
+                String(
+                    type === "Q"
+                        ? state.qRes[index]
+                        : state.sTopRes[index]
+                )
+              );
 
-    // === AGGIUNTA MIRATA SULLA STRUTTURA REALE DELLA FINALE ===
-    if(type === "F") {
-        const teamLines = document.querySelectorAll('#finaleBox .team-line');
-        const scoreCells = document.querySelectorAll('#finaleBox .score-cell input');
-        const winnerCard = document.getElementById('winnerCardKO');
-
-        if(teamLines.length >= 2 && scoreCells.length >= 2 && winnerCard) {
-            const team1 = teamLines[0].innerText.trim();
-            const team2 = teamLines[1].innerText.trim();
-            const gol1 = parseInt(scoreCells[0].value);
-            const gol2 = parseInt(scoreCells[1].value);
-
-            if(!isNaN(gol1) && !isNaN(gol2) && scoreCells[0].value.trim() !== "" && scoreCells[1].value.trim() !== "") {
-                let vincitore = gol1 > gol2 ? team1 : (gol2 > gol1 ? team2 : "");
-                if(vincitore) {
-                    winnerCard.style.display = "block";
-                    winnerCard.innerHTML = `
-                        <div class="winner-box top-win">
-                            🏆 CAMPIONE TORNEO:<br>
-                            <span style="font-size: 1.1em; font-weight: normal; color: #e2e8f0;">${vincitore}</span>
-                        </div>
-                    `;
-                } else {
-                    winnerCard.style.display = "none";
-                    winnerCard.innerHTML = "";
-                }
-            } else {
-                winnerCard.style.display = "none";
-                winnerCard.innerHTML = "";
-            }
-        }
+    if(risultatoCompleto){
+        sincronizzaFaseFinale();
+        renderKO();
     }
-    // ==========================================================
 
     updateAndSync();
 }
@@ -11263,36 +11226,15 @@ function renderKO(){
                    
 function renderMatchCard(titolo, match, type, index, risultato) {
     const res = String(risultato || "-").split("-");
-
     const risultato1 = res[0] === "-" ? "" : (res[0] || "");
     const risultato2 = res[1] || "";
 
-    const campKey = {
-        Q: "qCamp",
-        S: "sTopCamp",
-        F: "fTopCamp"
-    }[type];
+    const campKey = { Q:"qCamp", S:"sTopCamp", F:"fTopCamp" }[type];
+    const timeKey = { Q:"qTime", S:"sTopTime", F:"fTopTime" }[type];
 
-    const timeKey = {
-        Q: "qTime",
-        S: "sTopTime",
-        F: "fTopTime"
-    }[type];
+    const camp = Array.isArray(state[campKey]) ? (state[campKey][index] || "") : "";
+    const time = Array.isArray(state[timeKey]) ? (state[timeKey][index] || "") : "";
 
-    const camp = Array.isArray(state[campKey])
-        ? (state[campKey][index] || "")
-        : "";
-
-    const time = Array.isArray(state[timeKey])
-        ? (state[timeKey][index] || "")
-        : "";
-
-    /*
-     * NON convertire qui le squadre in String().
-     * Le squadre provenienti da classifica/gironi possono essere
-     * oggetti {nome, ...}: String(oggetto) produce "[object Object]"
-     * e impedisce a formatCoppiaDisplay() di mostrarle correttamente.
-     */
     const rawTeam1 = match && match[0] != null ? match[0] : "Da determinare";
     const rawTeam2 = match && match[1] != null ? match[1] : "Da determinare";
 
@@ -11306,11 +11248,8 @@ function renderMatchCard(titolo, match, type, index, risultato) {
         placeholder.test(displayTeam1.trim()) ||
         placeholder.test(displayTeam2.trim());
 
-    const winner = isPlaceholder ? null : getWinner(match, risultato);
-
     return `
 <tr>
-
     <td class="campo-cell">
         <input
             value="${camp}"
@@ -11328,19 +11267,9 @@ function renderMatchCard(titolo, match, type, index, risultato) {
     </td>
 
     <td class="match-cell">
-
-        <div class="team-line">
-            ${displayTeam1}
-        </div>
-
-        <div class="vs-line">
-            <b>VS</b>
-        </div>
-
-        <div class="team-line">
-            ${displayTeam2}
-        </div>
-
+        <div class="team-line">${displayTeam1}</div>
+        <div class="vs-line"><b>VS</b></div>
+        <div class="team-line">${displayTeam2}</div>
     </td>
 
     <td class="score-cell">
@@ -11349,7 +11278,7 @@ function renderMatchCard(titolo, match, type, index, risultato) {
             min="0"
             inputmode="numeric"
             value="${risultato1}"
-            onchange="updateKOResult('${type}', ${index}, this.value, 0)"
+            oninput="updateKOResult('${type}', ${index}, this.value, 0)"
             ${isPlaceholder ? "disabled" : ""}
         >
     </td>
@@ -11360,11 +11289,10 @@ function renderMatchCard(titolo, match, type, index, risultato) {
             min="0"
             inputmode="numeric"
             value="${risultato2}"
-            onchange="updateKOResult('${type}', ${index}, this.value, 1)"
+            oninput="updateKOResult('${type}', ${index}, this.value, 1)"
             ${isPlaceholder ? "disabled" : ""}
         >
     </td>
-
 </tr>`;
 }
 
