@@ -8,10 +8,11 @@ async function publishPoster(){
  const canvas=q('#naiManualCanvas');
  if(!canvas)return;
  const t=selected();
+ if(!t){alert('Seleziona prima un torneo.');return}
  const sb=window.supabaseClient||window.sb;
  if(!sb){alert('Connessione Supabase non disponibile.');return}
  if(b){b.disabled=true;b.textContent='⏳ Pubblicazione...'}
- try{if(!t){const out=document.createElement('canvas');out.width=720;out.height=900;out.getContext('2d').drawImage(canvas,0,0,out.width,out.height);let url=out.toDataURL('image/jpeg',0.55);if(url.length>650000)url=out.toDataURL('image/jpeg',0.4);const ins=await sb.from('news').insert({titolo:'Locandina',testo:'',immagine:url,pubblicata:true,tipo:'Comunicazione',link:null,in_evidenza:true,ordine:0,torneo_id:null}).select('*').single();if(ins.error||!ins.data)throw new Error(ins.error?.message||'Salvataggio News generale non riuscito');const status=q('#naiManualStatus');if(status)status.textContent='Locandina pubblicata nelle News generali.';return}
+ try{
   const out=document.createElement('canvas');out.width=720;out.height=900;
   out.getContext('2d').drawImage(canvas,0,0,out.width,out.height);
   let url=out.toDataURL('image/jpeg',0.55);
