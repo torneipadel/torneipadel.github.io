@@ -11345,16 +11345,22 @@ function renderMatchCard(titolo, match, type, index, risultato) {
 
     <td class="score-cell">
         <input
+            type="number"
+            min="0"
+            inputmode="numeric"
             value="${risultato1}"
-            oninput="updateKOResult('${type}', ${index}, this.value, 0)"
+            onchange="updateKOResult('${type}', ${index}, this.value, 0)"
             ${isPlaceholder ? "disabled" : ""}
         >
     </td>
 
     <td class="score-cell">
         <input
+            type="number"
+            min="0"
+            inputmode="numeric"
             value="${risultato2}"
-            oninput="updateKOResult('${type}', ${index}, this.value, 1)"
+            onchange="updateKOResult('${type}', ${index}, this.value, 1)"
             ${isPlaceholder ? "disabled" : ""}
         >
     </td>
