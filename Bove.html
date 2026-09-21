@@ -515,7 +515,6 @@ async function verifyAccess(){
             "Nessun utente autenticato"
         );
 
-        window.__BOVE_ADMIN_ACCESS__ = false;
         bloccaGestionale();
 
         return;
@@ -554,7 +553,6 @@ async function verifyAccess(){
             "Profilo non trovato"
         );
 
-        window.__BOVE_ADMIN_ACCESS__ = false;
         bloccaGestionale();
 
         return;
@@ -573,7 +571,6 @@ async function verifyAccess(){
             profilo
         );
 
-        window.__BOVE_ADMIN_ACCESS__ = false;
         bloccaGestionale();
         document.body.classList.add("user-mode");
 
@@ -644,19 +641,6 @@ async function verifyAccess(){
     Lascia tutto disponibile.
     */
 
-    /*
-     * Se il controllo accessi ha temporaneamente bloccato il gestionale
-     * mentre Supabase recuperava la sessione, riabilita gli elementi
-     * bloccati da bloccaGestionale(). I campi KO volutamente disabilitati
-     * dai segnaposto vengono ricreati da renderKO() e restano quindi
-     * soggetti alla loro logica specifica.
-     */
-    document.querySelectorAll('[data-bove-gestionale-locked="1"]').forEach(el=>{
-        el.disabled=false;
-        el.style.removeProperty("opacity");
-        delete el.dataset.boveGestionaleLocked;
-    });
-
     const adminSaveResultButton =
         document.getElementById("adminSaveResultButton");
 
@@ -676,18 +660,6 @@ async function verifyAccess(){
             "center",
             "important"
         );
-    }
-
-    window.__BOVE_ADMIN_ACCESS__ = true;
-
-    document.querySelectorAll('[data-bove-gestionale-locked="1"]').forEach(el=>{
-        el.disabled = false;
-        el.style.removeProperty("opacity");
-        delete el.dataset.boveGestionaleLocked;
-    });
-
-    if(typeof renderKO === "function"){
-        renderKO();
     }
 
     console.log(
@@ -710,7 +682,6 @@ function bloccaGestionale(){
         ){
 
             el.disabled = true;
-            el.dataset.boveGestionaleLocked = "1";
             el.style.opacity = "0.6";
 
         }
@@ -853,12 +824,6 @@ window.toggleMenu = function(){
 <style id="bove-print-bracket-style">
 @page{size:A4 landscape;margin:8mm}
 @media print{
-.menu-container,
-.menu-button,
-#menuComandi,
-#adminSaveResultButton{
-    display:none!important;
-}
 body{background:#fff!important;color:#1f2937!important;padding:0!important;margin:0!important;-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
 body>*:not(#bovePrintLayout){display:none!important}
 #bovePrintLayout{display:block!important;width:100%!important;background:#f5f7fa!important;color:#1f2937!important;font-family:Arial,Helvetica,sans-serif!important}
@@ -8986,12 +8951,11 @@ document.querySelectorAll('#finaleBox input').forEach(input => {
                     
 
  function updateKOResult(type,index,valore,pos){
-
     ensureRules();
 
     valore = String(valore ?? "").trim();
 
-    const aggiorna = (arr,i) => {
+    const aggiorna = (arr, i) => {
         let res = String(arr[i] || "-").split("-");
         if(res.length !== 2) res = ["",""];
         res[pos] = valore;
@@ -8999,50 +8963,46 @@ document.querySelectorAll('#finaleBox input').forEach(input => {
     };
 
     if(type === "Q"){
-        if(!Array.isArray(state.qRes))
-            state.qRes = Array(4).fill("-");
+        if(!Array.isArray(state.qRes)) state.qRes = Array(4).fill("-");
         aggiorna(state.qRes,index);
-
     }else if(type === "S"){
-        if(!Array.isArray(state.sTopRes))
-            state.sTopRes = Array(2).fill("-");
+        if(!Array.isArray(state.sTopRes)) state.sTopRes = Array(2).fill("-");
         aggiorna(state.sTopRes,index);
-
     }else if(type === "F"){
         let res = String(state.fTopRes || "-").split("-");
         if(res.length !== 2) res = ["",""];
         res[pos] = valore;
         state.fTopRes = res.join("-");
-
     }else{
         return;
     }
 
     /*
-     * NON ridisegnare il tabellone mentre l'admin sta digitando.
-     * Il DOM viene ricreato soltanto quando entrambi i punteggi
-     * sono numeri completi.
+     * Il campo risultato NON deve ricostruire il DOM mentre l'utente
+     * sta compilando il punteggio: altrimenti il focus viene perso e
+     * il secondo valore non può essere inserito normalmente.
+     * La fase finale viene invece ridisegnata quando il risultato è
+     * completo oppure quando si usa il normale salvataggio.
      */
-    const current =
+    const risultatoCompleto =
         type === "F"
-            ? String(state.fTopRes || "")
-            : String(
-                type === "Q"
-                    ? state.qRes[index]
-                    : state.sTopRes[index]
+            ? /^\d+\-\d+$/.test(String(state.fTopRes || ""))
+            : /^\d+\-\d+$/.test(
+                String(
+                    type === "Q"
+                        ? state.qRes[index]
+                        : state.sTopRes[index]
+                )
               );
-
-    const risultatoCompleto = /^\d+-\d+$/.test(current);
 
     if(risultatoCompleto){
         sincronizzaFaseFinale();
-        if(typeof renderKO === "function")
-            renderKO();
+        renderKO();
     }
 
     updateAndSync();
 }
-
+                    
 function getWinner(match,res){
 
     ensureRules();
@@ -10987,133 +10947,32 @@ oninput="updateRes('${tag}',${i},1,this.value)">
 
    
 function getFinalQualified(){
-
     ensureRules();
-
-    const qualificati = [];
-    const lettereGironi = ["A","B","C","D","E","F","G"];
-
+    const qualificati=[];
+    const lettereGironi=["A","B","C","D","E","F","G"];
     lettereGironi.forEach(tag=>{
-
-        const squadre = state[tag];
-
-        if(!Array.isArray(squadre) || squadre.length === 0)
-            return;
-
-        const risultati =
-            Array.isArray(state[tag+"res"])
-                ? state[tag+"res"]
-                : [];
-
-        const numeroPartite =
-            squadre.length * (squadre.length - 1) / 2;
-
-        if(
-            risultati.length < numeroPartite ||
-            risultati.slice(0,numeroPartite).some(
-                r => r === "-" || r === "" || r == null
-            )
-        )
-            return;
-
-        const classifica = calc(squadre,risultati);
-
-        if(!Array.isArray(classifica) || !classifica.length)
-            return;
-
-        let q = Number(state.rules.qualificatePerGirone);
-
-        if(!Number.isFinite(q) || q < 1)
-            q = 1;
-
-        classifica.slice(0,q).forEach((x,i)=>{
-            qualificati.push({
-                nome:x.n,
-                posizione:i+1,
-                girone:tag,
-                pt:Number(x.pt)||0,
-                gf:Number(x.gf)||0,
-                gs:Number(x.gs)||0,
-                df:Number(x.df)||0
-            });
-        });
+        const squadre=state[tag];
+        if(!Array.isArray(squadre)||squadre.length===0) return;
+        const risultati=Array.isArray(state[tag+"res"])?state[tag+"res"]:[];
+        const numeroPartite=squadre.length*(squadre.length-1)/2;
+        if(risultati.length<numeroPartite||risultati.slice(0,numeroPartite).some(r=>r==="-"||r===""||r==null)) return;
+        const classifica=calc(squadre,risultati);
+        if(!Array.isArray(classifica)||!classifica.length) return;
+        let q=Number(state.rules.qualificatePerGirone);
+        if(!Number.isFinite(q)||q<1) q=1;
+        if(state.rules.usaQuarti===true&&squadre.length===4) q=4;
+        classifica.slice(0,q).forEach((x,i)=>qualificati.push({nome:x.n,posizione:i+1,girone:tag,pt:x.pt,gf:x.gf,gs:x.gs,df:x.df}));
     });
-
-    if(
-        qualificati.length === 0 &&
-        Array.isArray(state.coppie) &&
-        state.coppie.length
-    ){
-        state.coppie.forEach((x,i)=>{
-            qualificati.push({
-                nome:x,
-                posizione:i+1,
-                girone:"",
-                pt:0,
-                gf:0,
-                gs:0,
-                df:0
-            });
-        });
+    if(qualificati.length===0&&Array.isArray(state.coppie)&&state.coppie.length){
+        state.coppie.forEach((x,i)=>qualificati.push({nome:x,posizione:i+1}));
     }
-
-    if(!qualificati.length)
-        return [];
-
-    /*
-     * Il numero dei qualificati deve dipendere dalla fase realmente
-     * possibile per il numero di squadre, non dall'ordine dei gironi.
-     *
-     * 4 qualificati -> semifinali
-     * 8 qualificati -> quarti
-     * 2 qualificati -> finale
-     */
-    let richiesti = 0;
-
-    if(
-        state.rules.usaQuarti === true &&
-        qualificati.length >= 8
-    ){
-        richiesti = 8;
-
-    }else if(
-        state.rules.usaSemifinali === true &&
-        qualificati.length >= 4
-    ){
-        richiesti = 4;
-
-    }else if(
-        state.rules.usaFinale === true &&
-        qualificati.length >= 2
-    ){
-        richiesti = 2;
-    }
-
-    if(!richiesti)
-        return [];
-
-    /*
-     * Con più di 8 qualificati non si devono prendere solo i primi
-     * gironi. Si costruisce invece una graduatoria globale sui dati
-     * già calcolati dal motore.
-     */
-    const ordinati = [...qualificati].sort((a,b)=>{
-
-        if(b.pt !== a.pt) return b.pt - a.pt;
-        if(b.df !== a.df) return b.df - a.df;
-        if(b.gf !== a.gf) return b.gf - a.gf;
-
-        if(a.posizione !== b.posizione)
-            return a.posizione - b.posizione;
-
-        return String(a.girone).localeCompare(String(b.girone));
-    });
-
-    return ordinati
-        .slice(0,richiesti)
-        .map(x=>x.nome);
+    if(!qualificati.length) return [];
+    let richiesti=0;
+    if(state.rules.usaQuarti===true) richiesti=8;
+    else if(state.rules.usaSemifinali===true) richiesti=4;
+    else if(state.rules.usaFinale===true) richiesti=2;
+    return richiesti>0?qualificati.slice(0,richiesti).map(x=>x.nome):[];
 }
-
 function sincronizzaFaseFinale(){
     ensureRules();
     const qualificati=getFinalQualified();
@@ -11123,7 +10982,8 @@ function sincronizzaFaseFinale(){
         state.sTopRes=Array(2).fill("-"); state.sTopCamp=[]; state.sTopTime=[];
         state.fTopRes="-"; state.fTopCamp=""; state.fTopTime=""; state.campioneTop=null; return;
     }
-    if(state.rules.usaQuarti===true && qualificati.length>=8){
+    if(state.rules.usaQuarti===true){
+        if(qualificati.length<8) return;
         state.quarti=[[qualificati[0],qualificati[7]],[qualificati[3],qualificati[4]],[qualificati[1],qualificati[6]],[qualificati[2],qualificati[5]]];
         if(!Array.isArray(state.qRes)) state.qRes=Array(4).fill("-");
         const v=[]; state.quarti.forEach((m,i)=>{const w=getWinner(m,state.qRes[i]); if(w)v.push(w);});
@@ -11366,7 +11226,6 @@ function renderKO(){
                    
 function renderMatchCard(titolo, match, type, index, risultato) {
     const res = String(risultato || "-").split("-");
-
     const risultato1 = res[0] === "-" ? "" : (res[0] || "");
     const risultato2 = res[1] || "";
 
@@ -11389,16 +11248,8 @@ function renderMatchCard(titolo, match, type, index, risultato) {
         placeholder.test(displayTeam1.trim()) ||
         placeholder.test(displayTeam2.trim());
 
-    /*
-     * I risultati sono input numerici reali.
-     * Vengono disabilitati soltanto quando la partita contiene
-     * ancora un qualificato/vincente da determinare.
-     */
-    const disabledAttr = "";
-
     return `
 <tr>
-
     <td class="campo-cell">
         <input
             value="${camp}"
@@ -11423,26 +11274,21 @@ function renderMatchCard(titolo, match, type, index, risultato) {
 
     <td class="score-cell">
         <input
-            type="number"
-            min="0"
             inputmode="numeric"
+            pattern="[0-9]*"
             value="${risultato1}"
             oninput="updateKOResult('${type}', ${index}, this.value, 0)"
-            ${disabledAttr}
         >
     </td>
 
     <td class="score-cell">
         <input
-            type="number"
-            min="0"
             inputmode="numeric"
+            pattern="[0-9]*"
             value="${risultato2}"
             oninput="updateKOResult('${type}', ${index}, this.value, 1)"
-            ${disabledAttr}
         >
     </td>
-
 </tr>`;
 }
 
@@ -11520,24 +11366,11 @@ function applicaModelloTorneo(){
             state.rules.formulaGironi="tuttiControTutti";
             state.rules.formulaFinale="eliminazioneDiretta";
             state.rules.qualificatePerGirone=2;
-
-            /*
-             * La fase finale deve essere compatibile con il numero
-             * reale di squadre:
-             * 8/12 squadre -> 4 qualificate -> semifinali
-             * 16/20/24 squadre -> 8 qualificate -> quarti
-             */
-            if(n <= 12){
-                state.rules.numeroQualificateFinali=4;
-                state.rules.usaQuarti=false;
-                state.rules.usaSemifinali=true;
-                state.rules.usaFinale=true;
-            }else{
-                state.rules.numeroQualificateFinali=8;
-                state.rules.usaQuarti=true;
-                state.rules.usaSemifinali=true;
-                state.rules.usaFinale=true;
-            }
+            state.rules.numeroQualificateFinali=
+                state.rules.numeroGironi*state.rules.qualificatePerGirone;
+            state.rules.usaQuarti=true;
+            state.rules.usaSemifinali=true;
+            state.rules.usaFinale=true;
         break;
 
         case "eliminazione":
