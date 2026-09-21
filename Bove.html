@@ -573,6 +573,7 @@ async function verifyAccess(){
             profilo
         );
 
+        window.__BOVE_ADMIN_ACCESS__ = false;
         bloccaGestionale();
         document.body.classList.add("user-mode");
 
@@ -684,6 +685,10 @@ async function verifyAccess(){
         el.style.removeProperty("opacity");
         delete el.dataset.boveGestionaleLocked;
     });
+
+    if(typeof renderKO === "function"){
+        renderKO();
+    }
 
     console.log(
         "ACCESSO ADMIN:",
