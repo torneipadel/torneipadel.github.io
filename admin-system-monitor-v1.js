@@ -25,6 +25,24 @@
   }
 
 
+  function costAlerts(db, git) {
+    const dbPct = ((Number(db.database_bytes) || 0) / DB_LIMIT) * 100;
+    const storagePct = ((Number(db.storage_bytes) || 0) / STORAGE_LIMIT) * 100;
+    const gitPct = ((Number(git.size) || 0) * 1024 / GIT_TARGET) * 100;
+    const items = [];
+    function add(name, pct, detail) {
+      if (pct >= 100) items.push('<div class="asm-alert asm-alert-critical">🔴 <b>' + name + ':</b> limite raggiunto o superato — ' + pct.toFixed(1) + '% · ' + detail + '</div>');
+      else if (pct >= 90) items.push('<div class="asm-alert asm-alert-critical">🔴 <b>' + name + ':</b> livello critico — ' + pct.toFixed(1) + '% · ' + detail + '</div>');
+      else if (pct >= 75) items.push('<div class="asm-alert asm-alert-warning">🟠 <b>' + name + ':</b> attenzione — ' + pct.toFixed(1) + '% · ' + detail + '</div>');
+    }
+    add('Supabase Database', dbPct, 'quota monitor 500 MB');
+    add('Supabase Storage', storagePct, 'quota monitor 1 GB');
+    if (!git.__monitorFallback) add('GitHub repository', gitPct, 'soglia prudenziale 1 GB; non è una quota di fatturazione');
+    if (!items.length) items.push('<div class="asm-alert asm-alert-ok">🟢 Nessun superamento delle soglie monitorate.</div>');
+    items.push('<div class="asm-alert asm-alert-info">ℹ️ <b>GitHub Actions/Packages/LFS:</b> gli alert ufficiali GitHub possono essere configurati al 90% e 100% dell\'utilizzo incluso; questi consumi non sono leggibili dal monitor browser.</div>');
+    return '<div class="asm-section"><h3>🚨 Alert costi</h3>' + items.join('') + '</div>';
+  }
+
   function costPanel(db, git) {
     const dbBytes = Number(db.database_bytes) || 0;
     const storageBytes = Number(db.storage_bytes) || 0;
@@ -153,7 +171,7 @@
       .asm-limit-graph{display:grid;gap:15px}.asm-limit-row{display:grid;gap:5px}.asm-limit-head,.asm-limit-foot{display:flex;justify-content:space-between;gap:10px;font-size:12px;color:#475569}
       .asm-limit-head b{font-size:13px;color:#0f172a}.asm-limit-track{position:relative;height:18px;border-radius:99px;background:#e2e8f0;overflow:hidden;border:1px solid rgba(15,23,42,.08)}
       .asm-limit-used{height:100%;border-radius:99px;background:#16a34a;min-width:2px}.asm-limit-used.warning{background:#d97706}.asm-limit-used.critical{background:#dc2626}
-      .asm-limit-max{position:absolute;right:0;top:0;bottom:0;width:2px;background:#0f172a}.asm-cost-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.asm-cost-card{padding:12px;border:1px solid rgba(15,23,42,.10);border-radius:12px;background:rgba(255,255,255,.75);display:grid;gap:5px}.asm-cost-card b{font-size:13px;color:#475569}.asm-cost-card strong{font-size:18px;color:#0f172a}.asm-cost-card span{font-size:12px;color:#64748b;line-height:1.4}.asm-section{margin-top:16px;background:rgba(255,255,255,.70);border:1px solid rgba(15,23,42,.10);border-radius:14px;padding:14px}
+      .asm-limit-max{position:absolute;right:0;top:0;bottom:0;width:2px;background:#0f172a}.asm-alert{padding:10px 12px;border-radius:8px;margin:7px 0}.asm-alert-warning{background:#fff3cd;color:#7a5700}.asm-alert-critical{background:#f8d7da;color:#842029}.asm-alert-info{background:#dbeafe;color:#1e3a8a}.asm-alert-ok{background:#dcfce7;color:#166534}..asm-cost-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.asm-cost-card{padding:12px;border:1px solid rgba(15,23,42,.10);border-radius:12px;background:rgba(255,255,255,.75);display:grid;gap:5px}.asm-cost-card b{font-size:13px;color:#475569}.asm-cost-card strong{font-size:18px;color:#0f172a}.asm-cost-card span{font-size:12px;color:#64748b;line-height:1.4}.asm-section{margin-top:16px;background:rgba(255,255,255,.70);border:1px solid rgba(15,23,42,.10);border-radius:14px;padding:14px}
       .asm-section h3{margin:0 0 10px;font-size:15px}.asm-table{width:100%;border-collapse:collapse;font-size:13px}.asm-table th,.asm-table td{text-align:left;padding:7px 5px;border-bottom:1px solid rgba(15,23,42,.08)}
       .asm-note{font-size:12px;color:#64748b;line-height:1.45;margin-top:10px}.asm-error{padding:12px;border-radius:10px;background:#fee2e2;color:#991b1b;font-size:13px}
       @media(max-width:800px){.asm-grid{grid-template-columns:1fr 1fr}.asm-cost-grid{grid-template-columns:1fr}}@media(max-width:520px){.asm-grid{grid-template-columns:1fr}.asm-card-value{font-size:21px}}
@@ -206,6 +224,7 @@
           card('Dati applicativi', String(totalRows), 'Record nelle 6 tabelle principali monitorate', 0, 'ok') +
           card('GitHub — Ultimo push', git.pushed_at ? dateIt(git.pushed_at) : (git.__monitorFallback ? 'Temporaneamente non disponibile' : '-'), 'Branch: ' + (git.default_branch || 'main') + (git.__monitorStale ? ' · dato GitHub in cache' : '') + (git.__monitorFallback ? ' · ultimo dato locale di sicurezza' : ''), 0, 'ok') +
         '</div>' +
+        costAlerts(db, git) +
         '<div class="asm-section"><h3>Limiti e massimi</h3>' +
           '<div class="asm-note">Il grafico confronta l\'utilizzo reale con il massimo monitorato: la barra arriva al 100% quando viene raggiunto il limite.</div>' +
           limitGraph([
