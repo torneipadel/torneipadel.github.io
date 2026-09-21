@@ -134,7 +134,10 @@
     renderBusy = true;
     ensureStyle();
     const root = $('appContent');
-    if (!root) return;
+    if (!root) {
+      renderBusy = false;
+      return;
+    }
     root.innerHTML = '<div class="asm-wrap"><div class="asm-head"><div><div class="asm-title">📊 Stato reale GitHub + Supabase</div><div class="asm-sub">Lettura diretta al momento dell\'aggiornamento.</div></div><div class="asm-actions"><button type="button" class="btn" id="asmRefresh">↻ Aggiorna</button></div></div><div id="asmBody">Caricamento dati reali…</div></div>';
     $('asmRefresh')?.addEventListener('click', render);
 
@@ -186,15 +189,20 @@
     const app = $('areaAdmin');
     if (!app || app.classList.contains('hidden')) return;
     document.querySelectorAll('#areaAdmin .sidebar .nav button[data-page]').forEach(x => x.classList.remove('active'));
-    $('topbarTitle').textContent = 'Stato risorse';
+    if ($('topbarTitle')) $('topbarTitle').textContent = 'Stato risorse';
     stopAutoRefresh();
     render(false);
   }
 
   function bind() {
-    $('sideSystemMonitor')?.addEventListener('click', open);
-    $('mobileSystemMonitor')?.addEventListener('click', () => {
-      $('mobileOverlay')?.classList.remove('open');
+    if (window.__adminSystemMonitorBound) return;
+    window.__adminSystemMonitorBound = true;
+    document.addEventListener('click', (ev) => {
+      const side = ev.target?.closest?.('#sideSystemMonitor');
+      const mobile = ev.target?.closest?.('#mobileSystemMonitor');
+      if (!side && !mobile) return;
+      ev.preventDefault();
+      if (mobile) $('mobileOverlay')?.classList.remove('open');
       open();
     });
   }
