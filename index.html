@@ -54,20 +54,8 @@ button{width:100%;height:48px;border:1px solid rgba(255,255,255,.20);border-radi
 </form>
 <div class="register"><span data-i18n="notRegistered">Non sei iscritto?</span> <span class="link" id="registerLink" data-i18n="registerLink">Registrati</span></div>
 <div id="status" class="status"></div>
-<div class="site-links" aria-label="Pagine del sito">
-  <a href="informazioni.html">Informazioni</a>
-  <a href="contatti.html">Contatti</a>
-  <a href="privacy.html">Privacy</a>
-  <a href="cookie.html">Cookie</a>
-  <a href="termini.html">Termini</a>
-</div>
 </main>
-<footer style="width:min(570px,100%);margin:14px auto 0;text-align:center;font:11px/1.5 Arial,sans-serif;color:rgba(255,255,255,.72)">
-<a href="privacy.html" style="color:#fff;text-decoration:none;margin:0 7px">Privacy</a>
-<a href="cookie.html" style="color:#fff;text-decoration:none;margin:0 7px">Cookie</a>
-<a href="termini.html" style="color:#fff;text-decoration:none;margin:0 7px">Termini</a>
-<a href="contatti.html" style="color:#fff;text-decoration:none;margin:0 7px">Contatti</a>
-</footer>
+<footer style="width:min(570px,100%);margin:14px auto 0;text-align:center;font:11px/1.5 Arial,sans-serif;color:rgba(255,255,255,.72)"><a href="informazioni.html" style="color:#fff;text-decoration:none;margin:0 7px">Informazioni</a><a href="contatti.html" style="color:#fff;text-decoration:none;margin:0 7px">Contatti</a><a href="privacy.html" style="color:#fff;text-decoration:none;margin:0 7px">Privacy</a><a href="cookie.html" style="color:#fff;text-decoration:none;margin:0 7px">Cookie</a><a href="termini.html" style="color:#fff;text-decoration:none;margin:0 7px">Termini</a></footer>
 <script>
 const sb=supabase.createClient("https://iybjvtmfaupgthqqsngd.supabase.co","sb_publishable_oLLML3_ne0I1dWKIinSRNA_K1Ao5SOl",{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});
 const status=document.getElementById("status");
