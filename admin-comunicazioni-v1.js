@@ -37,7 +37,13 @@ $('comBack')?.addEventListener('click',()=>window.openAdminPage?.('torneo'))
 
 function news(){
 const t=selected();
-if(!t){alert('Seleziona prima un torneo');return}
+if(!t){
+  const tornei=Array.isArray(state().tornei)?state().tornei:[];
+  const allNews=tornei.flatMap(torneo=>{const c=cfgOf(torneo),items=Array.isArray(c.news)?c.news:[];return items.map(n=>({...n,__torneoId:torneo.id,__torneoNome:torneo.nome||torneo.nomeTorneo||('Torneo '+torneo.id)}));});
+  shell('News','Comunicazioni globali · tutti i tornei',`<div class="card feature-card"><div class="card-head"><div><h2>Gestione News</h2><span class="notice">Le News sono consultabili senza selezionare un torneo.</span></div></div><div class="card-body"><div class="section-grid"><div class="feature-form"><label>Pubblica in un torneo</label><select id="newsTorneo" class="input">${tornei.map(x=>`<option value="${esc(x.id)}">${esc(x.nome||x.nomeTorneo||('Torneo '+x.id))}</option>`).join('')}</select><label>Titolo</label><input id="newsTitle" class="input" placeholder="Titolo della news"><label>Testo</label><textarea id="newsText" class="input" rows="6" placeholder="Testo della comunicazione"></textarea><button class="btn primary" id="newsSave">＋ Pubblica news</button></div><div><h3>Tutte le News</h3><div id="newsList" class="feature-list">${allNews.length?allNews.map(n=>`<div class="list-item"><strong>${esc(n.titolo)}</strong><small>${esc(n.__torneoNome)}</small><small>${esc(n.testo)}</small></div>`).join(''):'<div class="empty">Nessuna news pubblicata.</div>'}</div></div></div></div></div>`);
+  $('newsSave').onclick=async()=>{const torneoId=$('newsTorneo')?.value,torneo=tornei.find(x=>String(x.id)===String(torneoId)),titolo=$('newsTitle')?.value.trim(),testo=$('newsText')?.value.trim();if(!torneo){alert('Seleziona il torneo a cui pubblicare la News.');return}if(!titolo||!testo){alert('Inserisci titolo e testo della news.');return}const c=cfgOf(torneo),items=Array.isArray(c.news)?c.news:[],next=[...items,{id:'news-'+Date.now(),titolo,testo,data:new Date().toISOString()}];if(await saveCfg(torneo,{...c,news:next}))news()};
+  return;
+}
 const c=cfgOf(t),items=Array.isArray(c.news)?c.news:[];
 shell('News',`${esc(t.nome)} · ID ${esc(t.id)}`,`<div class="card feature-card"><div class="card-head"><div><h2>Gestione News</h2><span class="notice">Pubblica e gestisci le comunicazioni del torneo</span></div></div><div class="card-body"><div class="section-grid"><div class="feature-form"><label>Titolo</label><input id="newsTitle" class="input" placeholder="Titolo della news"><label>Testo</label><textarea id="newsText" class="input" rows="6" placeholder="Testo della comunicazione"></textarea><button class="btn primary" id="newsSave">＋ Pubblica news</button></div><div><h3>News del torneo</h3><div id="newsList" class="feature-list">${items.length?items.map((n,i)=>`<div class="list-item"><strong>${esc(n.titolo)}</strong><small>${esc(n.testo)}</small><button class="btn small danger" data-news-del="${i}">Elimina</button></div>`).join(''):'<div class="empty">Nessuna news pubblicata.</div>'}</div></div></div></div></div>`);
 $('newsSave').onclick=async()=>{
@@ -109,7 +115,8 @@ const fileToDataUrl=file=>new Promise((resolve,reject)=>{const r=new FileReader(
 const typeIcon=t=>{const x=String(t||'').toLowerCase();if(x.includes('torneo'))return '🏆';if(x.includes('promo'))return '🔥';if(x.includes('evento'))return '📅';if(x.includes('ricordo'))return '📸';if(x.includes('prodott'))return '🎾';if(x.includes('articol'))return '📰';return '📢'};
 const dateText=v=>{if(!v)return '';const d=new Date(v);return Number.isNaN(d.getTime())?'':d.toLocaleString('it-IT',{dateStyle:'short',timeStyle:'short'})};
 function newsEditor(){
-const t=selected();if(!t){alert('Seleziona prima un torneo');return}
+const t=selected();
+if(!t){return news();}
 const c=cfgOf(t),items=Array.isArray(c.news)?c.news:[];
 const root=$('appContent');if(!root)return;
 const types=['Comunicazione','Torneo','Promozione','Evento','Ricordo','Prodotto','Articolo'];
