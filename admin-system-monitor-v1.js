@@ -83,7 +83,7 @@
       '<div class="asm-cost-card"><b>Actions</b><strong>500 MB + 2.000 minuti/mese inclusi</strong><span>Servizio separato dal limite del repository.</span></div>' +
       '<div class="asm-cost-card"><b>Packages</b><strong>500 MB + 1 GB trasferimento/mese inclusi</strong><span>Consumi separati dal repository.</span></div>' +
       '<div class="asm-cost-card"><b>Git LFS</b><strong>10 GB storage + 10 GB banda/mese inclusi</strong><span>Consumi separati dal repository.</span></div>' +
-      '</div><div class="asm-note">⚠️ Eventuali eccedenze dei servizi a consumo dipendono dall'utilizzo e dalle impostazioni di billing GitHub.</div></div>';
+      '</div><div class="asm-note">⚠️ Eventuali eccedenze dei servizi a consumo dipendono dall\'utilizzo e dalle impostazioni di billing GitHub.</div></div>';
   }
 
 
