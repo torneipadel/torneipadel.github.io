@@ -86,7 +86,30 @@
     document.head.appendChild(s);
   }
 
-  async function render() {
+  let monitorTimer = null;
+  let renderBusy = false;
+
+  function stopAutoRefresh() {
+    if (monitorTimer) {
+      clearInterval(monitorTimer);
+      monitorTimer = null;
+    }
+  }
+
+  function startAutoRefresh() {
+    stopAutoRefresh();
+    monitorTimer = setInterval(() => {
+      if (!$('asmBody') || !$('asmRefresh')) {
+        stopAutoRefresh();
+        return;
+      }
+      render(true);
+    }, 30000);
+  }
+
+  async function render(silent) {
+    if (renderBusy) return;
+    renderBusy = true;
     ensureStyle();
     const root = $('appContent');
     if (!root) return;
@@ -105,7 +128,7 @@
       const totalRows = ['tornei','iscrizioni','profili','news','sponsor','mercatino'].reduce((a, k) => a + (Number(db[k]) || 0), 0);
 
       body.innerHTML =
-        '<div class="asm-grid">' +
+        '<div class="asm-grid">'
           card('Supabase — Database', fmtBytes(dbBytes), 'Limite Free: 500 MB per progetto', dbPct) +
           card('Supabase — Storage', fmtBytes(storageBytes), (Number(db.storage_objects)||0) + ' oggetti · quota Free 1 GB', storagePct) +
           card('GitHub — Repository', fmtBytes(gitBytes), 'Target operativo prudenziale: < 1 GB', gitPct) +
@@ -123,6 +146,9 @@
         '</div>';
     } catch (e) {
       body.innerHTML = '<div class="asm-error">Impossibile leggere il monitor: ' + esc(e?.message || e) + '<br><small>Il resto di admin.html non viene modificato.</small></div>';
+    } finally {
+      renderBusy = false;
+      startAutoRefresh();
     }
   }
 
@@ -131,7 +157,8 @@
     if (!app || app.classList.contains('hidden')) return;
     document.querySelectorAll('#areaAdmin .sidebar .nav button[data-page]').forEach(x => x.classList.remove('active'));
     $('topbarTitle').textContent = 'Stato risorse';
-    render();
+    stopAutoRefresh();
+    render(false);
   }
 
   function bind() {
