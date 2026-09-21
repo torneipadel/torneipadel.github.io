@@ -10,7 +10,7 @@ const current=()=> (state().tornei||[]).find(t=>String(t.id)===String(state().to
 const sb=()=>window.supabaseClient||window.sb;
 const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const approved=g=>g?.stato==='approvato'||g?.approvato===true;
-const name=g=>String([g?.nome,g?.cognome].filter(Boolean).join(' ')||g?.nome_giocatore||'Giocatore').trim();
+const name=g=>String(g?.nome_giocatore||[g?.nome,g?.cognome].filter(Boolean).join(' ')||g?.nome||'Giocatore').trim();
 const key=g=>String(g?.id??g?.user_id??g?.email??g?.nome_giocatore??name(g));
 const formula=t=>String(t?.formula||t?.configurazione?.rules?.formulaScelta||t?.configurazione?.rules?.tipoTorneo||'').trim();
 
@@ -68,26 +68,8 @@ async function players(t){
   const r=await client.from('iscrizioni').select('*').eq('torneo_id',id);
   if(r.error)throw r.error;
   const rows=Array.isArray(r.data)?r.data:[];
-  const approvedRows=rows.filter(approved);
-  const userIds=[...new Set(approvedRows.map(x=>String(x?.user_id||'')).filter(Boolean))];
-  let profiles=[];
-  if(userIds.length){
-    const pr=await client.from('profili').select('user_id,nome,cognome,email').in('user_id',userIds);
-    if(pr.error)throw pr.error;
-    profiles=Array.isArray(pr.data)?pr.data:[];
-  }
-  const byUser=Object.fromEntries(profiles.map(p=>[String(p.user_id),p]));
-  const canonical=approvedRows.map(row=>{
-    const p=byUser[String(row?.user_id||'')];
-    if(!p)return row;
-    return Object.assign({},row,{
-      nome:p.nome||row.nome||'',
-      cognome:p.cognome||row.cognome||'',
-      email:p.email||row.email||''
-    });
-  });
-  window.iscrizioniTorneo=canonical;
-  return canonical;
+  window.iscrizioniTorneo=rows;
+  return rows.filter(approved);
 }
 function emptyStats(p){return {id:key(p),nome:name(p),partite:0,vittorie:0,pareggi:0,sconfitte:0,punti:0,puntiFatti:0,puntiSubiti:0,differenza:0}}
 function history(c){
@@ -319,15 +301,7 @@ function previousRanking(t,ps){
   const rows=standings({...t,configurazione:before},ps);
   return Object.fromEntries(rows.map((x,i)=>[x.id,i+1]));
 }
-function fixKingRankingNoScroll(){
-  if(document.getElementById('king-ranking-no-scroll'))return;
-  const style=document.createElement('style');
-  style.id='king-ranking-no-scroll';
-  style.textContent='.king-ranking-wrap{width:100%!important;max-width:100%!important;overflow-x:hidden!important;overflow-y:hidden!important}.king-ranking{width:100%!important;max-width:100%!important;table-layout:fixed!important}.king-ranking th,.king-ranking td{box-sizing:border-box;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.king-ranking th:first-child,.king-ranking td:first-child{width:42px}.king-ranking th:nth-child(2),.king-ranking td:nth-child(2){width:auto;text-align:left}.king-ranking th:not(:nth-child(2)),.king-ranking td:not(:nth-child(2)){text-align:center}';
-  document.head.appendChild(style);
-}
 function render(t,ps){
-  fixKingRankingNoScroll();
   const root=$('appContent');if(!root)return;
   isolateKingUi();
   const c=config(t),r=c.rotazione,pm=playerMap(ps),rank=standings(t,ps),h=history(c),prevRank=previousRanking(t,ps);
