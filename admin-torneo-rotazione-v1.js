@@ -319,7 +319,15 @@ function previousRanking(t,ps){
   const rows=standings({...t,configurazione:before},ps);
   return Object.fromEntries(rows.map((x,i)=>[x.id,i+1]));
 }
+function fixKingRankingNoScroll(){
+  if(document.getElementById('king-ranking-no-scroll'))return;
+  const style=document.createElement('style');
+  style.id='king-ranking-no-scroll';
+  style.textContent='.king-ranking-wrap{width:100%!important;max-width:100%!important;overflow-x:hidden!important;overflow-y:hidden!important}.king-ranking{width:100%!important;max-width:100%!important;table-layout:fixed!important}.king-ranking th,.king-ranking td{box-sizing:border-box;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.king-ranking th:first-child,.king-ranking td:first-child{width:42px}.king-ranking th:nth-child(2),.king-ranking td:nth-child(2){width:auto;text-align:left}.king-ranking th:not(:nth-child(2)),.king-ranking td:not(:nth-child(2)){text-align:center}';
+  document.head.appendChild(style);
+}
 function render(t,ps){
+  fixKingRankingNoScroll();
   const root=$('appContent');if(!root)return;
   isolateKingUi();
   const c=config(t),r=c.rotazione,pm=playerMap(ps),rank=standings(t,ps),h=history(c),prevRank=previousRanking(t,ps);
