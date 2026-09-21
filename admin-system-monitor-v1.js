@@ -25,23 +25,67 @@
   }
 
 
-  function costAlerts(db, git) {
-    const dbPct = ((Number(db.database_bytes) || 0) / DB_LIMIT) * 100;
-    const storagePct = ((Number(db.storage_bytes) || 0) / STORAGE_LIMIT) * 100;
-    const gitPct = ((Number(git.size) || 0) * 1024 / GIT_TARGET) * 100;
-    const items = [];
-    function add(name, pct, detail) {
-      if (pct >= 100) items.push('<div class="asm-alert asm-alert-critical">🔴 <b>' + name + ':</b> limite raggiunto o superato — ' + pct.toFixed(1) + '% · ' + detail + '</div>');
-      else if (pct >= 90) items.push('<div class="asm-alert asm-alert-critical">🔴 <b>' + name + ':</b> livello critico — ' + pct.toFixed(1) + '% · ' + detail + '</div>');
-      else if (pct >= 75) items.push('<div class="asm-alert asm-alert-warning">🟠 <b>' + name + ':</b> attenzione — ' + pct.toFixed(1) + '% · ' + detail + '</div>');
-    }
-    add('Supabase Database', dbPct, 'quota monitor 500 MB');
-    add('Supabase Storage', storagePct, 'quota monitor 1 GB');
-    if (!git.__monitorFallback) add('GitHub repository', gitPct, 'soglia prudenziale 1 GB; non è una quota di fatturazione');
-    if (!items.length) items.push('<div class="asm-alert asm-alert-ok">🟢 Nessun superamento delle soglie monitorate.</div>');
-    items.push('<div class="asm-alert asm-alert-info">ℹ️ <b>GitHub Actions/Packages/LFS:</b> gli alert ufficiali GitHub possono essere configurati al 90% e 100% dell\'utilizzo incluso; questi consumi non sono leggibili dal monitor browser.</div>');
-    return '<div class="asm-section"><h3>🚨 Alert costi</h3>' + items.join('') + '</div>';
+  function providerMenu(title, id, content, openDefault) {
+    return '<details class="asm-provider-menu" id="' + id + '"' + (openDefault ? ' open' : '') + '><summary>' + title + '</summary><div class="asm-provider-content">' + content + '</div></details>';
   }
+
+  function supabasePanel(db) {
+    const dbBytes = Number(db.database_bytes) || 0;
+    const storageBytes = Number(db.storage_bytes) || 0;
+    const dbPct = (dbBytes / DB_LIMIT) * 100;
+    const storagePct = (storageBytes / STORAGE_LIMIT) * 100;
+    const overDb = Math.max(0, dbBytes - DB_LIMIT) / (1024 ** 3);
+    const overStorage = Math.max(0, storageBytes - STORAGE_LIMIT) / (1024 ** 3);
+    const overCost = overDb * 0.125 + overStorage * 0.021;
+    const alerts = [];
+    function alertLine(name, pct, detail) {
+      if (pct >= 100) alerts.push('<div class="asm-alert asm-alert-critical">🔴 <b>' + name + ':</b> limite raggiunto/superato — ' + pct.toFixed(1) + '% · ' + detail + '</div>');
+      else if (pct >= 90) alerts.push('<div class="asm-alert asm-alert-critical">🔴 <b>' + name + ':</b> livello critico — ' + pct.toFixed(1) + '% · ' + detail + '</div>');
+      else if (pct >= 75) alerts.push('<div class="asm-alert asm-alert-warning">🟠 <b>' + name + ':</b> attenzione — ' + pct.toFixed(1) + '% · ' + detail + '</div>');
+    }
+    alertLine('Database', dbPct, 'quota Free 500 MB');
+    alertLine('Storage', storagePct, 'quota Free 1 GB');
+    if (!alerts.length) alerts.push('<div class="asm-alert asm-alert-ok">🟢 Nessun alert Supabase sulle soglie monitorate.</div>');
+    return '<div class="asm-section"><h3>📊 Utilizzo e limiti</h3>' +
+      limitGraph([{label:'Database',value:dbBytes,limit:DB_LIMIT},{label:'Storage',value:storageBytes,limit:STORAGE_LIMIT}]) +
+      '<div class="asm-grid">' +
+      card('Database',fmtBytes(dbBytes),'Quota Free: 500 MB',dbPct) +
+      card('Storage',fmtBytes(storageBytes),(Number(db.storage_objects)||0)+' oggetti · quota Free 1 GB',storagePct) +
+      card('Utenti Auth',String(Number(db.auth_users)||0),'Quota Free: 50.000 MAU; conteggio utenti presenti',0,'ok') +
+      '</div></div>' +
+      '<div class="asm-section"><h3>🚨 Alert Supabase</h3>' + alerts.join('') + '</div>' +
+      '<div class="asm-section"><h3>💰 Costi Supabase</h3><div class="asm-cost-grid">' +
+      '<div class="asm-cost-card"><b>Piano attuale</b><strong>Free · $0/mese</strong><span>Database 500 MB · Storage 1 GB · Egress 5 GB · 50.000 MAU inclusi</span></div>' +
+      '<div class="asm-cost-card"><b>Eventuale eccedenza misurabile</b><strong>' + (overCost > 0 ? '$' + overCost.toFixed(2) + '/mese' : '$0 misurabile') + '</strong><span>Database oltre quota: $0,125/GB · Storage oltre quota: $0,021/GB. Egress e MAU richiedono Usage/Billing.</span></div>' +
+      '<div class="asm-cost-card"><b>Piano Pro</b><strong>$25/mese + eventuale uso eccedente</strong><span>Quota Pro: 8 GB database/progetto · 100 GB Storage · 250 GB egress · 100.000 MAU inclusi.</span></div>' +
+      '</div><div class="asm-note">⚠️ La stima non è una fattura reale.</div></div>';
+  }
+
+  function githubPanel(git) {
+    const gitBytes = (Number(git.size) || 0) * 1024;
+    const gitPct = (gitBytes / GIT_TARGET) * 100;
+    const alerts = [];
+    if (git.__monitorFallback) alerts.push('<div class="asm-alert asm-alert-info">🔵 <b>GitHub:</b> utilizzo live temporaneamente non disponibile; è attivo il dato locale di sicurezza.</div>');
+    else if (gitPct >= 100) alerts.push('<div class="asm-alert asm-alert-critical">🔴 <b>Repository:</b> raggiunta/superata la soglia prudenziale di 1 GB.</div>');
+    else if (gitPct >= 90) alerts.push('<div class="asm-alert asm-alert-critical">🔴 <b>Repository:</b> livello critico — ' + gitPct.toFixed(1) + '% della soglia prudenziale.</div>');
+    else if (gitPct >= 75) alerts.push('<div class="asm-alert asm-alert-warning">🟠 <b>Repository:</b> attenzione — ' + gitPct.toFixed(1) + '% della soglia prudenziale.</div>');
+    else alerts.push('<div class="asm-alert asm-alert-ok">🟢 Nessun alert GitHub sulla soglia prudenziale del repository.</div>');
+    alerts.push('<div class="asm-alert asm-alert-info">ℹ️ <b>Actions / Packages / LFS:</b> quote e alert ufficiali esistono, ma i consumi reali non sono leggibili dal monitor browser senza billing autenticato.</div>');
+    return '<div class="asm-section"><h3>📦 Repository e soglia monitor</h3>' +
+      limitGraph([{label:'Repository — soglia prudenziale',value:gitBytes,limit:GIT_TARGET}]) +
+      '<div class="asm-grid">' +
+      card('Repository',fmtBytes(gitBytes),'Soglia prudenziale interna: 1 GB',gitPct) +
+      card('Ultimo push',git.pushed_at ? dateIt(git.pushed_at) : (git.__monitorFallback ? 'Temporaneamente non disponibile' : '-'),'Branch: '+(git.default_branch||'main'),0,'ok') +
+      '</div></div>' +
+      '<div class="asm-section"><h3>🚨 Alert GitHub</h3>' + alerts.join('') + '</div>' +
+      '<div class="asm-section"><h3>💰 Costi GitHub</h3><div class="asm-cost-grid">' +
+      '<div class="asm-cost-card"><b>Piano Free</b><strong>$0/mese</strong><span>Repository pubblico: nessun costo per la dimensione del codice.</span></div>' +
+      '<div class="asm-cost-card"><b>Actions</b><strong>500 MB + 2.000 minuti/mese inclusi</strong><span>Servizio separato dal limite del repository.</span></div>' +
+      '<div class="asm-cost-card"><b>Packages</b><strong>500 MB + 1 GB trasferimento/mese inclusi</strong><span>Consumi separati dal repository.</span></div>' +
+      '<div class="asm-cost-card"><b>Git LFS</b><strong>10 GB storage + 10 GB banda/mese inclusi</strong><span>Consumi separati dal repository.</span></div>' +
+      '</div><div class="asm-note">⚠️ Eventuali eccedenze dei servizi a consumo dipendono dall'utilizzo e dalle impostazioni di billing GitHub.</div></div>';
+  }
+
 
   function costPanel(db, git) {
     const dbBytes = Number(db.database_bytes) || 0;
@@ -171,7 +215,7 @@
       .asm-limit-graph{display:grid;gap:15px}.asm-limit-row{display:grid;gap:5px}.asm-limit-head,.asm-limit-foot{display:flex;justify-content:space-between;gap:10px;font-size:12px;color:#475569}
       .asm-limit-head b{font-size:13px;color:#0f172a}.asm-limit-track{position:relative;height:18px;border-radius:99px;background:#e2e8f0;overflow:hidden;border:1px solid rgba(15,23,42,.08)}
       .asm-limit-used{height:100%;border-radius:99px;background:#16a34a;min-width:2px}.asm-limit-used.warning{background:#d97706}.asm-limit-used.critical{background:#dc2626}
-      .asm-limit-max{position:absolute;right:0;top:0;bottom:0;width:2px;background:#0f172a}.asm-alert{padding:10px 12px;border-radius:8px;margin:7px 0}.asm-alert-warning{background:#fff3cd;color:#7a5700}.asm-alert-critical{background:#f8d7da;color:#842029}.asm-alert-info{background:#dbeafe;color:#1e3a8a}.asm-alert-ok{background:#dcfce7;color:#166534}..asm-cost-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.asm-cost-card{padding:12px;border:1px solid rgba(15,23,42,.10);border-radius:12px;background:rgba(255,255,255,.75);display:grid;gap:5px}.asm-cost-card b{font-size:13px;color:#475569}.asm-cost-card strong{font-size:18px;color:#0f172a}.asm-cost-card span{font-size:12px;color:#64748b;line-height:1.4}.asm-section{margin-top:16px;background:rgba(255,255,255,.70);border:1px solid rgba(15,23,42,.10);border-radius:14px;padding:14px}
+      .asm-limit-max{position:absolute;right:0;top:0;bottom:0;width:2px;background:#0f172a}.asm-provider-menu{margin:12px 0;border:1px solid #ddd;border-radius:10px;background:#fff;overflow:hidden}.asm-provider-menu>summary{cursor:pointer;list-style:none;padding:15px 18px;font-weight:700;font-size:15px}.asm-provider-menu>summary::-webkit-details-marker{display:none}.asm-provider-menu>summary:before{content:'▸';display:inline-block;margin-right:8px}.asm-provider-menu[open]>summary:before{content:'▾'}.asm-provider-content{padding:0 12px 12px}.asm-alert{padding:10px 12px;border-radius:8px;margin:7px 0}.asm-alert-warning{background:#fff3cd;color:#7a5700}.asm-alert-critical{background:#f8d7da;color:#842029}.asm-alert-info{background:#dbeafe;color:#1e3a8a}.asm-alert-ok{background:#dcfce7;color:#166534}..asm-cost-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.asm-cost-card{padding:12px;border:1px solid rgba(15,23,42,.10);border-radius:12px;background:rgba(255,255,255,.75);display:grid;gap:5px}.asm-cost-card b{font-size:13px;color:#475569}.asm-cost-card strong{font-size:18px;color:#0f172a}.asm-cost-card span{font-size:12px;color:#64748b;line-height:1.4}.asm-section{margin-top:16px;background:rgba(255,255,255,.70);border:1px solid rgba(15,23,42,.10);border-radius:14px;padding:14px}
       .asm-section h3{margin:0 0 10px;font-size:15px}.asm-table{width:100%;border-collapse:collapse;font-size:13px}.asm-table th,.asm-table td{text-align:left;padding:7px 5px;border-bottom:1px solid rgba(15,23,42,.08)}
       .asm-note{font-size:12px;color:#64748b;line-height:1.45;margin-top:10px}.asm-error{padding:12px;border-radius:10px;background:#fee2e2;color:#991b1b;font-size:13px}
       @media(max-width:800px){.asm-grid{grid-template-columns:1fr 1fr}.asm-cost-grid{grid-template-columns:1fr}}@media(max-width:520px){.asm-grid{grid-template-columns:1fr}.asm-card-value{font-size:21px}}
@@ -216,30 +260,15 @@
       const totalRows = ['tornei','iscrizioni','profili','news','sponsor','mercatino'].reduce((a, k) => a + (Number(db[k]) || 0), 0);
 
       body.innerHTML =
-        '<div class="asm-grid">' +
-          card('Supabase — Database', fmtBytes(dbBytes), 'Limite Free: 500 MB per progetto', dbPct) +
-          card('Supabase — Storage', fmtBytes(storageBytes), (Number(db.storage_objects)||0) + ' oggetti · quota Free 1 GB', storagePct) +
-          card('GitHub — Repository', fmtBytes(gitBytes), 'Target operativo prudenziale: < 1 GB', gitPct) +
-          card('Supabase — Utenti Auth', String(Number(db.auth_users)||0), 'Quota Free: 50.000 MAU; conteggio utenti presenti, non MAU mensili', 0, 'ok') +
-          card('Dati applicativi', String(totalRows), 'Record nelle 6 tabelle principali monitorate', 0, 'ok') +
-          card('GitHub — Ultimo push', git.pushed_at ? dateIt(git.pushed_at) : (git.__monitorFallback ? 'Temporaneamente non disponibile' : '-'), 'Branch: ' + (git.default_branch || 'main') + (git.__monitorStale ? ' · dato GitHub in cache' : '') + (git.__monitorFallback ? ' · ultimo dato locale di sicurezza' : ''), 0, 'ok') +
-        '</div>' +
-        costAlerts(db, git) +
-        '<div class="asm-section"><h3>Limiti e massimi</h3>' +
-          '<div class="asm-note">Il grafico confronta l\'utilizzo reale con il massimo monitorato: la barra arriva al 100% quando viene raggiunto il limite.</div>' +
-          limitGraph([
-            {label:'Supabase Database', value:dbBytes, limit:DB_LIMIT},
-            {label:'Supabase Storage', value:storageBytes, limit:STORAGE_LIMIT},
-            {label:'GitHub Repository — soglia prudenziale', value:gitBytes, limit:GIT_TARGET}
-          ]) +
-        '</div>' +
-        costPanel(db, git) +
-        '<div class="asm-section"><h3>Dettaglio dati Supabase</h3><table class="asm-table"><thead><tr><th>Tabella</th><th>Record</th></tr></thead><tbody>' +
+        '<div class="asm-section"><h3>📌 Panoramica</h3><div class="asm-note">Apri il menu Supabase o il menu GitHub per vedere separatamente utilizzo, limiti, alert e costi.</div></div>' +
+        providerMenu('🟢 SUPABASE — utilizzo, limiti, alert e costi','asmSupabaseMenu',supabasePanel(db),true) +
+        providerMenu('⚫ GITHUB — repository, limiti, alert e costi','asmGithubMenu',githubPanel(git),false) +
+        '<div class="asm-section"><h3>📋 Dati applicativi Supabase</h3><table class="asm-table"><thead><tr><th>Tabella</th><th>Record</th></tr></thead><tbody>' +
           [['tornei',db.tornei],['iscrizioni',db.iscrizioni],['profili',db.profili],['news',db.news],['sponsor',db.sponsor],['mercatino',db.mercatino]]
           .map(x => '<tr><td>' + esc(x[0]) + '</td><td><b>' + Number(x[1]||0) + '</b></td></tr>').join('') +
           '</tbody></table></div>' +
-        '<div class="asm-section"><h3>Controllo operativo</h3>' +
-          '<div class="asm-note">🟢 Database Supabase e Storage sono confrontati con le quote del piano Free. Per GitHub non esiste un unico “limite di riempimento” del piano paragonabile ai 500 MB del database: il monitor usa quindi 1 GB come soglia prudenziale interna. Traffico/egress Supabase e MAU mensili richiedono invece i dati di Usage/Billing della piattaforma e non vengono inventati dal monitor.</div>' +
+        '<div class="asm-section"><h3>🔄 Controllo operativo</h3>' +
+          '<div class="asm-note">Aggiornamento automatico ogni 30 secondi. Il pulsante ↻ Aggiorna resta disponibile per un aggiornamento manuale.</div>' +
           '<div class="asm-note">Ultimo aggiornamento monitor: <b>' + dateIt(db.generated_at || new Date()) + '</b></div>' +
         '</div>';
     } catch (e) {
