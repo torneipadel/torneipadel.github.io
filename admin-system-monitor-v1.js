@@ -87,6 +87,22 @@
   }
 
 
+  function automationPanel() {
+    return '<div class="asm-section"><h3>🤖 Automazione 100% — quando serve acquistare</h3>' +
+      '<div class="asm-note"><b>Regola semplice:</b> il piano Free resta sufficiente finché vuoi approvare/generare/inviare manualmente. Un acquisto serve quando vuoi che il sistema esegua automaticamente anche il passaggio che oggi richiede il tuo intervento.</div>' +
+      '<div class="asm-cost-grid">' +
+        '<div class="asm-cost-card"><b>📰 NEWS — situazione attuale</b><strong>FREE · manuale assistita</strong><span>Creazione, modifica, pubblicazione e locandine sono gestibili dall\'Admin. L\'AI può essere collegata via API, ma l\'automazione completa richiede un servizio AI a consumo.</span></div>' +
+        '<div class="asm-cost-card"><b>📰 NEWS — 100% automatica</b><strong>AI API + generazione immagine</strong><span>Flusso possibile: dati evento → testo AI → immagine AI → locandina con template → salvataggio → pubblicazione. Le immagini API sono a consumo: ad esempio OpenAI GPT Image 2 ha prezzi indicativi da circa $0,006 per immagine 1024×1024 in qualità bassa; il costo cresce con qualità/dimensione.</span></div>' +
+        '<div class="asm-cost-card"><b>💬 WHATSAPP — situazione attuale</b><strong>FREE · invio manuale</strong><span>Il sistema prepara messaggio, destinatari e link WhatsApp; l\'invio finale richiede ancora l\'azione dell\'amministratore. Non è presente un mittente API automatico.</span></div>' +
+        '<div class="asm-cost-card"><b>💬 WHATSAPP — 100% automatica</b><strong>WhatsApp Business Platform/API · costo variabile</strong><span>Serve un account/API ufficiale e la gestione dei messaggi secondo le tariffe Meta applicabili a categoria, mercato e volume. Il monitor non inventa un canone fisso: il costo va calcolato sul traffico reale.</span></div>' +
+      '</div>' +
+      '<h4 style="margin:14px 0 8px">🟢 Quando NON acquistare</h4><div class="asm-alert asm-alert-ok">Se News e WhatsApp vengono confermati manualmente dall\'amministratore, non è necessario aggiungere API a pagamento solo per il normale funzionamento.</div>' +
+      '<h4 style="margin:14px 0 8px">🟠 Quando PREPARARSI</h4><div class="asm-alert asm-alert-warning">Se vuoi eliminare attività ripetitive — scrittura automatica, locandine automatiche, pubblicazione automatica o invio automatico WhatsApp — è il momento di definire il budget e il provider, ma non significa che il piano Free sia già insufficiente.</div>' +
+      '<h4 style="margin:14px 0 8px">🔴 Quando ACQUISTARE</h4><div class="asm-alert asm-alert-critical">Acquistare/attivare il servizio solo quando viene richiesta l\'automazione senza intervento umano. In quel caso il costo dipende soprattutto da numero di news/locandine generate e messaggi WhatsApp inviati.</div>' +
+      '<div class="asm-note">💡 Architettura consigliata: AI per testo/immagine + template deterministico per inserire dati esatti di torneo/offerta + Supabase per salvataggio/pubblicazione + WhatsApp Business Platform per l\'invio automatico. Così i dati come data, ora, prezzo e nome torneo non dipendono dalla precisione grafica dell\'AI.</div>' +
+      '</div>';
+  }
+
   function costPanel(db, git) {
     const dbBytes = Number(db.database_bytes) || 0;
     const storageBytes = Number(db.storage_bytes) || 0;
@@ -263,6 +279,7 @@
         '<div class="asm-section"><h3>📌 Panoramica</h3><div class="asm-note">Apri il menu Supabase o il menu GitHub per vedere separatamente utilizzo, limiti, alert e costi.</div></div>' +
         providerMenu('🟢 SUPABASE — utilizzo, limiti, alert e costi','asmSupabaseMenu',supabasePanel(db),true) +
         providerMenu('⚫ GITHUB — repository, limiti, alert e costi','asmGithubMenu',githubPanel(git),false) +
+        automationPanel() +
         '<div class="asm-section"><h3>📋 Dati applicativi Supabase</h3><table class="asm-table"><thead><tr><th>Tabella</th><th>Record</th></tr></thead><tbody>' +
           [['tornei',db.tornei],['iscrizioni',db.iscrizioni],['profili',db.profili],['news',db.news],['sponsor',db.sponsor],['mercatino',db.mercatino]]
           .map(x => '<tr><td>' + esc(x[0]) + '</td><td><b>' + Number(x[1]||0) + '</b></td></tr>').join('') +
