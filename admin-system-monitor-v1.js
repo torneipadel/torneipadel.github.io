@@ -281,24 +281,34 @@
 
   function open() {
     const app = $('areaAdmin');
-    if (!app || app.classList.contains('hidden')) return;
+    if (!app || app.classList.contains('hidden')) return false;
     document.querySelectorAll('#areaAdmin .sidebar .nav button[data-page]').forEach(x => x.classList.remove('active'));
     if ($('topbarTitle')) $('topbarTitle').textContent = 'Stato risorse';
     stopAutoRefresh();
-    render(false);
+    try {
+      render(false);
+    } catch (e) {
+      const root = $('appContent');
+      if (root) root.innerHTML = '<div class="asm-wrap"><div class="asm-error">Impossibile aprire il monitor: ' + esc(e?.message || e) + '</div></div>';
+      renderBusy = false;
+      startAutoRefresh();
+    }
+    return true;
   }
 
   function bind() {
     if (window.__adminSystemMonitorBound) return;
     window.__adminSystemMonitorBound = true;
-    document.addEventListener('click', (ev) => {
+    const handler = (ev) => {
       const side = ev.target?.closest?.('#sideSystemMonitor');
       const mobile = ev.target?.closest?.('#mobileSystemMonitor');
       if (!side && !mobile) return;
       ev.preventDefault();
+      ev.stopPropagation();
       if (mobile) $('mobileOverlay')?.classList.remove('open');
       open();
-    });
+    };
+    document.addEventListener('click', handler, true);
   }
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', bind, {once:true});
