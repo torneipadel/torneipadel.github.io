@@ -10,7 +10,7 @@ const current=()=> (state().tornei||[]).find(t=>String(t.id)===String(state().to
 const sb=()=>window.supabaseClient||window.sb;
 const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const approved=g=>g?.stato==='approvato'||g?.approvato===true;
-const name=g=>String(g?.nome_giocatore||[g?.nome,g?.cognome].filter(Boolean).join(' ')||g?.nome||'Giocatore').trim();
+const name=g=>String([g?.nome,g?.cognome].filter(Boolean).join(' ')||g?.nome_giocatore||'Giocatore').trim();
 const key=g=>String(g?.id??g?.user_id??g?.email??g?.nome_giocatore??name(g));
 const formula=t=>String(t?.formula||t?.configurazione?.rules?.formulaScelta||t?.configurazione?.rules?.tipoTorneo||'').trim();
 
@@ -68,8 +68,26 @@ async function players(t){
   const r=await client.from('iscrizioni').select('*').eq('torneo_id',id);
   if(r.error)throw r.error;
   const rows=Array.isArray(r.data)?r.data:[];
-  window.iscrizioniTorneo=rows;
-  return rows.filter(approved);
+  const approvedRows=rows.filter(approved);
+  const userIds=[...new Set(approvedRows.map(x=>String(x?.user_id||'')).filter(Boolean))];
+  let profiles=[];
+  if(userIds.length){
+    const pr=await client.from('profili').select('user_id,nome,cognome,email').in('user_id',userIds);
+    if(pr.error)throw pr.error;
+    profiles=Array.isArray(pr.data)?pr.data:[];
+  }
+  const byUser=Object.fromEntries(profiles.map(p=>[String(p.user_id),p]));
+  const canonical=approvedRows.map(row=>{
+    const p=byUser[String(row?.user_id||'')];
+    if(!p)return row;
+    return Object.assign({},row,{
+      nome:p.nome||row.nome||'',
+      cognome:p.cognome||row.cognome||'',
+      email:p.email||row.email||''
+    });
+  });
+  window.iscrizioniTorneo=canonical;
+  return canonical;
 }
 function emptyStats(p){return {id:key(p),nome:name(p),partite:0,vittorie:0,pareggi:0,sconfitte:0,punti:0,puntiFatti:0,puntiSubiti:0,differenza:0}}
 function history(c){
