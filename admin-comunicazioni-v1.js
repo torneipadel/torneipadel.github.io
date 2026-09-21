@@ -35,7 +35,29 @@ root.innerHTML=`<div class="page-head"><div><h1>${title}</h1><p>${sub}</p></div>
 $('comBack')?.addEventListener('click',()=>window.openAdminPage?.('torneo'))
 }
 
-async function news(){return newsEditor()}
+function news(){
+const t=selected();
+if(!t){
+  const tornei=Array.isArray(state().tornei)?state().tornei:[];
+  const allNews=tornei.flatMap(torneo=>{const c=cfgOf(torneo),items=Array.isArray(c.news)?c.news:[];return items.map(n=>({...n,__torneoId:torneo.id,__torneoNome:torneo.nome||torneo.nomeTorneo||('Torneo '+torneo.id)}));});
+  shell('News','Comunicazioni globali · tutti i tornei',`<div class="card feature-card"><div class="card-head"><div><h2>Gestione News</h2><span class="notice">Le News sono consultabili senza selezionare un torneo.</span></div></div><div class="card-body"><div class="section-grid"><div class="feature-form"><label>Pubblica in un torneo</label><select id="newsTorneo" class="input">${tornei.map(x=>`<option value="${esc(x.id)}">${esc(x.nome||x.nomeTorneo||('Torneo '+x.id))}</option>`).join('')}</select><label>Titolo</label><input id="newsTitle" class="input" placeholder="Titolo della news"><label>Testo</label><textarea id="newsText" class="input" rows="6" placeholder="Testo della comunicazione"></textarea><button class="btn primary" id="newsSave">＋ Pubblica news</button></div><div><h3>Tutte le News</h3><div id="newsList" class="feature-list">${allNews.length?allNews.map(n=>`<div class="list-item"><strong>${esc(n.titolo)}</strong><small>${esc(n.__torneoNome)}</small><small>${esc(n.testo)}</small></div>`).join(''):'<div class="empty">Nessuna news pubblicata.</div>'}</div></div></div></div></div>`);
+  $('newsSave').onclick=async()=>{const torneoId=$('newsTorneo')?.value,torneo=tornei.find(x=>String(x.id)===String(torneoId)),titolo=$('newsTitle')?.value.trim(),testo=$('newsText')?.value.trim();if(!torneo){alert('Seleziona il torneo a cui pubblicare la News.');return}if(!titolo||!testo){alert('Inserisci titolo e testo della news.');return}const c=cfgOf(torneo),items=Array.isArray(c.news)?c.news:[],next=[...items,{id:'news-'+Date.now(),titolo,testo,data:new Date().toISOString()}];if(await saveCfg(torneo,{...c,news:next}))news()};
+  return;
+}
+const c=cfgOf(t),items=Array.isArray(c.news)?c.news:[];
+shell('News',`${esc(t.nome)} · ID ${esc(t.id)}`,`<div class="card feature-card"><div class="card-head"><div><h2>Gestione News</h2><span class="notice">Pubblica e gestisci le comunicazioni del torneo</span></div></div><div class="card-body"><div class="section-grid"><div class="feature-form"><label>Titolo</label><input id="newsTitle" class="input" placeholder="Titolo della news"><label>Testo</label><textarea id="newsText" class="input" rows="6" placeholder="Testo della comunicazione"></textarea><button class="btn primary" id="newsSave">＋ Pubblica news</button></div><div><h3>News del torneo</h3><div id="newsList" class="feature-list">${items.length?items.map((n,i)=>`<div class="list-item"><strong>${esc(n.titolo)}</strong><small>${esc(n.testo)}</small><button class="btn small danger" data-news-del="${i}">Elimina</button></div>`).join(''):'<div class="empty">Nessuna news pubblicata.</div>'}</div></div></div></div></div>`);
+$('newsSave').onclick=async()=>{
+const titolo=$('newsTitle')?.value.trim();
+const testo=$('newsText')?.value.trim();
+if(!titolo||!testo){alert('Inserisci titolo e testo della news.');return}
+const next=[...items,{id:'news-'+Date.now(),titolo,testo,data:new Date().toISOString()}];
+if(await saveCfg(t,{...c,news:next}))news()
+};
+document.querySelectorAll('[data-news-del]').forEach(b=>b.onclick=async()=>{
+const next=items.filter((_,i)=>i!==Number(b.dataset.newsDel));
+if(await saveCfg(t,{...c,news:next}))news()
+})
+}
 
 async function sponsor(){
 const items=await loadGlobalSponsors();
@@ -66,9 +88,7 @@ document.querySelectorAll('[data-sponsor-del]').forEach(b=>b.onclick=async()=>{i
 function whatsapp(){
 const t=selected();if(!t){alert('Seleziona prima un torneo');return}
 const link=location.origin+'/Bove.html?idTorneo='+encodeURIComponent(t.id);
-shell('WhatsApp',`${esc(t.nome)} · ID ${esc(t.id)}`,`<div class="card feature-card"><div class="card-head"><div><h2>Comunicazioni WhatsApp</h2><span class="notice">Messaggio pronto con il link del torneo selezionato</span></div></div><div class="card-body"><label>Messaggio</label><textarea id="waText" class="input" rows="6">Ciao! Ti invitiamo al torneo ${esc(t.nome)} del ${esc(t.data||t.data_torneo||'')}.
-
-${esc(link)}</textarea><div class="admin-feature-actions"><button class="btn primary" id="waOpen">📱 Apri WhatsApp</button><button class="btn" id="waCopy">📋 Copia link torneo</button></div><div class="notice" style="margin-top:14px">Il link è sempre riferito al torneo attualmente selezionato.</div></div></div>`);
+shell('WhatsApp',`${esc(t.nome)} · ID ${esc(t.id)}`,`<div class="card feature-card"><div class="card-head"><div><h2>Comunicazioni WhatsApp</h2><span class="notice">Messaggio pronto con il link del torneo selezionato</span></div></div><div class="card-body"><label>Messaggio</label><textarea id="waText" class="input" rows="6">Ciao! Ti invitiamo al torneo ${esc(t.nome)} del ${esc(t.data||t.data_torneo||'')}.\n\n${esc(link)}</textarea><div class="admin-feature-actions"><button class="btn primary" id="waOpen">📱 Apri WhatsApp</button><button class="btn" id="waCopy">📋 Copia link torneo</button></div><div class="notice" style="margin-top:14px">Il link è sempre riferito al torneo attualmente selezionato.</div></div></div>`);
 $('waOpen').onclick=()=>window.open('https://wa.me/?text='+encodeURIComponent($('waText')?.value||''),'_blank');
 $('waCopy').onclick=()=>navigator.clipboard?.writeText(link).then(()=>alert('Link copiato negli appunti.'))
 }
@@ -79,7 +99,6 @@ document.querySelectorAll('[data-com-page]').forEach(b=>{if(b.dataset.comBound)r
 function bindSidebar(){document.querySelectorAll('#areaAdmin .sidebar [data-page]').forEach(b=>{if(b.dataset.sidebarBound)return;b.dataset.sidebarBound='1';b.addEventListener('click',async()=>{const page=b.dataset.page;if(!page)return;document.querySelectorAll('#areaAdmin .sidebar [data-page]').forEach(x=>x.classList.remove('active'));b.classList.add('active');if(typeof window.openAdminPage==='function')await window.openAdminPage(page)})})}
 function bindAll(){bindSidebar();bindComLinks()}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',bindAll,{once:true});else bindAll();
-window.openAdminSponsor=()=>sponsor();
 window.openAdminComPage=p=>p==='news'?news():p==='sponsor'?sponsor():whatsapp();
 
 })();
@@ -95,62 +114,30 @@ async function saveNewsCfg(t,cfg){const sb=window.supabaseClient||window.sb;if(!
 const fileToDataUrl=file=>new Promise((resolve,reject)=>{const r=new FileReader();r.onload=()=>resolve(String(r.result||''));r.onerror=()=>reject(new Error('Impossibile leggere l’immagine.'));r.readAsDataURL(file)});
 const typeIcon=t=>{const x=String(t||'').toLowerCase();if(x.includes('torneo'))return '🏆';if(x.includes('promo'))return '🔥';if(x.includes('evento'))return '📅';if(x.includes('ricordo'))return '📸';if(x.includes('prodott'))return '🎾';if(x.includes('articol'))return '📰';return '📢'};
 const dateText=v=>{if(!v)return '';const d=new Date(v);return Number.isNaN(d.getTime())?'':d.toLocaleString('it-IT',{dateStyle:'short',timeStyle:'short'})};
-async function loadGlobalNews(){const sb=window.supabaseClient||window.sb;if(!sb)return [];const {data,error}=await sb.from('news').select('id,titolo,testo,immagine,pubblicata,created_at,tipo,link,in_evidenza,ordine,torneo_id').order('ordine',{ascending:true}).order('created_at',{ascending:false});if(error){console.error('Errore caricamento News:',error);alert('Errore caricamento News: '+error.message);return []}return data||[]}
-async function saveGlobalNews(row){const sb=window.supabaseClient||window.sb;if(!sb){alert('Connessione Supabase non disponibile.');return false}const payload={titolo:row.titolo,testo:row.testo,immagine:row.immagine||null,pubblicata:row.pubblicata!==false,tipo:row.tipo||'Comunicazione',link:row.link||null,in_evidenza:!!row.in_evidenza,ordine:Number(row.ordine)||0,torneo_id:row.torneo_id?Number(row.torneo_id):null};let q;if(row.id)q=await sb.from('news').update(payload).eq('id',row.id).select('*').maybeSingle();else q=await sb.from('news').insert(payload).select('*').single();if(q.error){console.error('Errore salvataggio News:',q.error);alert('Errore salvataggio News: '+q.error.message);return false}return !!q.data}
-async function newsEditor(){
+function newsEditor(){
+const t=selected();
+if(!t){return news();}
+const c=cfgOf(t),items=Array.isArray(c.news)?c.news:[];
 const root=$('appContent');if(!root)return;
-let editingId=null;
-let items=await loadGlobalNews();
-const tournaments=Array.isArray(window.adminState?.tornei)?window.adminState.tornei:[];
-const selectedTournament=selected();
-const selectedCfg=cfgOf(selectedTournament);
-const selectedLegacyNews=Array.isArray(selectedCfg.news)?selectedCfg.news:[];
-const linkedPoster=items.find(n=>selectedTournament&&String(n.torneo_id)===String(selectedTournament.id)&&n.immagine)||selectedLegacyNews.slice().reverse().find(n=>n?.immagine&&/locandina|poster|torneo/i.test(String(n.tipo||'')+' '+String(n.titolo||'')))||null;
 const types=['Comunicazione','Torneo','Promozione','Evento','Ricordo','Prodotto','Articolo'];
-const tournamentDate=selectedTournament?.data_torneo||selectedTournament?.data||selectedCfg?.dataTorneo||'';
-const tournamentTime=selectedTournament?.ora_inizio||selectedCfg?.oraDefault||selectedCfg?.rules?.start||'';
-const tournamentDescription=selectedTournament?.descrizione||selectedCfg?.descrizione||'';
-const tournamentLink=selectedTournament?(()=>{try{return new URL('Bove.html?idTorneo='+encodeURIComponent(selectedTournament.id),location.href).href}catch(e){return 'Bove.html?idTorneo='+encodeURIComponent(selectedTournament.id)}})():'';
-const autoTitle=selectedTournament?.nome||'';
-const autoText=selectedTournament?[
-'🏆 '+(selectedTournament.nome||''),
-tournamentDate?'📅 Data: '+tournamentDate:'',
-tournamentTime?'🕒 Ora: '+tournamentTime:'',
-tournamentDescription?'ℹ️ '+tournamentDescription:''
-].filter(Boolean).join('\\n'):'';
-const autoType=selectedTournament?'Torneo':'Comunicazione';
-const autoTournamentId=selectedTournament?String(selectedTournament.id):'';
-const autoImage=linkedPoster?.immagine||'';
+let editingId=null;
 const render=()=>{
-const current=[...items];
-const editing=current.find(n=>String(n.id)===String(editingId));
-const isNew=!editing;
-const initialType=editing?.tipo||(isNew?autoType:'Comunicazione');
-const initialTitle=editing?.titolo||(isNew?autoTitle:'');
-const initialText=editing?.testo||(isNew?autoText:'');
-const initialLink=editing?.link||(isNew?tournamentLink:'');
-const initialTournamentId=editing?.torneo_id?String(editing.torneo_id):(isNew?autoTournamentId:'');
-const initialImage=editing?.immagine||(isNew?autoImage:'');
-root.innerHTML=`<div class="page-head"><div><h1>News & Comunicazioni</h1><p>Contenuti globali del sito · ${selectedTournament?esc(selectedTournament.nome)+' · dati torneo precompilati':'il torneo è facoltativo'}</p></div><button class="btn" id="newsBack">← Torna al torneo</button></div><div class="card feature-card"><div class="card-head"><div><h2>${editing?'Modifica contenuto':'Nuovo contenuto'}</h2><span class="notice">${selectedTournament?'Il torneo selezionato ha precompilato automaticamente titolo, data, riferimenti e collegamento. La locandina viene recuperata se già disponibile. Puoi modificare tutto prima della pubblicazione.':'Pubblica comunicazioni, promozioni, eventi, ricordi, prodotti e articoli senza dover selezionare un torneo.'}</span></div></div><div class="card-body"><div class="section-grid"><div class="feature-form"><label>Tipo contenuto</label><select id="newsType" class="input">${types.map(x=>`<option value="${esc(x)}">${esc(x)}</option>`).join('')}</select><label>Immagine / Locandina</label><input id="newsImage" class="input" type="file" accept="image/png,image/jpeg,image/webp,image/gif"><small class="notice">${initialImage?'Locandina recuperata automaticamente dal torneo selezionato. Seleziona un file solo se vuoi sostituirla.':'Facoltativa. Se il torneo ha già una locandina pubblicata, verrà recuperata automaticamente.'} Massimo 5 MB.</small><div id="newsPreview" style="margin-top:10px"></div><label>Titolo</label><input id="newsTitle" class="input" placeholder="Titolo del contenuto"><label>Testo</label><textarea id="newsText" class="input" rows="7" placeholder="Testo della comunicazione o dell'articolo"></textarea><label>Link facoltativo</label><input id="newsLink" class="input" placeholder="https://..."><label>Collega a un torneo (facoltativo)</label><select id="newsTournament" class="input"><option value="">Nessun torneo · News generale</option>${tournaments.map(t=>`<option value="${esc(t.id)}">${esc(t.nome||('Torneo '+t.id))}</option>`).join('')}</select><label style="display:flex;align-items:center;gap:9px;margin-top:12px"><input id="newsFeatured" type="checkbox"> ⭐ Contenuto principale in evidenza</label><div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px"><button class="btn primary" id="newsSave">${editing?'💾 Salva modifiche':'＋ Pubblica contenuto'}</button>${editing?'<button class="btn" id="newsCancel">Annulla</button>':''}</div></div><div><div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap"><div><h3>Contenuti pubblicati</h3><span class="notice">${current.length} contenuti globali</span></div></div><div id="newsList" class="feature-list"></div></div></div></div></div>`;
+const current=Array.isArray((cfgOf(t)).news)?(cfgOf(t)).news:[];
+root.innerHTML=`<div class="page-head"><div><h1>News & Comunicazioni</h1><p>${esc(t.nome)} · ID ${esc(t.id)}</p></div><button class="btn" id="newsBack">← Torna al torneo</button></div><div class="card feature-card"><div class="card-head"><div><h2>${editingId?'Modifica contenuto':'Nuovo contenuto'}</h2><span class="notice">Crea promozioni, locandine, tornei, ricordi, prodotti o articoli.</span></div></div><div class="card-body"><div class="section-grid"><div class="feature-form"><label>Tipo contenuto</label><select id="newsType" class="input">${types.map(x=>`<option value="${x}">${x}</option>`).join('')}</select><label>Immagine / Locandina</label><input id="newsImage" class="input" type="file" accept="image/png,image/jpeg,image/webp,image/gif"><small class="notice">Facoltativa. Puoi sostituire l’immagine anche quando modifichi un contenuto.</small><div id="newsPreview" style="margin-top:10px"></div><label>Titolo</label><input id="newsTitle" class="input" placeholder="Titolo del contenuto"><label>Testo</label><textarea id="newsText" class="input" rows="7" placeholder="Testo della comunicazione o dell'articolo"></textarea><label>Link facoltativo</label><input id="newsLink" class="input" placeholder="https://..."><label style="display:flex;align-items:center;gap:9px;margin-top:12px"><input id="newsFeatured" type="checkbox"> ⭐ Contenuto principale in evidenza</label><div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px"><button class="btn primary" id="newsSave">${editingId?'💾 Salva modifiche':'＋ Pubblica contenuto'}</button>${editingId?'<button class="btn" id="newsCancel">Annulla</button>':''}</div></div><div><div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap"><div><h3>Contenuti pubblicati</h3><span class="notice">La stellina determina la locandina principale.</span></div></div><div id="newsList" class="feature-list"></div></div></div></div></div>`;
 $('newsBack')?.addEventListener('click',()=>window.openAdminPage?.('torneo'));
-$('newsType').value=initialType;
-$('newsTitle').value=initialTitle;
-$('newsText').value=initialText;
-$('newsLink').value=initialLink;
-$('newsTournament').value=initialTournamentId;
-$('newsPreview').innerHTML=initialImage?`<div style="width:100%;max-width:320px;height:150px;border-radius:10px;overflow:hidden"><img src="${esc(initialImage)}" style="width:100%;height:100%;object-fit:cover" alt="Locandina"></div>`:'';
-$('newsImage')?.addEventListener('change',async()=>{const file=$('newsImage').files?.[0];if(!file)return;if(!['image/png','image/jpeg','image/webp','image/gif'].includes(file.type)){alert('L’immagine deve essere PNG, JPG, WEBP o GIF.');$('newsImage').value='';return}if(file.size>5*1024*1024){alert('L’immagine è troppo grande. Usa un file massimo di 5 MB.');$('newsImage').value='';return}try{const u=await fileToDataUrl(file);$('newsPreview').innerHTML=`<div style="width:100%;max-width:320px;height:150px;border-radius:10px;overflow:hidden"><img src="${esc(u)}" style="width:100%;height:100%;object-fit:cover" alt="Anteprima"></div>`}catch(e){alert(e.message)}});
+const editing=current.find(n=>String(n.id)===String(editingId));
+if(editing){$('newsType').value=editing.tipo||'Comunicazione';$('newsTitle').value=editing.titolo||'';$('newsText').value=editing.testo||'';$('newsLink').value=editing.link||'';$('newsFeatured').checked=!!editing.inEvidenza;$('newsPreview').innerHTML=editing.immagine?`<div style="width:100%;max-width:320px;height:150px;border-radius:10px;overflow:hidden"><img src="${esc(editing.immagine)}" style="width:100%;height:100%;object-fit:cover" alt=""></div>`:''}
+$('newsImage')?.addEventListener('change',async()=>{const f=$('newsImage').files?.[0];if(!f){return}if(!['image/png','image/jpeg','image/webp','image/gif'].includes(f.type)){alert('L’immagine deve essere PNG, JPG, WEBP o GIF.');$('newsImage').value='';return}if(f.size>5*1024*1024){alert('L’immagine è troppo grande. Usa un file massimo di 5 MB.');$('newsImage').value='';return}try{const u=await fileToDataUrl(f);$('newsPreview').innerHTML=`<div style="width:100%;max-width:320px;height:150px;border-radius:10px;overflow:hidden"><img src="${esc(u)}" style="width:100%;height:100%;object-fit:cover" alt="Anteprima"></div>`}catch(e){alert(e.message)}});
 $('newsCancel')?.addEventListener('click',()=>{editingId=null;render()});
-$('newsSave')?.addEventListener('click',async()=>{const tipo=$('newsType').value,titolo=$('newsTitle').value.trim(),testo=$('newsText').value.trim(),link=$('newsLink').value.trim(),torneoId=$('newsTournament').value||null,featured=$('newsFeatured').checked,file=$('newsImage').files?.[0];if(!titolo||!testo){alert('Inserisci titolo e testo.');return}let image=editing?.immagine||initialImage||'';if(file)image=await fileToDataUrl(file);if(featured){const sb=window.supabaseClient||window.sb;if(!sb){alert('Connessione Supabase non disponibile.');return}const clearQ=editing?.id?await sb.from('news').update({in_evidenza:false}).neq('id',editing.id):await sb.from('news').update({in_evidenza:false}).neq('id',-1);if(clearQ.error){alert('Errore aggiornamento evidenza: '+clearQ.error.message);return}}const row={id:editing?.id,titolo,testo,immagine:image,pubblicata:true,tipo,link:link||null,in_evidenza:featured,ordine:editing?.ordine??current.length,torneo_id:torneoId};if(await saveGlobalNews(row)){items=await loadGlobalNews();editingId=null;render()}});
+$('newsSave')?.addEventListener('click',async()=>{const tipo=$('newsType').value,titolo=$('newsTitle').value.trim(),testo=$('newsText').value.trim(),link=$('newsLink').value.trim(),featured=$('newsFeatured').checked,file=$('newsImage').files?.[0];if(!titolo||!testo){alert('Inserisci titolo e testo.');return}let image=editing?.immagine||'';if(file)image=await fileToDataUrl(file);let next=current.map(n=>({...n}));const now=new Date().toISOString();if(editingId){next=next.map(n=>String(n.id)===String(editingId)?{...n,tipo,titolo,testo,link,immagine:image,inEvidenza:featured,updatedAt:now}:n)}else{next.push({id:'news-'+Date.now(),tipo,titolo,testo,link,immagine:image,inEvidenza:featured,data:now,ordine:next.length})}if(featured)next=next.map(n=>({...n,inEvidenza:String(n.id)===String(editingId||next[next.length-1]?.id)}));if(!featured&&editingId){next=next.map(n=>String(n.id)===String(editingId)?{...n,inEvidenza:false}:n)}next=next.map((n,i)=>({...n,ordine:i}));if(await saveNewsCfg(t,{...cfgOf(t),news:next})){editingId=null;render()}});
 const list=$('newsList');
-current.forEach(n=>{const row=document.createElement('div');row.className='list-item';row.style='display:flex;gap:10px;align-items:flex-start;flex-wrap:wrap';const tor=tournaments.find(t=>String(t.id)===String(n.torneo_id));row.innerHTML=`<div style="width:82px;height:60px;border-radius:9px;overflow:hidden;background:rgba(15,23,42,.12);display:flex;align-items:center;justify-content:center;flex:none">${n.immagine?`<img src="${esc(n.immagine)}" style="width:100%;height:100%;object-fit:cover" alt="">`:'<span style="font-size:24px">📰</span>'}</div><div style="flex:1;min-width:190px"><strong>${esc(n.titolo||'News')}</strong><small style="display:block;margin-top:4px">${esc(n.tipo||'Comunicazione')} · ${n.in_evidenza?'⭐ IN EVIDENZA':'News globale'}${tor?' · '+esc(tor.nome):''}</small><small style="display:block;margin-top:4px">${esc(n.testo||'').slice(0,180)}${String(n.testo||'').length>180?'…':''}</small></div><div style="display:flex;gap:5px;flex-wrap:wrap"><button class="btn small" data-edit="${esc(n.id)}">✏️ Modifica</button><button class="btn small" data-feature="${esc(n.id)}">${n.in_evidenza?'⭐ In evidenza':'☆ Evidenza'}</button><button class="btn small danger" data-del="${esc(n.id)}">Elimina</button></div>`;list.appendChild(row)});
+current.forEach((n,i)=>{const row=document.createElement('div');row.className='list-item';row.style='display:flex;gap:10px;align-items:flex-start;flex-wrap:wrap';row.innerHTML=`<div style="width:82px;height:60px;border-radius:9px;overflow:hidden;background:rgba(15,23,42,.12);display:flex;align-items:center;justify-content:center;flex:none">${n.immagine?`<img src="${esc(n.immagine)}" style="width:100%;height:100%;object-fit:cover" alt="">`:`<span style="font-size:24px">${typeIcon(n.tipo)}</span>`}</div><div style="flex:1;min-width:190px"><strong>${esc(n.titolo||'News')}</strong><small style="display:block;margin-top:4px">${esc(n.tipo||'Comunicazione')} ${n.inEvidenza?'· ⭐ IN EVIDENZA':''}</small><small style="display:block;margin-top:4px">${esc(n.testo||'').slice(0,180)}${String(n.testo||'').length>180?'…':''}</small></div><div style="display:flex;gap:5px;flex-wrap:wrap"><button class="btn small" data-edit="${esc(n.id)}">✏️ Modifica</button><button class="btn small" data-up="${esc(n.id)}" ${i===0?'disabled':''}>↑</button><button class="btn small" data-down="${esc(n.id)}" ${i===current.length-1?'disabled':''}>↓</button><button class="btn small" data-feature="${esc(n.id)}">${n.inEvidenza?'⭐ In evidenza':'☆ Evidenza'}</button><button class="btn small danger" data-del="${esc(n.id)}">Elimina</button></div>`;list.appendChild(row)});
 list.querySelectorAll('[data-edit]').forEach(b=>b.onclick=()=>{editingId=b.dataset.edit;render()});
-list.querySelectorAll('[data-feature]').forEach(b=>b.onclick=async()=>{const sb=window.supabaseClient||window.sb;if(!sb)return;const on=!current.find(n=>String(n.id)===String(b.dataset.feature))?.in_evidenza;const {error}=await sb.from('news').update({in_evidenza:on}).eq('id',b.dataset.feature);if(error){alert('Errore evidenza: '+error.message);return}if(on)await sb.from('news').update({in_evidenza:false}).neq('id',b.dataset.feature);items=await loadGlobalNews();render()});
-list.querySelectorAll('[data-del]').forEach(b=>b.onclick=async()=>{if(!confirm('Eliminare questo contenuto?'))return;const sb=window.supabaseClient||window.sb;if(!sb)return;const {error}=await sb.from('news').delete().eq('id',b.dataset.del);if(error){alert('Errore eliminazione News: '+error.message);return}items=await loadGlobalNews();render()});
+list.querySelectorAll('[data-del]').forEach(b=>b.onclick=async()=>{if(!confirm('Eliminare questo contenuto?'))return;const next=current.filter(n=>String(n.id)!==String(b.dataset.del)).map((n,i)=>({...n,ordine:i}));if(await saveNewsCfg(t,{...cfgOf(t),news:next}))render()});
+list.querySelectorAll('[data-feature]').forEach(b=>b.onclick=async()=>{const next=current.map(n=>({...n,inEvidenza:String(n.id)===String(b.dataset.feature)}));if(await saveNewsCfg(t,{...cfgOf(t),news:next}))render()});
+list.querySelectorAll('[data-up]').forEach(b=>b.onclick=async()=>{const idx=current.findIndex(n=>String(n.id)===String(b.dataset.up));if(idx<=0)return;const next=[...current];[next[idx-1],next[idx]]=[next[idx],next[idx-1]];const ordered=next.map((n,i)=>({...n,ordine:i}));if(await saveNewsCfg(t,{...cfgOf(t),news:ordered}))render()});
+list.querySelectorAll('[data-down]').forEach(b=>b.onclick=async()=>{const idx=current.findIndex(n=>String(n.id)===String(b.dataset.down));if(idx<0||idx>=current.length-1)return;const next=[...current];[next[idx],next[idx+1]]=[next[idx+1],next[idx]];const ordered=next.map((n,i)=>({...n,ordine:i}));if(await saveNewsCfg(t,{...cfgOf(t),news:ordered}))render()});
 };
 render();
 }
-const oldOpenAdminComPage=window.openAdminComPage;
-window.openAdminComPage=p=>p==='news'?newsEditor():oldOpenAdminComPage?.(p);
-document.addEventListener('click',e=>{const b=e.target?.closest?.('[data-com-page="news"]');if(!b)return;e.preventDefault();e.stopImmediatePropagation();document.getElementById('mobileOverlay')?.classList.remove('open');newsEditor()},true);
 })();
