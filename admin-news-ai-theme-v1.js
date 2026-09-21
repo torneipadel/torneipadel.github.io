@@ -37,7 +37,7 @@ function hook(){install();bindInputs();installPanel();if(lastType&&q('#naiType')
 const obs=new MutationObserver(mutations=>{mutations.forEach(m=>m.removedNodes.forEach(n=>{if(n.nodeType!==1)return;const old=n.id==='naiType'?n:n.querySelector?.('#naiType');if(old?.value)lastType=old.value}));hook()});obs.observe(document.body,{childList:true,subtree:true});window.addEventListener('admin:render',hook);if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',hook,{once:true});else hook();
 
 /* ROUTING FIX: il pulsante News deve aprire sempre l'editor completo. */
-document.addEventListener('click',e=>{const b=e.target?.closest?.('[data-com-page="news"]');if(!b)return;e.preventDefault();e.stopImmediatePropagation();document.getElementById('mobileOverlay')?.classList.remove('open');if(typeof window.openAdminComPage==='function'){window.openAdminComPage('news-ai');}},{capture:true});
+document.addEventListener('click',e=>{const b=e.target?.closest?.('[data-com-page="news"]');if(!b)return;e.preventDefault();e.stopImmediatePropagation();document.getElementById('mobileOverlay')?.classList.remove('open');if(typeof window.openAdminComPage==='function'){window.openAdminComPage('news');}},{capture:true});
 
 /* EDIT FIX: quando si modifica una News pubblicata, ripristina i campi realmente ricavabili dal contenuto salvato e mostra la locandina esistente. */
 function currentAdminTorneo(){return window.getTorneoAdminCorrente?.()||((window.adminState?.tornei||[]).find(t=>String(t.id)===String(window.adminState?.torneoSelezionato))||null)}
