@@ -7066,7 +7066,7 @@ try{
                 error:erroreIscritti
             } = await sb
                 .from("iscrizioni")
-                .select("*")
+                .select("id,nome,cognome,nome_giocatore,stato,approvato")
                 .eq(
                     "torneo_id",
                     Number(idParam)
