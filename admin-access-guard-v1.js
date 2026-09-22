@@ -13,9 +13,14 @@
       try{
         const email=String(session.user?.email||"").trim().toLowerCase();
         const superadminEmail=email==="giose.rizzi@gmail.com";
+        const adminEmail=email==="boverob@libero.it"||email==="cfalba@libero.it";
+        const ruoloAutorizzato=superadminEmail?"superadmin":adminEmail?"admin":"";
 
-        // Il Superadmin è identificato dall'account autorizzato e non deve
-        // dipendere dall'esistenza della relativa riga nella tabella profili.
+        if(!ruoloAutorizzato){
+          window.location.href="2Page.html";
+          return false;
+        }
+
         if(superadminEmail){
           window.adminRuolo="superadmin";
           window.isSuperadmin=true;
@@ -37,20 +42,7 @@
           return true;
         }
 
-        const {data:profilo,error}=await client
-          .from("profili")
-          .select("ruolo")
-          .eq("user_id",session.user.id)
-          .maybeSingle();
-
-        const ruoloDb=String(profilo?.ruolo||"").trim().toLowerCase();
-        const ruolo=ruoloDb;
-        const autorizzato=ruolo==="admin";
-
-        if(error || !profilo || !autorizzato){
-          window.location.href="2Page.html";
-          return false;
-        }
+        const ruolo=ruoloAutorizzato;
 
         window.adminRuolo=ruolo;
         window.isSuperadmin=ruolo==="superadmin";
