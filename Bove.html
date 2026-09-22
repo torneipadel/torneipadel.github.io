@@ -7119,7 +7119,7 @@ try{
             "qRes","qCamp","qTime",
             "sTopRes","sTopCamp","sTopTime",
             "fTopRes","fTopCamp","fTopTime",
-            "finalTop"
+            "quarti","semiTop","finalTop","campioneTop"
         ];
 
         arrayDaRecuperare.forEach(k=>{
@@ -11044,6 +11044,29 @@ function renderKO(){
     const teams=getFinalQualified();
     const validTeams=Array.isArray(teams) ? teams : [];
 
+    /*
+     * PERSISTENZA FASE FINALE:
+     * se il torneo è già arrivato alla finale, i finalisti e il
+     * campione salvati in Supabase sono la fonte primaria.
+     * Non devono essere sostituiti da segnaposto durante render().
+     */
+    const savedFinalTop =
+        Array.isArray(state.finalTop) && state.finalTop.length===2
+            ? state.finalTop.slice()
+            : [];
+
+    const savedChampion =
+        state.campioneTop !== undefined &&
+        state.campioneTop !== null &&
+        String(state.campioneTop).trim() !== ""
+            ? state.campioneTop
+            : null;
+
+    const savedFinalTopIsConcrete =
+        savedFinalTop.length===2 &&
+        !/qualificat|vincente|da determinare/i.test(String(savedFinalTop[0])) &&
+        !/qualificat|vincente|da determinare/i.test(String(savedFinalTop[1]));
+
     let semifinali=[];
     let finalisti=[];
 
@@ -11138,7 +11161,13 @@ function renderKO(){
     }
 
     if(usaF){
-        if(finalisti.length!==2){
+        /*
+         * Se abbiamo finalisti reali già salvati, non li perdiamo
+         * quando renderKO() viene richiamata dopo un refresh/load.
+         */
+        if(savedFinalTopIsConcrete){
+            finalisti = savedFinalTop.slice();
+        }else if(finalisti.length!==2){
             if(usaS){
                 finalisti=[
                     "Vincente Semifinale 1",
@@ -11188,6 +11217,15 @@ function renderKO(){
                     else if(g2>g1) campione=finalisti[1];
                 }
             }
+        }
+
+        /*
+         * Fallback per i tornei già conclusi e correttamente salvati:
+         * se il risultato/finalisti non possono essere ricostruiti dal
+         * girone corrente, manteniamo il campione persistito.
+         */
+        if(!campione && savedChampion && !finalPlaceholder){
+            campione=savedChampion;
         }
 
         let winnerCard=document.getElementById("winnerCardKO");
