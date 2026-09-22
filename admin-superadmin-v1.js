@@ -64,6 +64,7 @@
     root.innerHTML=
       '<div class="page-head"><div><h1>👑 Area Superadmin</h1><p>Controllo accessi, registro modifiche, backup e ripristino.</p></div><button type="button" class="btn" id="closeSuperadmin">← Torna al pannello</button></div>'+
       '<div class="card"><div class="card-head"><div><h2>Ruolo e protezioni</h2><span class="notice">Questa area è disponibile esclusivamente al Superadmin.</span></div></div><div class="card-body" id="superadminSummary"></div></div>'+
+      '<div class="card" style="margin-top:18px"><div class="card-head"><div><h2>🛡️ Cosa può fare il Superadmin</h2><span class="notice">Mappa precisa delle operazioni consentite e dei ripristini realmente disponibili.</span></div></div><div class="card-body" id="superadminCapabilities"></div></div>'+
       '<div class="card" style="margin-top:18px"><div class="card-head"><div><h2>📋 Registro modifiche</h2><span class="notice">Le modifiche ai tornei vengono registrate automaticamente.</span></div><button type="button" class="btn" id="refreshAudit">↻ Aggiorna</button></div><div class="card-body"><div id="auditList"></div></div></div>'+
       '<div class="card" style="margin-top:18px"><div class="card-head"><div><h2>💾 Backup tornei</h2><span class="notice">Prima di una modifica o eliminazione viene salvata una copia completa del torneo.</span></div><button type="button" class="btn" id="refreshBackups">↻ Aggiorna</button></div><div class="card-body"><div id="backupList"></div></div></div>';
     $('appContent')?.replaceChildren(root);
@@ -81,6 +82,28 @@
     shell();
     const email=(await client()?.auth?.getUser())?.data?.user?.email||window.adminState?.adminEmail||'-';
     $('superadminSummary').innerHTML='<div class="info-row"><span>Ruolo</span><b>👑 SUPERADMIN</b></div><div class="info-row"><span>Account</span><b>'+esc(email)+'</b></div><div class="info-row"><span>Eliminazione tornei</span><b>Consentita solo al Superadmin</b></div><div class="info-row"><span>Ripristino backup</span><b>Consentito solo al Superadmin</b></div>';
+    $('superadminCapabilities').innerHTML=
+      '<div style="display:grid;gap:14px">'+
+      '<div><h3 style="margin:0 0 6px">✅ Può fare</h3><ul style="margin:0;padding-left:20px">'+
+      '<li>Gestire tutte le funzioni disponibili all’Admin.</li>'+
+      '<li>Eliminare definitivamente un torneo.</li>'+
+      '<li>Eliminare iscrizioni.</li>'+
+      '<li>Archiviare un torneo e riaprire un torneo già archiviato.</li>'+
+      '<li>Consultare il registro audit delle modifiche amministrative.</li>'+
+      '<li>Consultare i backup automatici dei tornei.</li>'+
+      '<li>Ripristinare un torneo da uno dei backup disponibili.</li>'+
+      '</ul></div>'+
+      '<div><h3 style="margin:0 0 6px">↩️ Può ripristinare</h3><table style="width:100%;border-collapse:collapse"><tr><th style="text-align:left;padding:7px;border-bottom:1px solid #ddd">Elemento</th><th style="text-align:left;padding:7px;border-bottom:1px solid #ddd">Ripristino</th><th style="text-align:left;padding:7px;border-bottom:1px solid #ddd">Come</th></tr>'+
+      '<tr><td style="padding:7px">Torneo</td><td style="padding:7px"><b>SI</b></td><td style="padding:7px">Da un backup automatico presente in <code>tornei_admin_backup</code>; sostituisce i dati correnti del medesimo ID con lo snapshot salvato.</td></tr>'+
+      '<tr><td style="padding:7px">Configurazione/regole del torneo</td><td style="padding:7px"><b>SI, se presenti nello snapshot</b></td><td style="padding:7px">Sono ripristinate insieme alla riga completa del torneo.</td></tr>'+
+      '<tr><td style="padding:7px">Iscrizioni</td><td style="padding:7px"><b>NO</b></td><td style="padding:7px">Non esiste attualmente un archivio/backup automatico delle righe <code>iscrizioni</code>.</td></tr>'+
+      '<tr><td style="padding:7px">Profili/ruoli utenti</td><td style="padding:7px"><b>NO</b></td><td style="padding:7px">Non sono inclusi nei backup dei tornei.</td></tr>'+
+      '<tr><td style="padding:7px">News</td><td style="padding:7px"><b>NO</b></td><td style="padding:7px">Non sono incluse nello snapshot del torneo.</td></tr>'+
+      '<tr><td style="padding:7px">Sponsor/Mercatino</td><td style="padding:7px"><b>NO</b></td><td style="padding:7px">Non sono inclusi nel sistema di backup Superadmin attuale.</td></tr>'+
+      '</table></div>'+
+      '<div><h3 style="margin:0 0 6px">🚫 Non può ripristinare automaticamente</h3><p style="margin:0">Un dato cancellato senza un backup specifico non può essere ricostruito dal pulsante <b>↩ Ripristina</b>. Il ripristino disponibile oggi riguarda esclusivamente gli snapshot presenti in <code>tornei_admin_backup</code>.</p></div>'+
+      '<div style="padding:10px 12px;border-left:4px solid #9a6700;background:#fff8e6"><b>Importante:</b> il Superadmin non può recuperare magicamente dati che non sono mai stati salvati in un backup. Prima di dichiarare un recupero possibile, controllare che esista un backup relativo all’elemento interessato.</div>'+
+      '</div>';
     await Promise.all([loadAudit(),loadBackups()]);
     return true;
   }
