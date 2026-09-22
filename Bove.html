@@ -1752,22 +1752,6 @@ Seleziona formato torneo
 
 
 
-    <div style="margin-top:10px;">
-
-      <label>Punti Sconfitta</label>
-
-      <input 
-
-        id="lP" 
-
-        type="number" 
-
-        value="0">
-
-    </div>
-
-
-
     <hr style="margin:15px 0;">
 
 
@@ -2936,7 +2920,7 @@ let state = {
             TIPO TORNEO
         */
 
-        tipoTorneo:"italiana",
+        tipoTorneo:"gironi",
 
         formatoTorneo:8,
 
@@ -3002,9 +2986,9 @@ let state = {
             FORMULE
         */
 
-        formulaGironi:"tuttiControTutti",
+        formulaGironi:"italiana",
 
-        formulaFinale:"eliminazioneDiretta"
+        formulaFinale:"eliminazione_diretta",
 
 
 
@@ -4835,7 +4819,7 @@ function ensureRules(){
 
     if(state.rules.tipoTorneo===undefined)
 
-        state.rules.tipoTorneo="italiana";
+        state.rules.tipoTorneo="gironi";
 
 
     const formatoSalvato =
@@ -4970,14 +4954,14 @@ function ensureRules(){
 
     if(state.rules.formulaGironi===undefined)
 
-        state.rules.formulaGironi="tuttiControTutti";
+        state.rules.formulaGironi="italiana";
 
 
 
     if(state.rules.formulaFinale===undefined)
 
         state.rules.formulaFinale=
-            "eliminazioneDiretta";
+            "eliminazione_diretta";
 
 
 
