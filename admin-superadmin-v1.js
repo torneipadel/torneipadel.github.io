@@ -67,14 +67,14 @@
       '<div class="card" style="margin-top:18px"><div class="card-head"><div><h2>🛡️ Cosa può fare il Superadmin</h2><span class="notice">Mappa precisa delle operazioni consentite e dei ripristini realmente disponibili.</span></div></div><div class="card-body" id="superadminCapabilities"></div></div>'+
       '<div class="card" style="margin-top:18px"><div class="card-head"><div><h2>📋 Registro modifiche</h2><span class="notice">Le modifiche ai tornei vengono registrate automaticamente.</span></div><button type="button" class="btn" id="refreshAudit">↻ Aggiorna</button></div><div class="card-body"><div id="auditList"></div></div></div>'+
       '<div class="card" style="margin-top:18px"><div class="card-head"><div><h2>💾 Backup tornei</h2><span class="notice">Prima di una modifica o eliminazione viene salvata una copia completa del torneo.</span></div><button type="button" class="btn" id="refreshBackups">↻ Aggiorna</button></div><div class="card-body"><div id="backupList"></div></div></div>'+
-      '<div class="card" style="margin-top:18px"><div class="card-head"><div><h2>🗄️ Backup dati amministrativi</h2><span class="notice">Iscrizioni, profili, News, Sponsor e Mercatino hanno ora backup automatico per ogni riga modificata.</span></div><button type="button" class="btn" id="refreshDataBackups">↻ Aggiorna</button></div><div class="card-body"><div id="dataBackupList"></div></div></div>';
+      '<div class="card" style="margin-top:18px"><div class="card-head"><div><h2>🗄️ Backup dati amministrativi</h2><span class="notice">Iscrizioni, profili, News, Sponsor e Mercatino hanno ora backup automatico per ogni riga modificata.</span></div><button type="button" class="btn" id="refreshDataBackups">↻ Aggiorna</button></div><div class="card-body"><div id="dataBackupList"></div></div></div>'+
       '<div class="card" style="margin-top:18px"><div class="card-head"><div><h2>🧩 Backup e ripristino codice</h2><span class="notice">Git conserva ogni modifica in modo differenziale; ogni versione può ricostruire il file completo.</span></div><button type="button" class="btn" id="refreshCodeBackups">↻ Aggiorna</button></div><div class="card-body"><div id="codeBackupList"></div></div></div>';
     $('appContent')?.replaceChildren(root);
     $('closeSuperadmin').onclick=()=>window.renderCleanAdmin?.();
     $('refreshAudit').onclick=loadAudit;
     $('refreshBackups').onclick=loadBackups;
-    $('refreshDataBackups').onclick=loadDataBackups;
-    $('refreshCodeBackups').onclick=loadCodeBackups;
+    $('refreshDataBackups')?.addEventListener('click',loadDataBackups);
+    $('refreshCodeBackups')?.addEventListener('click',loadCodeBackups);
     return root;
   }
 
