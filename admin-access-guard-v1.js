@@ -17,10 +17,35 @@
           .eq("user_id",session.user.id)
           .maybeSingle();
 
-        if(error || !profilo || profilo.ruolo!=="admin"){
+        const ruolo=String(profilo?.ruolo||"").trim().toLowerCase();
+        const autorizzato=ruolo==="admin"||ruolo==="superadmin";
+
+        if(error || !profilo || !autorizzato){
           window.location.href="2Page.html";
           return false;
         }
+
+        window.adminRuolo=ruolo;
+        window.isSuperadmin=ruolo==="superadmin";
+        window.isAdmin=ruolo==="admin"||ruolo==="superadmin";
+
+        document.documentElement.dataset.adminRole=ruolo;
+
+        const mini=document.getElementById("adminEmailMini");
+        if(mini && session.user?.email){
+          mini.textContent=session.user.email;
+        }
+
+        const badge=document.getElementById("adminRoleBadge");
+        if(badge){
+          badge.textContent=ruolo==="superadmin"?"👑 SUPERADMIN":"👤 ADMIN";
+          badge.dataset.role=ruolo;
+        }
+
+        window.dispatchEvent(new CustomEvent("admin:role-ready",{
+          detail:{ruolo,isSuperadmin:ruolo==="superadmin",isAdmin:true}
+        }));
+
         return true;
       }catch(e){
         console.error("Errore verifica accesso amministratore:",e);
