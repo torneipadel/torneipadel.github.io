@@ -11259,11 +11259,9 @@ function sincronizzaFaseFinale(){
     if(state.fTopRes===undefined) state.fTopRes="-";
 
     /*
-     * FASE FINALE: una volta create le squadre del turno,
-     * quelle squadre diventano la sorgente di verita'.
-     * I risultati dei quarti NON devono ricostruire i
-     * qualificati dai gironi e quindi non devono mai
-     * sostituire i vincitori con i segnaposto.
+     * La fase KO viene aggiornata progressivamente:
+     * ogni vincitore disponibile sostituisce immediatamente
+     * il relativo segnaposto del turno successivo.
      */
     if(usaQ){
         if(!Array.isArray(state.quarti) || state.quarti.length!==4){
@@ -11285,24 +11283,26 @@ function sincronizzaFaseFinale(){
             return;
         }
 
-        const vincitoriQuarti=[];
-        state.quarti.forEach((match,index)=>{
-            const w=getWinner(match,state.qRes[index]||"-");
-            if(w) vincitoriQuarti.push(w);
+        const v=state.quarti.map((match,index)=>{
+            return getWinner(match,state.qRes[index]||"-") || null;
         });
 
-        if(vincitoriQuarti.length===4 && usaS){
+        if(usaS){
             state.semiTop=[
-                [vincitoriQuarti[0],vincitoriQuarti[1]],
-                [vincitoriQuarti[2],vincitoriQuarti[3]]
+                [
+                    v[0] || "Vincente Quarto 1",
+                    v[1] || "Vincente Quarto 2"
+                ],
+                [
+                    v[2] || "Vincente Quarto 3",
+                    v[3] || "Vincente Quarto 4"
+                ]
             ];
-        }else if(vincitoriQuarti.length===4 && usaF){
-            state.finalTop=vincitoriQuarti.slice(0,2);
-        }else{
-            if(vincitoriQuarti.length<4) state.finalTop=[];
-            if(usaS) state.semiTop=[];
-            state.campioneTop=null;
-            return;
+        }else if(usaF){
+            state.finalTop=[
+                v[0] || "Vincente Quarto 1",
+                v[1] || "Vincente Quarto 2"
+            ];
         }
     }else if(usaS){
         if(!Array.isArray(state.semiTop) || state.semiTop.length!==2){
@@ -11314,6 +11314,7 @@ function sincronizzaFaseFinale(){
                 ];
             }
         }
+
         if(!Array.isArray(state.semiTop) || state.semiTop.length!==2){
             state.finalTop=[];
             state.campioneTop=null;
@@ -11322,8 +11323,10 @@ function sincronizzaFaseFinale(){
     }else if(usaF){
         if(!Array.isArray(state.finalTop) || state.finalTop.length!==2){
             const q=getFinalQualified();
-            if(Array.isArray(q) && q.length>=2) state.finalTop=q.slice(0,2);
+            if(Array.isArray(q) && q.length>=2)
+                state.finalTop=q.slice(0,2);
         }
+
         if(!Array.isArray(state.finalTop) || state.finalTop.length!==2){
             state.campioneTop=null;
             return;
@@ -11337,27 +11340,34 @@ function sincronizzaFaseFinale(){
     }
 
     if(usaS && Array.isArray(state.semiTop) && state.semiTop.length===2){
-        const vincitoriSemi=[];
-        state.semiTop.forEach((match,index)=>{
-            const w=getWinner(match,state.sTopRes[index]||"-");
-            if(w) vincitoriSemi.push(w);
-        });
+        const s1=getWinner(state.semiTop[0],state.sTopRes[0]||"-");
+        const s2=getWinner(state.semiTop[1],state.sTopRes[1]||"-");
 
-        if(vincitoriSemi.length===2 && usaF){
-            state.finalTop=[vincitoriSemi[0],vincitoriSemi[1]];
-        }else if(vincitoriSemi.length<2){
-            state.finalTop=[];
-            state.campioneTop=null;
-            return;
+        if(usaF){
+            state.finalTop=[
+                s1 || "Vincente Semifinale 1",
+                s2 || "Vincente Semifinale 2"
+            ];
         }
     }
 
     if(usaF && Array.isArray(state.finalTop) && state.finalTop.length===2){
-        state.campioneTop=getWinner(state.finalTop,state.fTopRes||"-")||null;
+        const finalista1=state.finalTop[0];
+        const finalista2=state.finalTop[1];
+
+        const placeholder=
+            /qualificat|vincente/i.test(String(finalista1)) ||
+            /qualificat|vincente/i.test(String(finalista2));
+
+        state.campioneTop=
+            placeholder
+                ? null
+                : (getWinner(state.finalTop,state.fTopRes||"-")||null);
     }else{
         state.campioneTop=null;
     }
 }
+
 function renderKO(){
     ensureRules();
 
