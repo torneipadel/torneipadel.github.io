@@ -8432,12 +8432,27 @@ return true;
 // Funzione di esempio da inserire nel tuo script JS principale
 function getKOExtra(type,index){const key={Q:"qExtra",S:"sTopExtra",F:"fTopExtra"}[type];if(!key)return "";if(!Array.isArray(state[key]))state[key]=[];return String(state[key][index]||"").trim();}
 function getKOResult(type,index){const key={Q:"qRes",S:"sTopRes",F:"fTopRes"}[type];if(!key)return "-";const base=String(type==="F"?state[key]||"-":(Array.isArray(state[key])?state[key][index]:"-")||"-"),extra=getKOExtra(type,index);return extra&&base!=="-"?base+"|"+extra:base;}
-function updateKOExtra(type,index,valore){ensureRules();const key={Q:"qExtra",S:"sTopExtra",F:"fTopExtra"}[type];if(!key)return;if(!Array.isArray(state[key]))state[key]=[];state[key][index]=String(valore??"").trim();sincronizzaFaseFinale();renderKO();updateAndSync();}
+function updateKOExtra(type,index,valore){ensureRules();const key={Q:"qExtra",S:"sTopExtra",F:"fTopExtra"}[type];if(!key)return;if(!Array.isArray(state[key]))state[key]=[];state[key][index]=String(valore??"").trim();updateAndSync();}
 function updateKOResult(type,index,valore,pos){
-    ensureRules();const key={Q:"qRes",S:"sTopRes",F:"fTopRes"}[type];if(!key)return;valore=String(valore??"").trim();
-    if(type==="F"){let res=String(state[key]||"-").split("-");if(res.length!==2)res=["",""];res[pos===1?1:0]=valore;state[key]=res.join("-");}
-    else{if(!Array.isArray(state[key]))state[key]=type==="Q"?Array(4).fill("-"):Array(2).fill("-");let res=String(state[key][index]||"-").split("-");if(res.length!==2)res=["",""];res[pos===1?1:0]=valore;state[key][index]=res.join("-");}
-    sincronizzaFaseFinale();renderKO();updateAndSync();
+    ensureRules();
+    const key={Q:"qRes",S:"sTopRes",F:"fTopRes"}[type];
+    if(!key)return;
+    valore=String(valore??"").trim();
+    if(type==="F"){
+        let res=String(state[key]||"-").split("-");
+        if(res.length!==2)res=["",""];
+        res[pos===1?1:0]=valore;
+        state[key]=res.join("-");
+    }else{
+        if(!Array.isArray(state[key]))state[key]=type==="Q"?Array(4).fill("-"):Array(2).fill("-");
+        let res=String(state[key][index]||"-").split("-");
+        if(res.length!==2)res=["",""];
+        res[pos===1?1:0]=valore;
+        state[key][index]=res.join("-");
+    }
+    const baseResult=type==="F"?String(state[key]||""):String(state[key][index]||"");
+    if(/^\d+-\d+$/.test(baseResult)){sincronizzaFaseFinale();renderKO();}
+    updateAndSync();
 }
                     
 function getWinner(match,res){
@@ -10154,12 +10169,12 @@ function renderFinaleGirone(){
 function updateFinalGroupResult(index,pos,val){ensureRules();const i=Number(index);if(!Array.isArray(state.finalGroupRes)||!Number.isInteger(i)||i<0||i>=state.finalGroupRes.length)return;let r=String(state.finalGroupRes[i]||"-").split("-");if(r.length!==2)r=["",""];r[pos===1?1:0]=String(val??"").trim();state.finalGroupRes[i]=r.join("-");renderFinaleGirone();updateAndSync();}
 function renderMatchCard(titolo,match,type,index,risultato){
     ensureRules();
-    const res=String(risultato||"-").split("-"),risultato1=res[0]==="-"?"":(res[0]||""),risultato2=res[1]||"";
+    const res=String(risultato||"-").split("|")[0].split("-"),risultato1=res[0]==="-"?"":(res[0]||""),risultato2=res[1]||"";
     const campKey={Q:"qCamp",S:"sTopCamp",F:"fTopCamp"}[type],timeKey={Q:"qTime",S:"sTopTime",F:"fTopTime"}[type];
     const camp=Array.isArray(state[campKey])?(state[campKey][index]||""):"",time=Array.isArray(state[timeKey])?(state[timeKey][index]||""):"";
     const displayTeam1=formatCoppiaDisplay(match&&match[0]!=null?match[0]:"Da determinare")||"Da determinare",displayTeam2=formatCoppiaDisplay(match&&match[1]!=null?match[1]:"Da determinare")||"Da determinare";
     const extra=getKOExtra(type,index),showExtra=state.rules.killerPoint===true||state.rules.rigori===true||state.rules.tempoSupplementare===true;
-    return `<tr><td class="campo-cell"><input value="${camp}" oninput="updateKOField('${type}',${index},'camp',this.value)" style="width:45px"></td><td class="orario-cell"><input type="time" value="${time}" oninput="updateKOField('${type}',${index},'time',this.value)"></td><td class="match-cell"><div class="team-line">${displayTeam1}</div><div class="vs-line"><b>VS</b></div><div class="team-line">${displayTeam2}</div></td><td class="score-cell"><input inputmode="numeric" pattern="[0-9]*" value="${risultato1}" oninput="updateKOResult('${type}',${index},this.value,0)"></td><td class="score-cell"><input inputmode="numeric" pattern="[0-9]*" value="${risultato2}" oninput="updateKOResult('${type}',${index},this.value,1)"></td></tr>`+(showExtra?`<tr class="ko-extra-row"><td colspan="5"><input value="${extra}" placeholder="Extra: KP-A / KP-B / R-5-4 / 3-2" oninput="updateKOExtra('${type}',${index},this.value)" style="max-width:260px;font-size:11px"></td></tr>`:"");
+    return `<tr><td class="campo-cell"><input value="${camp}" oninput="updateKOField('${type}',${index},'camp',this.value)" style="width:45px"></td><td class="orario-cell"><input type="time" value="${time}" oninput="updateKOField('${type}',${index},'time',this.value)"></td><td class="match-cell"><div class="team-line">${displayTeam1}</div><div class="vs-line"><b>VS</b></div><div class="team-line">${displayTeam2}</div></td><td class="score-cell"><input inputmode="numeric" pattern="[0-9]*" value="${risultato1}" oninput="updateKOResult('${type}',${index},this.value,0)"></td><td class="score-cell"><input inputmode="numeric" pattern="[0-9]*" value="${risultato2}" oninput="updateKOResult('${type}',${index},this.value,1)"></td></tr>`+(showExtra?`<tr class="ko-extra-row"><td colspan="5"><input value="${extra}" placeholder="Extra: KP-A / KP-B / R-5-4 / 3-2" onchange="updateKOExtra('${type}',${index},this.value)" style="max-width:260px;font-size:11px"></td></tr>`:"");
 }
 function applicaModelloTorneo(){
 
