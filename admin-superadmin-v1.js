@@ -68,11 +68,13 @@
       '<div class="card" style="margin-top:18px"><div class="card-head"><div><h2>📋 Registro modifiche</h2><span class="notice">Le modifiche ai tornei vengono registrate automaticamente.</span></div><button type="button" class="btn" id="refreshAudit">↻ Aggiorna</button></div><div class="card-body"><div id="auditList"></div></div></div>'+
       '<div class="card" style="margin-top:18px"><div class="card-head"><div><h2>💾 Backup tornei</h2><span class="notice">Prima di una modifica o eliminazione viene salvata una copia completa del torneo.</span></div><button type="button" class="btn" id="refreshBackups">↻ Aggiorna</button></div><div class="card-body"><div id="backupList"></div></div></div>'+
       '<div class="card" style="margin-top:18px"><div class="card-head"><div><h2>🗄️ Backup dati amministrativi</h2><span class="notice">Iscrizioni, profili, News, Sponsor e Mercatino hanno ora backup automatico per ogni riga modificata.</span></div><button type="button" class="btn" id="refreshDataBackups">↻ Aggiorna</button></div><div class="card-body"><div id="dataBackupList"></div></div></div>';
+      '<div class="card" style="margin-top:18px"><div class="card-head"><div><h2>🧩 Backup e ripristino codice</h2><span class="notice">Git conserva ogni modifica in modo differenziale; ogni versione può ricostruire il file completo.</span></div><button type="button" class="btn" id="refreshCodeBackups">↻ Aggiorna</button></div><div class="card-body"><div id="codeBackupList"></div></div></div>';
     $('appContent')?.replaceChildren(root);
     $('closeSuperadmin').onclick=()=>window.renderCleanAdmin?.();
     $('refreshAudit').onclick=loadAudit;
     $('refreshBackups').onclick=loadBackups;
     $('refreshDataBackups').onclick=loadDataBackups;
+    $('refreshCodeBackups').onclick=loadCodeBackups;
     return root;
   }
 
@@ -139,6 +141,74 @@
     const rows=r.data||[];
     box.innerHTML=rows.length?'<div class="list">'+rows.map(x=>'<div class="list-item"><div class="list-item-main"><div><strong>'+esc(x.table_name)+' · riga #'+esc(x.row_id)+' · '+esc(x.action)+'</strong><small>Backup #'+esc(x.id)+' · '+esc(x.created_by_email||'-')+' · '+esc(dt(x.created_at))+'</small></div><button type="button" class="btn small danger" data-restore-data-backup="'+esc(x.id)+'">↩ Ripristina</button></div></div>').join('')+'</div>':'<div class="empty">Nessun backup dati disponibile.</div>';
     box.querySelectorAll('[data-restore-data-backup]').forEach(b=>b.onclick=()=>restoreData(Number(b.dataset.restoreDataBackup)));
+  }
+
+
+  const CODE_FILES=['Bove.html','admin.html','admin-superadmin-v1.js','manuale.html','admin-system-monitor-v1.js','admin-torneo-rotazione-v1.js'];
+  const GITHUB_REPO='torneirobertobove/torneirobertobove.github.io';
+
+  async function loadCodeBackups(){
+    const box=$('codeBackupList'); if(!box)return;
+    const c=client(); if(!c){box.textContent='Supabase non disponibile.';return}
+    const reg=await c.from('code_backup_registry').select('file_path,commit_sha,status,note,marked_by_email,created_at').order('created_at',{ascending:false}).limit(500);
+    if(reg.error){box.innerHTML='<div class="empty">Impossibile leggere il registro codice: '+esc(reg.error.message)+'</div>';return}
+    const registry={};
+    (reg.data||[]).forEach(x=>registry[x.file_path+'@'+x.commit_sha]=x);
+    const results=await Promise.all(CODE_FILES.map(async file=>{
+      try{
+        const r=await fetch('https://api.github.com/repos/'+GITHUB_REPO+'/commits?path='+encodeURIComponent(file)+'&per_page=12',{headers:{Accept:'application/vnd.github+json'}});
+        if(!r.ok)throw new Error('GitHub HTTP '+r.status);
+        const data=await r.json();
+        return {file,commits:data};
+      }catch(e){return {file,commits:[],error:e.message}}
+    }));
+    let html='<div style="display:grid;gap:16px">';
+    results.forEach(group=>{
+      html+='<div style="border:1px solid #ddd;border-radius:10px;padding:12px"><h3 style="margin:0 0 10px">'+esc(group.file)+'</h3>';
+      if(group.error){html+='<div class="empty">Errore: '+esc(group.error)+'</div></div>';return}
+      if(!group.commits.length){html+='<div class="empty">Nessuna versione trovata.</div></div>';return}
+      html+='<div style="display:grid;gap:8px">';
+      group.commits.forEach(cm=>{
+        const sha=cm.sha;
+        const meta=registry[group.file+'@'+sha];
+        const status=meta?.status||'TEST';
+        const badge=status==='STABILE'?'🟢 STABILE':status==='PROBLEMATICA'?'🔴 PROBLEMATICA':'🟡 TEST';
+        const msg=cm.commit?.message?.split('\n')[0]||'';
+        const date=cm.commit?.author?.date||cm.committer?.date;
+        html+='<div style="padding:10px;border:1px solid #eee;border-radius:8px"><div style="display:flex;gap:10px;justify-content:space-between;align-items:flex-start;flex-wrap:wrap"><div><strong>'+badge+' · '+esc(sha.slice(0,10))+'</strong><small style="display:block">'+esc(dt(date))+' · '+esc(msg)+'</small></div><div style="display:flex;gap:6px;flex-wrap:wrap">'+
+          '<a class="btn small" href="https://github.com/'+GITHUB_REPO+'/commit/'+sha+'" target="_blank" rel="noopener">Apri</a>'+
+          '<a class="btn small" href="https://github.com/'+GITHUB_REPO+'/compare/'+sha+'...main" target="_blank" rel="noopener">Confronta</a>'+
+          '<button type="button" class="btn small" data-code-status="STABILE" data-code-file="'+esc(group.file)+'" data-code-sha="'+sha+'">⭐ Stabile</button>'+
+          '<button type="button" class="btn small" data-code-status="TEST" data-code-file="'+esc(group.file)+'" data-code-sha="'+sha+'">🟡 Test</button>'+
+          '<button type="button" class="btn small" data-code-status="PROBLEMATICA" data-code-file="'+esc(group.file)+'" data-code-sha="'+sha+'">🔴 Problematica</button>'+
+          '<button type="button" class="btn small danger" data-code-restore="'+sha+'" data-code-file="'+esc(group.file)+'">↩ Ripristina</button>'+
+          '</div></div></div>';
+      });
+      html+='</div></div>';
+    });
+    html+='</div><div style="margin-top:12px;padding:10px 12px;border-left:4px solid #9a6700;background:#fff8e6"><b>Ripristino:</b> il Superadmin seleziona una versione completa del file; la richiesta viene presa automaticamente da GitHub Actions e genera un nuovo commit, senza cancellare la cronologia precedente. Il controllo viene eseguito ogni 5 minuti.</div>';
+    box.innerHTML=html;
+    box.querySelectorAll('[data-code-status]').forEach(b=>b.onclick=()=>setCodeStatus(b.dataset.codeFile,b.dataset.codeSha,b.dataset.codeStatus));
+    box.querySelectorAll('[data-code-restore]').forEach(b=>b.onclick=()=>requestCodeRestore(b.dataset.codeFile,b.dataset.codeRestore));
+  }
+
+  async function setCodeStatus(file,sha,status){
+    if(!isSuper())return;
+    const c=client(); if(!c)return;
+    const user=(await c.auth.getUser())?.data?.user;
+    const r=await c.from('code_backup_registry').upsert({file_path:file,commit_sha:sha,status,marked_by:user?.id||null,marked_by_email:user?.email||null,note:status==='STABILE'?'Versione approvata dal Superadmin':status==='PROBLEMATICA'?'Versione marcata come problematica':'Versione in test'},{onConflict:'file_path,commit_sha'});
+    if(r.error){alert('Impossibile aggiornare lo stato: '+r.error.message);return}
+    await loadCodeBackups();
+  }
+
+  async function requestCodeRestore(file,sha){
+    if(!isSuper())return;
+    if(!confirm('Confermi il ripristino COMPLETO di '+file+' alla versione '+sha.slice(0,10)+'? Verrà creato un nuovo commit senza cancellare la cronologia.'))return;
+    const c=client(); if(!c)return;
+    const r=await c.rpc('superadmin_request_code_restore',{p_file_path:file,p_commit_sha:sha});
+    if(r.error){alert('Richiesta di ripristino non creata: '+r.error.message);return}
+    alert('Richiesta registrata. GitHub Actions eseguirà automaticamente il ripristino e creerà un nuovo commit entro pochi minuti.');
+    await loadCodeBackups();
   }
 
   async function restoreData(id){
