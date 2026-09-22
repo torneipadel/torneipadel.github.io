@@ -22,19 +22,13 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
 
-      - name: Generate favicon
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y imagemagick
-          convert loghi/logo_senza_scritte.jpg -auto-orient -resize 48x48 -background none -gravity center -extent 48x48 favicon.ico
-
       - name: Upload site
-        uses: actions/upload-pages-artifact@v3
+        uses: actions/upload-pages-artifact@v4
         with:
           path: .
 
