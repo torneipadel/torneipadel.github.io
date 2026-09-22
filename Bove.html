@@ -8433,6 +8433,58 @@ function calc(squadre, risultati){
 
 
 }
+function updateCamp(g,i,val){
+    const tag=String(g||"").toUpperCase();
+    if(!["A","B","C","D","E","F"].includes(tag)) return;
+
+    const key=tag+"camp";
+    if(!Array.isArray(state[key])) state[key]=[];
+
+    state[key][Number(i)]=String(val ?? "").trim();
+
+    updateAndSync();
+}
+
+function updateTime(g,i,pos,val){
+    const tag=String(g||"").toUpperCase();
+    if(!["A","B","C","D","E","F"].includes(tag)) return;
+
+    const key=tag+"time";
+    if(!Array.isArray(state[key])) state[key]=[];
+
+    state[key][Number(i)]=String(val ?? "").trim();
+
+    updateAndSync();
+}
+
+function autofillTimes(){
+    const tags=["A","B","C","D","E","F"];
+    const baseMinutes=19*60;
+    const durata=60;
+
+    tags.forEach(tag=>{
+        const res=state[tag+"res"];
+        if(!Array.isArray(res)) return;
+
+        const key=tag+"time";
+        if(!Array.isArray(state[key])) state[key]=[];
+
+        res.forEach((_,i)=>{
+            if(String(state[key][i]||"").trim()) return;
+
+            const minuti=baseMinutes+(i*durata);
+            const ore=Math.floor((minuti%1440)/60);
+            const min=minuti%60;
+
+            state[key][i]=
+                String(ore).padStart(2,"0")+":"+
+                String(min).padStart(2,"0");
+        });
+    });
+
+    updateAndSync();
+}
+
 function renderClass(){
 
     ensureRules();
