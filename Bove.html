@@ -10976,32 +10976,124 @@ function getFinalQualified(){
 }
 function sincronizzaFaseFinale(){
     ensureRules();
+
     const qualificati=getFinalQualified();
-    state.quarti=[]; state.semiTop=[]; state.finalTop=[];
+
+    /*
+     * Non cancellare una fase finale già salvata se, durante un
+     * aggiornamento, i gironi non sono temporaneamente ricostruibili.
+     * Questo evita di perdere finalisti/campione al salvataggio del risultato.
+     */
+    const salvatiQuarti=Array.isArray(state.quarti)?state.quarti.slice():[];
+    const salvatiSemi=Array.isArray(state.semiTop)?state.semiTop.slice():[];
+    const salvatiFinal=Array.isArray(state.finalTop)?state.finalTop.slice():[];
+    const salvatoCampione=state.campioneTop;
+
     if(!Array.isArray(qualificati)||qualificati.length<2){
-        state.qRes=Array(4).fill("-"); state.qCamp=[]; state.qTime=[];
-        state.sTopRes=Array(2).fill("-"); state.sTopCamp=[]; state.sTopTime=[];
-        state.fTopRes="-"; state.fTopCamp=""; state.fTopTime=""; state.campioneTop=null; return;
+        return;
     }
+
+    state.quarti=[];
+    state.semiTop=[];
+    state.finalTop=[];
+
     if(state.rules.usaQuarti===true){
-        if(qualificati.length<8) return;
-        state.quarti=[[qualificati[0],qualificati[7]],[qualificati[3],qualificati[4]],[qualificati[1],qualificati[6]],[qualificati[2],qualificati[5]]];
+        if(qualificati.length<8){
+            state.quarti=salvatiQuarti;
+            state.semiTop=salvatiSemi;
+            state.finalTop=salvatiFinal;
+            state.campioneTop=salvatoCampione;
+            return;
+        }
+
+        state.quarti=[
+            [qualificati[0],qualificati[7]],
+            [qualificati[3],qualificati[4]],
+            [qualificati[1],qualificati[6]],
+            [qualificati[2],qualificati[5]]
+        ];
+
         if(!Array.isArray(state.qRes)) state.qRes=Array(4).fill("-");
-        const v=[]; state.quarti.forEach((m,i)=>{const w=getWinner(m,state.qRes[i]); if(w)v.push(w);});
-        if(v.length<4) return;
-        if(state.rules.usaSemifinali===true) state.semiTop=[[v[0],v[1]],[v[2],v[3]]];
-        else state.finalTop=v.slice(0,2);
+
+        const v=[];
+        state.quarti.forEach((m,i)=>{
+            const w=getWinner(m,state.qRes[i]);
+            if(w)v.push(w);
+        });
+
+        if(v.length<4){
+            state.semiTop=salvatiSemi;
+            state.finalTop=salvatiFinal;
+            state.campioneTop=salvatoCampione;
+            return;
+        }
+
+        if(state.rules.usaSemifinali===true){
+            state.semiTop=[[v[0],v[1]],[v[2],v[3]]];
+        }else{
+            state.finalTop=v.slice(0,2);
+        }
+
     }else if(state.rules.usaSemifinali===true){
-        if(qualificati.length<4) return;
-        state.semiTop=[[qualificati[0],qualificati[3]],[qualificati[1],qualificati[2]]];
+
+        if(qualificati.length<4){
+            state.quarti=salvatiQuarti;
+            state.semiTop=salvatiSemi;
+            state.finalTop=salvatiFinal;
+            state.campioneTop=salvatoCampione;
+            return;
+        }
+
+        state.semiTop=[
+            [qualificati[0],qualificati[3]],
+            [qualificati[1],qualificati[2]]
+        ];
+
     }else if(state.rules.usaFinale===true){
+
         state.finalTop=qualificati.slice(0,2);
-    }else return;
-    if(state.rules.usaSemifinali===true){
-        const v=[]; state.semiTop.forEach((m,i)=>{const w=getWinner(m,Array.isArray(state.sTopRes)?state.sTopRes[i]:"-"); if(w)v.push(w);});
-        if(v.length===2) state.finalTop=v; else if(state.rules.usaFinale===true) return;
+
+    }else{
+        state.quarti=salvatiQuarti;
+        state.semiTop=salvatiSemi;
+        state.finalTop=salvatiFinal;
+        state.campioneTop=salvatoCampione;
+        return;
     }
-    state.campioneTop=(state.rules.usaFinale===true&&Array.isArray(state.finalTop)&&state.finalTop.length===2)?(getWinner(state.finalTop,state.fTopRes)||null):null;
+
+    if(state.rules.usaSemifinali===true){
+        const v=[];
+
+        state.semiTop.forEach((m,i)=>{
+            const w=getWinner(
+                m,
+                Array.isArray(state.sTopRes)
+                    ? state.sTopRes[i]
+                    : "-"
+            );
+            if(w)v.push(w);
+        });
+
+        if(v.length===2){
+            state.finalTop=v;
+        }else if(state.rules.usaFinale===true){
+            state.finalTop=salvatiFinal;
+            state.campioneTop=salvatoCampione;
+            return;
+        }
+    }
+
+    const nuovoCampione=
+        state.rules.usaFinale===true &&
+        Array.isArray(state.finalTop) &&
+        state.finalTop.length===2
+            ? getWinner(state.finalTop,state.fTopRes)
+            : null;
+
+    state.campioneTop=
+        nuovoCampione ||
+        salvatoCampione ||
+        null;
 }
 function renderKO(){
     ensureRules();
