@@ -11,6 +11,32 @@
     async function verificaAccessoAdmin(session){
       if(!session)return true;
       try{
+        const email=String(session.user?.email||"").trim().toLowerCase();
+        const superadminEmail=email==="giose.rizzi@gmail.com";
+
+        // Il Superadmin è identificato dall'account autorizzato e non deve
+        // dipendere dall'esistenza della relativa riga nella tabella profili.
+        if(superadminEmail){
+          window.adminRuolo="superadmin";
+          window.isSuperadmin=true;
+          window.isAdmin=true;
+          document.documentElement.dataset.adminRole="superadmin";
+
+          const mini=document.getElementById("adminEmailMini");
+          if(mini && session.user?.email) mini.textContent=session.user.email;
+
+          const badge=document.getElementById("adminRoleBadge");
+          if(badge){
+            badge.textContent="👑 SUPERADMIN";
+            badge.dataset.role="superadmin";
+          }
+
+          window.dispatchEvent(new CustomEvent("admin:role-ready",{
+            detail:{ruolo:"superadmin",isSuperadmin:true,isAdmin:true}
+          }));
+          return true;
+        }
+
         const {data:profilo,error}=await client
           .from("profili")
           .select("ruolo")
@@ -18,10 +44,8 @@
           .maybeSingle();
 
         const ruoloDb=String(profilo?.ruolo||"").trim().toLowerCase();
-        const email=String(session.user?.email||"").trim().toLowerCase();
-        const superadminEmail=email==="giose.rizzi@gmail.com";
-        const ruolo=superadminEmail?"superadmin":ruoloDb;
-        const autorizzato=ruolo==="admin"||ruolo==="superadmin";
+        const ruolo=ruoloDb;
+        const autorizzato=ruolo==="admin";
 
         if(error || !profilo || !autorizzato){
           window.location.href="2Page.html";
