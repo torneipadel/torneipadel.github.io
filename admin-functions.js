@@ -36,7 +36,54 @@ function apriRegoleTorneoAdmin(id){adminState.torneoSelezionato=id;window.adminS
 function renderAdmin(){if(typeof window.renderCleanAdmin==='function')window.renderCleanAdmin()}
 function syncDashboard(){}
 function openWorkspace(section){if(section==='link')generaLinkBove()}
-async function wireDashboard(){caricaAdminState();try{const{data,error}=await sb.auth.getSession();if(error)throw error;const session=data?.session;if(!session){adminState.adminLoggato=false;adminState.adminEmail="";salvaAdminState();document.getElementById("areaAdmin")?.classList.add("hidden");document.getElementById("boxLoginAdmin")?.classList.remove("hidden");return}const email=String(session.user?.email||"").trim().toLowerCase();const superadmin=email==="giose.rizzi@gmail.com";const admin=email==="boverob@libero.it"||email==="cfalba@libero.it";if(!superadmin&&!admin){await sb.auth.signOut();adminState.adminLoggato=false;adminState.adminEmail="";salvaAdminState();document.getElementById("areaAdmin")?.classList.add("hidden");document.getElementById("boxLoginAdmin")?.classList.remove("hidden");return}window.adminRuolo=superadmin?"superadmin":"admin";window.isSuperadmin=superadmin;window.isAdmin=true;document.documentElement.dataset.adminRole=window.adminRuolo;adminState.adminLoggato=true;adminState.adminEmail=session.user?.email||"Admin";salvaAdminState();document.getElementById("boxLoginAdmin")?.classList.add("hidden");document.getElementById("areaAdmin")?.classList.remove("hidden");await caricaTorneiSupabase();window.dispatchEvent(new CustomEvent("admin:role-ready",{detail:{ruolo:window.adminRuolo,isSuperadmin:superadmin,isAdmin:true}}))}catch(e){console.error("Errore verifica sessione Admin:",e);adminState.adminLoggato=false;adminState.adminEmail="";salvaAdminState();document.getElementById("areaAdmin")?.classList.add("hidden");document.getElementById("boxLoginAdmin")?.classList.remove("hidden")}}
+async function wireDashboard(){
+  caricaAdminState();
+  try{
+    let session=null;
+    for(let i=0;i<5;i++){
+      const{data,error}=await sb.auth.getSession();
+      if(error)throw error;
+      session=data?.session||null;
+      if(session)break;
+      await new Promise(r=>setTimeout(r,200));
+    }
+    const email=String(session?.user?.email||"").trim().toLowerCase();
+    const superadmin=email==="giose.rizzi@gmail.com";
+    const admin=email==="boverob@libero.it"||email==="cfalba@libero.it";
+    if(!session||(!superadmin&&!admin)){
+      adminState.adminLoggato=false;
+      adminState.adminEmail="";
+      window.adminRuolo="";
+      window.isSuperadmin=false;
+      window.isAdmin=false;
+      document.documentElement.dataset.adminRole="";
+      salvaAdminState();
+      document.getElementById("areaAdmin")?.classList.add("hidden");
+      document.getElementById("boxLoginAdmin")?.classList.remove("hidden");
+      return false
+    }
+    window.adminRuolo=superadmin?"superadmin":"admin";
+    window.isSuperadmin=superadmin;
+    window.isAdmin=true;
+    document.documentElement.dataset.adminRole=window.adminRuolo;
+    adminState.adminLoggato=true;
+    adminState.adminEmail=session.user?.email||email;
+    window.adminState=adminState;
+    salvaAdminState();
+    document.getElementById("boxLoginAdmin")?.classList.add("hidden");
+    document.getElementById("areaAdmin")?.classList.remove("hidden");
+    const mini=document.getElementById("adminEmailMini");
+    if(mini)mini.textContent=session.user?.email||email;
+    await caricaTorneiSupabase();
+    window.dispatchEvent(new CustomEvent("admin:role-ready",{detail:{ruolo:window.adminRuolo,isSuperadmin:superadmin,isAdmin:true}}));
+    return true
+  }catch(e){
+    console.error("Errore verifica sessione Admin:",e);
+    document.getElementById("areaAdmin")?.classList.add("hidden");
+    document.getElementById("boxLoginAdmin")?.classList.remove("hidden");
+    return false
+  }
+}
 document.addEventListener("DOMContentLoaded",wireDashboard);
 
 /* CONTROLLI TORNEO + CONTATORE LIVE: aggiunta isolata, senza modificare il flusso Admin esistente. */
