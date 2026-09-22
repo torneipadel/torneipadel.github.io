@@ -7133,7 +7133,8 @@ try{
 
                 if(
                     Array.isArray(configurazione[k]) ||
-                    k==="fTopRes"
+                    k==="fTopRes" ||
+                    k==="campioneTop"
                 ){
 
                     state[k]=configurazione[k];
@@ -11224,7 +11225,7 @@ function renderKO(){
          * se il risultato/finalisti non possono essere ricostruiti dal
          * girone corrente, manteniamo il campione persistito.
          */
-        if(!campione && savedChampion && !finalPlaceholder){
+        if(!campione && savedChampion){
             campione=savedChampion;
         }
 
