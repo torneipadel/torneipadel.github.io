@@ -4092,30 +4092,7 @@ async function apriArchivioTornei(){
 
 
 }
-function chiudiMenuAutomatico(){
 
-    let menu =
-        document.getElementById("menuComandi");
-
-
-    if(!menu)
-        return;
-
-
-    menu.addEventListener(
-        "click",
-        function(){
-
-            setTimeout(()=>{
-
-                menu.classList.remove("show");
-
-            },100);
-
-        }
-    );
-
-}
 async function caricaTorneoArchivio(id){
 
 
@@ -4831,6 +4808,14 @@ function ensureRules(){
         ============================
     */
 
+
+    if(!Array.isArray(state.qRes)) state.qRes=Array(4).fill("-");
+    if(!Array.isArray(state.sTopRes)) state.sTopRes=Array(2).fill("-");
+    if(state.fTopRes===undefined) state.fTopRes="-";
+    if(!Array.isArray(state.quarti)) state.quarti=[];
+    if(!Array.isArray(state.semiTop)) state.semiTop=[];
+    if(!Array.isArray(state.finalTop)) state.finalTop=[];
+    if(state.campioneTop===undefined) state.campioneTop=null;
 
     if(state.rules.locked===undefined)
 
@@ -8192,298 +8177,77 @@ function formatCoppiaDisplay(coppia){
 }
 
 function calc(squadre, risultati){
+    if(!Array.isArray(squadre) || !Array.isArray(risultati)) return [];
 
-    if(
-        !Array.isArray(squadre)
-        ||
-        !Array.isArray(risultati)
-    ){
-
-        return [];
-
-    }
-
-
-
-    let classifica=[];
-
-
-
-    squadre.forEach(nome=>{
-
-
-        classifica.push({
-
-            n:nome,
-
-            pt:0,
-
-            gf:0,
-
-            gs:0,
-
-            df:0
-
-        });
-
-
-    });
-
-
+    const classifica=squadre.map(nome=>({
+        n:nome,
+        pt:0,
+        gf:0,
+        gs:0,
+        df:0
+    }));
 
     let indice=0;
+    for(let i=0;i<squadre.length;i++){
+        for(let j=i+1;j<squadre.length;j++){
+            const risultato=risultati[indice++];
+            if(!risultato || risultato==="-" || String(risultato).trim()==="") continue;
 
+            const parti=String(risultato).split("-");
+            if(parti.length!==2) continue;
 
+            const a=Number(parti[0]);
+            const b=Number(parti[1]);
+            if(Number.isNaN(a)||Number.isNaN(b)) continue;
 
-    for(
-        let i=0;
-        i<squadre.length;
-        i++
-    ){
-
-        for(
-            let j=i+1;
-            j<squadre.length;
-            j++
-        ){
-
-
-            let risultato =
-                risultati[indice];
-
-
-            indice++;
-
-
-
-            if(
-                !risultato
-                ||
-                risultato==="-"
-            ){
-
-                continue;
-
-            }
-
-
-
-            let parti =
-                risultato
-                .split("-");
-
-
-
-            if(parti.length!==2){
-
-                continue;
-
-            }
-
-
-
-            let a =
-                Number(
-                    parti[0]
-                );
-
-
-            let b =
-                Number(
-                    parti[1]
-                );
-
-
-
-            if(
-                Number.isNaN(a)
-                ||
-                Number.isNaN(b)
-            ){
-
-                continue;
-
-            }
-
-
-
-            classifica[i].gf += a;
-
-            classifica[i].gs += b;
-
-
-
-            classifica[j].gf += b;
-
-            classifica[j].gs += a;
-
-
+            classifica[i].gf+=a;
+            classifica[i].gs+=b;
+            classifica[j].gf+=b;
+            classifica[j].gs+=a;
 
             if(a>b){
-
-
-                classifica[i].pt +=
-                    Number(
-                        state.rules?.w || 3
-                    );
-
-
+                classifica[i].pt+=Number(state.rules?.w ?? 3);
+                classifica[j].pt+=Number(state.rules?.l ?? 0);
+            }else if(b>a){
+                classifica[j].pt+=Number(state.rules?.w ?? 3);
+                classifica[i].pt+=Number(state.rules?.l ?? 0);
+            }else{
+                classifica[i].pt+=Number(state.rules?.d ?? 1);
+                classifica[j].pt+=Number(state.rules?.d ?? 1);
             }
-            else
-            if(b>a){
-
-
-                classifica[j].pt +=
-                    Number(
-                        state.rules?.w || 3
-                    );
-
-
-            }
-            else{
-
-
-                classifica[i].pt +=
-                    Number(
-                        state.rules?.d || 1
-                    );
-
-
-                classifica[j].pt +=
-                    Number(
-                        state.rules?.d || 1
-                    );
-
-
-            }
-
-
         }
-
     }
 
+    classifica.forEach(x=>x.df=x.gf-x.gs);
 
+    const criteri=[
+        state.rules?.crit1,
+        state.rules?.crit2,
+        state.rules?.crit3
+    ].filter(x=>["df","gf","gs"].includes(x));
 
-    classifica.forEach(x=>{
-
-
-        x.df =
-            x.gf -
-            x.gs;
-
-
-    });
-
-
+    const ordinati=[...new Set(criteri)];
+    ["df","gf","gs"].forEach(x=>{if(!ordinati.includes(x)) ordinati.push(x);});
 
     classifica.sort((a,b)=>{
-
-
-        if(
-            b.pt!==a.pt
-        )
-
-            return b.pt-a.pt;
-
-
-
-        if(
-            b.df!==a.df
-        )
-
-            return b.df-a.df;
-
-
-
-        if(
-            b.gf!==a.gf
-        )
-
-            return b.gf-a.gf;
-
-
-
-        return a.gs-b.gs;
-
-
+        if(b.pt!==a.pt) return b.pt-a.pt;
+        for(const criterio of ordinati){
+            if(criterio==="df" && b.df!==a.df) return b.df-a.df;
+            if(criterio==="gf" && b.gf!==a.gf) return b.gf-a.gf;
+            if(criterio==="gs" && b.gs!==a.gs) return a.gs-b.gs;
+        }
+        return String(a.n).localeCompare(String(b.n));
     });
 
-
-
-    const qualificate =
-
-        Number(
-            state.rules?.qualificatePerGirone || 2
-        );
-
-
-
-    classifica.forEach((x,i)=>{
-
-
-        x.qual =
-            i < qualificate;
-
-
-    });
-
-
-
+    const qualificate=Number(state.rules?.qualificatePerGirone || 2);
+    classifica.forEach((x,i)=>x.qual=i<qualificate);
     return classifica;
-
-
-}
-function updateCamp(g,i,val){
-    const tag=String(g||"").toUpperCase();
-    if(!["A","B","C","D","E","F"].includes(tag)) return;
-
-    const key=tag+"camp";
-    if(!Array.isArray(state[key])) state[key]=[];
-
-    state[key][Number(i)]=String(val ?? "").trim();
-
-    updateAndSync();
 }
 
-function updateTime(g,i,pos,val){
-    const tag=String(g||"").toUpperCase();
-    if(!["A","B","C","D","E","F"].includes(tag)) return;
 
-    const key=tag+"time";
-    if(!Array.isArray(state[key])) state[key]=[];
 
-    state[key][Number(i)]=String(val ?? "").trim();
 
-    updateAndSync();
-}
 
-function autofillTimes(){
-    const tags=["A","B","C","D","E","F"];
-    const baseMinutes=19*60;
-    const durata=60;
-
-    tags.forEach(tag=>{
-        const res=state[tag+"res"];
-        if(!Array.isArray(res)) return;
-
-        const key=tag+"time";
-        if(!Array.isArray(state[key])) state[key]=[];
-
-        res.forEach((_,i)=>{
-            if(String(state[key][i]||"").trim()) return;
-
-            const minuti=baseMinutes+(i*durata);
-            const ore=Math.floor((minuti%1440)/60);
-            const min=minuti%60;
-
-            state[key][i]=
-                String(ore).padStart(2,"0")+":"+
-                String(min).padStart(2,"0");
-        });
-    });
-
-    updateAndSync();
-}
 
 function renderClass(){
 
@@ -8728,74 +8492,26 @@ function autofillTimes(){
 }
 
 function updateRes(g,i,pos,val){
+    const tag=String(g||"").toUpperCase();
+    if(!["A","B","C","D","E","F"].includes(tag)) return;
 
-    let s;
+    const key=tag+"res";
+    if(!Array.isArray(state[key])) return;
 
+    const index=Number(i);
+    if(!Number.isInteger(index)||index<0||index>=state[key].length) return;
 
-    if(g==="A")
-        s=state.Ares;
+    if(!state[key][index]) state[key][index]="-";
 
-    else if(g==="B")
-        s=state.Bres;
+    let p=String(state[key][index]).split("-");
+    if(p.length!==2) p=["",""];
 
-    else if(g==="C")
-        s=state.Cres;
-
-    else if(g==="D")
-        s=state.Dres;
-
-    else
-        return;
-
-
-
-    if(!Array.isArray(s))
-        return;
-
-
-
-    if(!s[i])
-        s[i]="-";
-
-
-
-    let p =
-        s[i]
-        .toString()
-        .split("-");
-
-
-
-    if(p.length<2){
-
-        p=[
-            "",
-            ""
-        ];
-
-    }
-
-
-
-    p[pos]=val;
-
-
-
-    s[i]=
-        p.join("-");
-
-
+    p[Number(pos)===1?1:0]=String(val ?? "").trim();
+    state[key][index]=p.join("-");
 
     renderClass();
-
-
-    if(typeof renderKO==="function")
-        renderKO();
-
-
-
+    if(typeof renderKO==="function") renderKO();
     updateAndSync();
-
 }
 async function salvaTorneoSupabase(){
 
@@ -9070,56 +8786,7 @@ return true;
     updateAndSync();
 }
 // Funzione di esempio da inserire nel tuo script JS principale
-function aggiornaVincitoreDinamico() {
-    // 1. Legge i nomi delle due squadre finaliste
-    const squadra1 = document.querySelector('#finaleBox tr .team-line:nth-child(1)')?.innerText.trim() || '';
-    const squadra2 = document.querySelector('#finaleBox tr .team-line:nth-child(3)')?.innerText.trim() || '';
-    
-    // 2. Legge i gol inseriti nei rispettivi input dei risultati della finale
-    const inputGol1 = document.querySelector('#finaleBox tr td:nth-child(4) input');
-    const inputGol2 = document.querySelector('#finaleBox tr td:nth-child(5) input');
-    
-    if (!inputGol1 || !inputGol2) return;
-    
-    const gol1 = parseInt(inputGol1.value);
-    const gol2 = parseInt(inputGol2.value);
-    
-    let vincitoreTrovato = "";
-    
-    // 3. Determina chi ha vinto in base ai gol
-    if (!isNaN(gol1) && !isNaN(gol2)) {
-        if (gol1 > gol2) {
-            vincitoreTrovato = squadra1;
-        } else if (gol2 > gol1) {
-            vincitoreTrovato = squadra2;
-        }
-    }
-    
-    // 4. Seleziona il box del vincitore nella pagina e aggiorna il testo dinamicamente
-    const winnerCard = document.getElementById('winnerCardKO');
-    if (winnerCard) {
-        if (vincitoreTrovato) {
-            winnerCard.style.display = 'block';
-            winnerCard.innerHTML = `
-                <div class="winner-box top-win">
-                    🏆 CAMPIONE TORNEO:<br>
-                    <span style="font-size: 1.1em; font-weight: normal; color: #e2e8f0;">${vincitoreTrovato}</span>
-                </div>
-            `;
-        } else {
-            // Se la finale non è ancora conclusa o i gol non sono inseriti, nasconde il box
-            winnerCard.style.display = 'none';
-        }
-    }
-}
-
-// Collega questa funzione agli eventi di input dei gol della finale
-document.querySelectorAll('#finaleBox input').forEach(input => {
-    input.addEventListener('input', aggiornaVincitoreDinamico);
-});
-                    
-
- function updateKOResult(type,index,valore,pos){
+function updateKOResult(type,index,valore,pos){
     ensureRules();
 
     valore = String(valore ?? "").trim();
@@ -11399,19 +11066,7 @@ function renderKO(){
     q.style.display=usaQ ? "table-row-group" : "none";
     s.style.display=usaS ? "table-row-group" : "none";
 
-    /*
-     * IMPORTANTE:
-     * dopo la creazione del tabellone, state.quarti,
-     * state.semiTop e state.finalTop sono la sorgente di
-     * verita'. Non vengono ricalcolati dai gironi dopo
-     * ogni risultato KO.
-     */
-    if(usaQ && (!Array.isArray(state.quarti) || state.quarti.length!==4)){
-        sincronizzaFaseFinale();
-    }
-    if(usaS && (!Array.isArray(state.semiTop) || state.semiTop.length!==2)){
-        sincronizzaFaseFinale();
-    }
+    if(usaQ || usaS || usaF) sincronizzaFaseFinale();
 
     if(usaQ){
         const quarti =
@@ -11425,20 +11080,12 @@ function renderKO(){
                   ];
 
         quarti.forEach((match,index)=>{
-            q.innerHTML+=renderMatchCard(
-                "QUARTO "+(index+1),
-                match,
-                "Q",
-                index,
-                state.qRes[index]
-            );
+            q.innerHTML+=renderMatchCard("QUARTO "+(index+1),match,"Q",index,state.qRes[index]);
         });
     }
 
-    let semifinali=[];
-
     if(usaS){
-        semifinali =
+        const semifinali =
             Array.isArray(state.semiTop) && state.semiTop.length===2
                 ? state.semiTop
                 : [
@@ -11447,18 +11094,12 @@ function renderKO(){
                   ];
 
         semifinali.forEach((match,index)=>{
-            s.innerHTML+=renderMatchCard(
-                "SEMIFINALE "+(index+1),
-                match,
-                "S",
-                index,
-                state.sTopRes[index]
-            );
+            s.innerHTML+=renderMatchCard("SEMIFINALE "+(index+1),match,"S",index,state.sTopRes[index]);
         });
     }
 
     if(usaF){
-        let finalisti =
+        const finalisti =
             Array.isArray(state.finalTop) && state.finalTop.length===2
                 ? state.finalTop
                 : (usaS
@@ -11469,43 +11110,44 @@ function renderKO(){
 
         state.finalTop=[...finalisti];
 
-        f.innerHTML=renderMatchCard(
-            "🏆 FINALE",
-            finalisti,
-            "F",
-            0,
-            state.fTopRes
-        );
+        f.innerHTML=renderMatchCard("🏆 FINALE",finalisti,"F",0,state.fTopRes);
+
+        const oldCard=document.getElementById("winnerCardKO");
+        if(oldCard) oldCard.remove();
+
+        const table=f.closest("table");
+        const cardHost=table?.parentElement || f.parentElement;
+        const winnerCard=document.createElement("div");
+        winnerCard.id="winnerCardKO";
+        winnerCard.style.cssText="display:none; margin-top:15px;";
 
         const finalPlaceholder =
-            /qualificat|vincente/i.test(String(finalisti[0])) ||
-            /qualificat|vincente/i.test(String(finalisti[1]));
+            /qualificat|vincente|da determinare/i.test(String(finalisti[0])) ||
+            /qualificat|vincente|da determinare/i.test(String(finalisti[1]));
 
         const campione =
-            finalPlaceholder
-                ? null
-                : getWinner(finalisti,state.fTopRes);
-
-        const winnerCard=document.getElementById("winnerCardKO");
+            !finalPlaceholder
+                ? getWinner(finalisti,state.fTopRes)
+                : null;
 
         if(campione){
             state.campioneTop=campione;
-            if(winnerCard){
-                winnerCard.style.cssText="display: block !important; margin-top: 15px;";
-                winnerCard.innerHTML=`
-                    <div class="winner-box top-win" style="background: rgba(251,191,36,.2); color: #fbbf24; padding: 15px; border-radius: 8px; text-align: center; font-weight: bold; font-size: 1.3em;">
-                        🏆 CAMPIONE TORNEO:<br>
-                        <span style="font-size: 1.1em; font-weight: normal; color: #e2e8f0;">${formatCoppiaDisplay(campione)}</span>
-                    </div>
-                `;
-            }
+            winnerCard.style.cssText="display:block; margin-top:15px;";
+            winnerCard.innerHTML=
+                '<div class="winner-box top-win" style="background:rgba(251,191,36,.2);color:#fbbf24;padding:15px;border-radius:8px;text-align:center;font-weight:bold;font-size:1.3em;">' +
+                '🏆 CAMPIONE TORNEO:<br>' +
+                '<span style="font-size:1.1em;font-weight:normal;color:#e2e8f0;">' +
+                formatCoppiaDisplay(campione) +
+                '</span></div>';
         }else{
             state.campioneTop=null;
-            if(winnerCard){
-                winnerCard.style.cssText="display: none !important;";
-                winnerCard.innerHTML="";
-            }
         }
+
+        if(cardHost) cardHost.appendChild(winnerCard);
+    }else{
+        state.campioneTop=null;
+        const oldCard=document.getElementById("winnerCardKO");
+        if(oldCard) oldCard.remove();
     }
 }
 function renderMatchCard(titolo, match, type, index, risultato) {
