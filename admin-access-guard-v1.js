@@ -17,7 +17,10 @@
           .eq("user_id",session.user.id)
           .maybeSingle();
 
-        const ruolo=String(profilo?.ruolo||"").trim().toLowerCase();
+        const ruoloDb=String(profilo?.ruolo||"").trim().toLowerCase();
+        const email=String(session.user?.email||"").trim().toLowerCase();
+        const superadminEmail=email==="giose.rizzi@gmail.com";
+        const ruolo=superadminEmail?"superadmin":ruoloDb;
         const autorizzato=ruolo==="admin"||ruolo==="superadmin";
 
         if(error || !profilo || !autorizzato){
