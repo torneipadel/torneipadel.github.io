@@ -8638,6 +8638,95 @@ ${formatCoppiaDisplay(x.n)}
 
 
 }
+function updateCamp(g,i,val){
+
+    const campKey = String(g) + "camp";
+
+    if(!Array.isArray(state[campKey]))
+        state[campKey]=[];
+
+    state[campKey][i] = String(val ?? "").trim();
+
+    updateAndSync();
+
+}
+
+function updateTime(g,i,pos,val){
+
+    const timeKey = String(g) + "time";
+
+    if(!Array.isArray(state[timeKey]))
+        state[timeKey]=[];
+
+    state[timeKey][i] = String(val ?? "").trim();
+
+    updateAndSync();
+
+}
+
+function autofillTimes(){
+
+    const lettere=["A","B","C","D","E","F","G"];
+
+    let slot=0;
+
+    lettere.forEach(g=>{
+
+        const squadre=state[g];
+
+        if(!Array.isArray(squadre) || squadre.length<2)
+            return;
+
+        const totale=squadre.length*(squadre.length-1)/2;
+
+        if(!Array.isArray(state[g+"time"]))
+            state[g+"time"]=[];
+
+        if(!Array.isArray(state[g+"camp"]))
+            state[g+"camp"]=[];
+
+        for(let i=0;i<totale;i++){
+
+            if(
+                state[g+"time"][i]===undefined ||
+                state[g+"time"][i]===null ||
+                String(state[g+"time"][i]).trim()==="" ||
+                String(state[g+"time"][i]).trim()==="-"
+            ){
+
+                const minutiTotali =
+                    19*60 + (slot*60);
+
+                const ore =
+                    Math.floor(minutiTotali/60)%24;
+
+                const minuti =
+                    minutiTotali%60;
+
+                state[g+"time"][i] =
+                    String(ore).padStart(2,"0") +
+                    ":" +
+                    String(minuti).padStart(2,"0");
+
+            }
+
+            if(
+                state[g+"camp"][i]===undefined ||
+                state[g+"camp"][i]===null
+            ){
+                state[g+"camp"][i]="";
+            }
+
+            slot++;
+
+        }
+
+    });
+
+    updateAndSync();
+
+}
+
 function updateRes(g,i,pos,val){
 
     let s;
