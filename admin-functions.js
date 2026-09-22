@@ -59,7 +59,7 @@ async function wireDashboard(){
       document.documentElement.dataset.adminRole="";
       salvaAdminState();
       document.getElementById("areaAdmin")?.classList.add("hidden");
-      document.getElementById("boxLoginAdmin")?.classList.remove("hidden");
+      window.location.replace("index.html");
       return false
     }
     window.adminRuolo=superadmin?"superadmin":"admin";
@@ -80,7 +80,7 @@ async function wireDashboard(){
   }catch(e){
     console.error("Errore verifica sessione Admin:",e);
     document.getElementById("areaAdmin")?.classList.add("hidden");
-    document.getElementById("boxLoginAdmin")?.classList.remove("hidden");
+    window.location.replace("index.html");
     return false
   }
 }
