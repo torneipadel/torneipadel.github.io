@@ -66,11 +66,13 @@
       '<div class="card"><div class="card-head"><div><h2>Ruolo e protezioni</h2><span class="notice">Questa area è disponibile esclusivamente al Superadmin.</span></div></div><div class="card-body" id="superadminSummary"></div></div>'+
       '<div class="card" style="margin-top:18px"><div class="card-head"><div><h2>🛡️ Cosa può fare il Superadmin</h2><span class="notice">Mappa precisa delle operazioni consentite e dei ripristini realmente disponibili.</span></div></div><div class="card-body" id="superadminCapabilities"></div></div>'+
       '<div class="card" style="margin-top:18px"><div class="card-head"><div><h2>📋 Registro modifiche</h2><span class="notice">Le modifiche ai tornei vengono registrate automaticamente.</span></div><button type="button" class="btn" id="refreshAudit">↻ Aggiorna</button></div><div class="card-body"><div id="auditList"></div></div></div>'+
-      '<div class="card" style="margin-top:18px"><div class="card-head"><div><h2>💾 Backup tornei</h2><span class="notice">Prima di una modifica o eliminazione viene salvata una copia completa del torneo.</span></div><button type="button" class="btn" id="refreshBackups">↻ Aggiorna</button></div><div class="card-body"><div id="backupList"></div></div></div>';
+      '<div class="card" style="margin-top:18px"><div class="card-head"><div><h2>💾 Backup tornei</h2><span class="notice">Prima di una modifica o eliminazione viene salvata una copia completa del torneo.</span></div><button type="button" class="btn" id="refreshBackups">↻ Aggiorna</button></div><div class="card-body"><div id="backupList"></div></div></div>'+
+      '<div class="card" style="margin-top:18px"><div class="card-head"><div><h2>🗄️ Backup dati amministrativi</h2><span class="notice">Iscrizioni, profili, News, Sponsor e Mercatino hanno ora backup automatico per ogni riga modificata.</span></div><button type="button" class="btn" id="refreshDataBackups">↻ Aggiorna</button></div><div class="card-body"><div id="dataBackupList"></div></div></div>';
     $('appContent')?.replaceChildren(root);
     $('closeSuperadmin').onclick=()=>window.renderCleanAdmin?.();
     $('refreshAudit').onclick=loadAudit;
     $('refreshBackups').onclick=loadBackups;
+    $('refreshDataBackups').onclick=loadDataBackups;
     return root;
   }
 
@@ -86,25 +88,24 @@
       '<div style="display:grid;gap:14px">'+
       '<div><h3 style="margin:0 0 6px">✅ Può fare</h3><ul style="margin:0;padding-left:20px">'+
       '<li>Gestire tutte le funzioni disponibili all’Admin.</li>'+
-      '<li>Eliminare definitivamente un torneo.</li>'+
-      '<li>Eliminare iscrizioni.</li>'+
-      '<li>Archiviare un torneo e riaprire un torneo già archiviato.</li>'+
-      '<li>Consultare il registro audit delle modifiche amministrative.</li>'+
-      '<li>Consultare i backup automatici dei tornei.</li>'+
-      '<li>Ripristinare un torneo da uno dei backup disponibili.</li>'+
+      '<li>Eliminare definitivamente tornei e iscrizioni.</li>'+
+      '<li>Archiviare e riaprire tornei.</li>'+
+      '<li>Consultare audit e backup.</li>'+
+      '<li>Ripristinare dati da backup disponibili.</li>'+
+      '<li>Gestire i ruoli utenti a livello database, inclusa la protezione contro l’auto-promozione degli Admin.</li>'+
       '</ul></div>'+
-      '<div><h3 style="margin:0 0 6px">↩️ Può ripristinare</h3><table style="width:100%;border-collapse:collapse"><tr><th style="text-align:left;padding:7px;border-bottom:1px solid #ddd">Elemento</th><th style="text-align:left;padding:7px;border-bottom:1px solid #ddd">Ripristino</th><th style="text-align:left;padding:7px;border-bottom:1px solid #ddd">Come</th></tr>'+
-      '<tr><td style="padding:7px">Torneo</td><td style="padding:7px"><b>SI</b></td><td style="padding:7px">Da un backup automatico presente in <code>tornei_admin_backup</code>; sostituisce i dati correnti del medesimo ID con lo snapshot salvato.</td></tr>'+
-      '<tr><td style="padding:7px">Configurazione/regole del torneo</td><td style="padding:7px"><b>SI, se presenti nello snapshot</b></td><td style="padding:7px">Sono ripristinate insieme alla riga completa del torneo.</td></tr>'+
-      '<tr><td style="padding:7px">Iscrizioni</td><td style="padding:7px"><b>NO</b></td><td style="padding:7px">Non esiste attualmente un archivio/backup automatico delle righe <code>iscrizioni</code>.</td></tr>'+
-      '<tr><td style="padding:7px">Profili/ruoli utenti</td><td style="padding:7px"><b>NO</b></td><td style="padding:7px">Non sono inclusi nei backup dei tornei.</td></tr>'+
-      '<tr><td style="padding:7px">News</td><td style="padding:7px"><b>NO</b></td><td style="padding:7px">Non sono incluse nello snapshot del torneo.</td></tr>'+
-      '<tr><td style="padding:7px">Sponsor/Mercatino</td><td style="padding:7px"><b>NO</b></td><td style="padding:7px">Non sono inclusi nel sistema di backup Superadmin attuale.</td></tr>'+
+      '<div><h3 style="margin:0 0 6px">↩️ Copertura ripristino</h3><table style="width:100%;border-collapse:collapse"><tr><th style="text-align:left;padding:7px;border-bottom:1px solid #ddd">Elemento</th><th style="text-align:left;padding:7px;border-bottom:1px solid #ddd">Backup</th><th style="text-align:left;padding:7px;border-bottom:1px solid #ddd">Ripristino</th></tr>'+
+      '<tr><td style="padding:7px">Torneo + configurazione/regole</td><td style="padding:7px"><b>SI</b></td><td style="padding:7px"><b>SI</b></td></tr>'+
+      '<tr><td style="padding:7px">Iscrizioni</td><td style="padding:7px"><b>SI</b></td><td style="padding:7px"><b>SI</b></td></tr>'+
+      '<tr><td style="padding:7px">Profili/ruoli</td><td style="padding:7px"><b>SI</b></td><td style="padding:7px"><b>SI</b></td></tr>'+
+      '<tr><td style="padding:7px">News</td><td style="padding:7px"><b>SI</b></td><td style="padding:7px"><b>SI</b></td></tr>'+
+      '<tr><td style="padding:7px">Sponsor</td><td style="padding:7px"><b>SI</b></td><td style="padding:7px"><b>SI</b></td></tr>'+
+      '<tr><td style="padding:7px">Mercatino</td><td style="padding:7px"><b>SI</b></td><td style="padding:7px"><b>SI</b></td></tr>'+
       '</table></div>'+
-      '<div><h3 style="margin:0 0 6px">🚫 Non può ripristinare automaticamente</h3><p style="margin:0">Un dato cancellato senza un backup specifico non può essere ricostruito dal pulsante <b>↩ Ripristina</b>. Il ripristino disponibile oggi riguarda esclusivamente gli snapshot presenti in <code>tornei_admin_backup</code>.</p></div>'+
-      '<div style="padding:10px 12px;border-left:4px solid #9a6700;background:#fff8e6"><b>Importante:</b> il Superadmin non può recuperare magicamente dati che non sono mai stati salvati in un backup. Prima di dichiarare un recupero possibile, controllare che esista un backup relativo all’elemento interessato.</div>'+
+      '<div style="padding:10px 12px;border-left:4px solid #198754;background:#eefaf2"><b>Come funziona:</b> per i dati amministrativi il sistema conserva lo snapshot della singola riga quando viene inserita, modificata o cancellata. Il Superadmin può quindi riportare quella riga allo stato salvato. Non è un’immagine completa dell’intero database in un unico backup.</div>'+
+      '<div style="padding:10px 12px;border-left:4px solid #9a6700;background:#fff8e6"><b>Importante:</b> il ripristino è possibile solo se esiste il relativo snapshot. Un dato creato e mai passato da un backup non può essere ricostruito.</div>'+
       '</div>';
-    await Promise.all([loadAudit(),loadBackups()]);
+    await Promise.all([loadAudit(),loadBackups(),loadDataBackups()]);
     return true;
   }
 
@@ -128,6 +129,27 @@
       return '<div class="list-item"><div class="list-item-main"><div><strong>'+esc(nome)+'</strong><small>Backup #'+esc(x.id)+' · '+esc(x.reason||'')+' · '+esc(x.created_by_email||'-')+' · '+esc(dt(x.created_at))+'</small></div><button type="button" class="btn small danger" data-restore-backup="'+esc(x.id)+'">↩ Ripristina</button></div></div>';
     }).join('')+'</div>':'<div class="empty">Nessun backup disponibile.</div>';
     box.querySelectorAll('[data-restore-backup]').forEach(b=>b.onclick=()=>restore(Number(b.dataset.restoreBackup)));
+  }
+
+  async function loadDataBackups(){
+    const box=$('dataBackupList'); if(!box)return;
+    const c=client(); if(!c){box.textContent='Supabase non disponibile.';return}
+    const r=await c.from('admin_data_backup').select('id,table_name,row_id,action,reason,created_by_email,created_at').order('created_at',{ascending:false}).limit(200);
+    if(r.error){box.innerHTML='<div class="empty">Impossibile leggere i backup dati: '+esc(r.error.message)+'</div>';return}
+    const rows=r.data||[];
+    box.innerHTML=rows.length?'<div class="list">'+rows.map(x=>'<div class="list-item"><div class="list-item-main"><div><strong>'+esc(x.table_name)+' · riga #'+esc(x.row_id)+' · '+esc(x.action)+'</strong><small>Backup #'+esc(x.id)+' · '+esc(x.created_by_email||'-')+' · '+esc(dt(x.created_at))+'</small></div><button type="button" class="btn small danger" data-restore-data-backup="'+esc(x.id)+'">↩ Ripristina</button></div></div>').join('')+'</div>':'<div class="empty">Nessun backup dati disponibile.</div>';
+    box.querySelectorAll('[data-restore-data-backup]').forEach(b=>b.onclick=()=>restoreData(Number(b.dataset.restoreDataBackup)));
+  }
+
+  async function restoreData(id){
+    if(!isSuper()||!Number.isFinite(id))return;
+    if(!confirm('Confermi il ripristino del dato dal backup #'+id+'? La riga corrente con lo stesso ID verrà sostituita dallo snapshot.'))return;
+    const c=client(); if(!c)return;
+    const r=await c.rpc('superadmin_restore_data_backup',{p_backup_id:id});
+    if(r.error){alert('Ripristino dati non riuscito: '+r.error.message);return}
+    alert('Ripristino dati completato.');
+    await loadAudit();
+    await loadDataBackups();
   }
 
   async function restore(id){
