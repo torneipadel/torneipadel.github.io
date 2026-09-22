@@ -7066,7 +7066,7 @@ try{
                 error:erroreIscritti
             } = await sb
                 .from("iscrizioni")
-                .select("id,nome,cognome,nome_giocatore,stato,approvato")
+                .select("*")
                 .eq(
                     "torneo_id",
                     Number(idParam)
@@ -7119,7 +7119,7 @@ try{
             "qRes","qCamp","qTime",
             "sTopRes","sTopCamp","sTopTime",
             "fTopRes","fTopCamp","fTopTime",
-            "quarti","semiTop","finalTop","campioneTop"
+            "finalTop"
         ];
 
         arrayDaRecuperare.forEach(k=>{
@@ -7133,8 +7133,7 @@ try{
 
                 if(
                     Array.isArray(configurazione[k]) ||
-                    k==="fTopRes" ||
-                    k==="campioneTop"
+                    k==="fTopRes"
                 ){
 
                     state[k]=configurazione[k];
@@ -8974,46 +8973,27 @@ document.querySelectorAll('#finaleBox input').forEach(input => {
         if(res.length !== 2) res = ["",""];
         res[pos] = valore;
         state.fTopRes = res.join("-");
-
-        /*
-         * LA FINALE NON DEVE ESSERE RICOSTRUITA.
-         * I finalisti già presenti restano invariati e, quando il
-         * risultato è completo, viene aggiornato direttamente il
-         * campione.
-         */
-        if(/^\d+\-\d+$/.test(String(state.fTopRes || "")) &&
-           Array.isArray(state.finalTop) &&
-           state.finalTop.length === 2){
-
-            const vincitore=getWinner(
-                state.finalTop,
-                state.fTopRes
-            );
-
-            if(vincitore){
-                state.campioneTop=vincitore;
-            }
-        }
-
-        renderKO();
-        updateAndSync();
-        return;
     }else{
         return;
     }
 
     /*
-     * Q e S: solo dopo un risultato completo si ricostruisce
-     * la fase successiva.
+     * Il campo risultato NON deve ricostruire il DOM mentre l'utente
+     * sta compilando il punteggio: altrimenti il focus viene perso e
+     * il secondo valore non può essere inserito normalmente.
+     * La fase finale viene invece ridisegnata quando il risultato è
+     * completo oppure quando si usa il normale salvataggio.
      */
     const risultatoCompleto =
-        /^\d+\-\d+$/.test(
-            String(
-                type === "Q"
-                    ? state.qRes[index]
-                    : state.sTopRes[index]
-            )
-        );
+        type === "F"
+            ? /^\d+\-\d+$/.test(String(state.fTopRes || ""))
+            : /^\d+\-\d+$/.test(
+                String(
+                    type === "Q"
+                        ? state.qRes[index]
+                        : state.sTopRes[index]
+                )
+              );
 
     if(risultatoCompleto){
         sincronizzaFaseFinale();
@@ -10995,124 +10975,32 @@ function getFinalQualified(){
 }
 function sincronizzaFaseFinale(){
     ensureRules();
-
     const qualificati=getFinalQualified();
-
-    /*
-     * Non cancellare una fase finale già salvata se, durante un
-     * aggiornamento, i gironi non sono temporaneamente ricostruibili.
-     * Questo evita di perdere finalisti/campione al salvataggio del risultato.
-     */
-    const salvatiQuarti=Array.isArray(state.quarti)?state.quarti.slice():[];
-    const salvatiSemi=Array.isArray(state.semiTop)?state.semiTop.slice():[];
-    const salvatiFinal=Array.isArray(state.finalTop)?state.finalTop.slice():[];
-    const salvatoCampione=state.campioneTop;
-
+    state.quarti=[]; state.semiTop=[]; state.finalTop=[];
     if(!Array.isArray(qualificati)||qualificati.length<2){
-        return;
+        state.qRes=Array(4).fill("-"); state.qCamp=[]; state.qTime=[];
+        state.sTopRes=Array(2).fill("-"); state.sTopCamp=[]; state.sTopTime=[];
+        state.fTopRes="-"; state.fTopCamp=""; state.fTopTime=""; state.campioneTop=null; return;
     }
-
-    state.quarti=[];
-    state.semiTop=[];
-    state.finalTop=[];
-
     if(state.rules.usaQuarti===true){
-        if(qualificati.length<8){
-            state.quarti=salvatiQuarti;
-            state.semiTop=salvatiSemi;
-            state.finalTop=salvatiFinal;
-            state.campioneTop=salvatoCampione;
-            return;
-        }
-
-        state.quarti=[
-            [qualificati[0],qualificati[7]],
-            [qualificati[3],qualificati[4]],
-            [qualificati[1],qualificati[6]],
-            [qualificati[2],qualificati[5]]
-        ];
-
+        if(qualificati.length<8) return;
+        state.quarti=[[qualificati[0],qualificati[7]],[qualificati[3],qualificati[4]],[qualificati[1],qualificati[6]],[qualificati[2],qualificati[5]]];
         if(!Array.isArray(state.qRes)) state.qRes=Array(4).fill("-");
-
-        const v=[];
-        state.quarti.forEach((m,i)=>{
-            const w=getWinner(m,state.qRes[i]);
-            if(w)v.push(w);
-        });
-
-        if(v.length<4){
-            state.semiTop=salvatiSemi;
-            state.finalTop=salvatiFinal;
-            state.campioneTop=salvatoCampione;
-            return;
-        }
-
-        if(state.rules.usaSemifinali===true){
-            state.semiTop=[[v[0],v[1]],[v[2],v[3]]];
-        }else{
-            state.finalTop=v.slice(0,2);
-        }
-
+        const v=[]; state.quarti.forEach((m,i)=>{const w=getWinner(m,state.qRes[i]); if(w)v.push(w);});
+        if(v.length<4) return;
+        if(state.rules.usaSemifinali===true) state.semiTop=[[v[0],v[1]],[v[2],v[3]]];
+        else state.finalTop=v.slice(0,2);
     }else if(state.rules.usaSemifinali===true){
-
-        if(qualificati.length<4){
-            state.quarti=salvatiQuarti;
-            state.semiTop=salvatiSemi;
-            state.finalTop=salvatiFinal;
-            state.campioneTop=salvatoCampione;
-            return;
-        }
-
-        state.semiTop=[
-            [qualificati[0],qualificati[3]],
-            [qualificati[1],qualificati[2]]
-        ];
-
+        if(qualificati.length<4) return;
+        state.semiTop=[[qualificati[0],qualificati[3]],[qualificati[1],qualificati[2]]];
     }else if(state.rules.usaFinale===true){
-
         state.finalTop=qualificati.slice(0,2);
-
-    }else{
-        state.quarti=salvatiQuarti;
-        state.semiTop=salvatiSemi;
-        state.finalTop=salvatiFinal;
-        state.campioneTop=salvatoCampione;
-        return;
-    }
-
+    }else return;
     if(state.rules.usaSemifinali===true){
-        const v=[];
-
-        state.semiTop.forEach((m,i)=>{
-            const w=getWinner(
-                m,
-                Array.isArray(state.sTopRes)
-                    ? state.sTopRes[i]
-                    : "-"
-            );
-            if(w)v.push(w);
-        });
-
-        if(v.length===2){
-            state.finalTop=v;
-        }else if(state.rules.usaFinale===true){
-            state.finalTop=salvatiFinal;
-            state.campioneTop=salvatoCampione;
-            return;
-        }
+        const v=[]; state.semiTop.forEach((m,i)=>{const w=getWinner(m,Array.isArray(state.sTopRes)?state.sTopRes[i]:"-"); if(w)v.push(w);});
+        if(v.length===2) state.finalTop=v; else if(state.rules.usaFinale===true) return;
     }
-
-    const nuovoCampione=
-        state.rules.usaFinale===true &&
-        Array.isArray(state.finalTop) &&
-        state.finalTop.length===2
-            ? getWinner(state.finalTop,state.fTopRes)
-            : null;
-
-    state.campioneTop=
-        nuovoCampione ||
-        salvatoCampione ||
-        null;
+    state.campioneTop=(state.rules.usaFinale===true&&Array.isArray(state.finalTop)&&state.finalTop.length===2)?(getWinner(state.finalTop,state.fTopRes)||null):null;
 }
 function renderKO(){
     ensureRules();
@@ -11155,29 +11043,6 @@ function renderKO(){
      */
     const teams=getFinalQualified();
     const validTeams=Array.isArray(teams) ? teams : [];
-
-    /*
-     * PERSISTENZA FASE FINALE:
-     * se il torneo è già arrivato alla finale, i finalisti e il
-     * campione salvati in Supabase sono la fonte primaria.
-     * Non devono essere sostituiti da segnaposto durante render().
-     */
-    const savedFinalTop =
-        Array.isArray(state.finalTop) && state.finalTop.length===2
-            ? state.finalTop.slice()
-            : [];
-
-    const savedChampion =
-        state.campioneTop !== undefined &&
-        state.campioneTop !== null &&
-        String(state.campioneTop).trim() !== ""
-            ? state.campioneTop
-            : null;
-
-    const savedFinalTopIsConcrete =
-        savedFinalTop.length===2 &&
-        !/qualificat|vincente|da determinare/i.test(String(savedFinalTop[0])) &&
-        !/qualificat|vincente|da determinare/i.test(String(savedFinalTop[1]));
 
     let semifinali=[];
     let finalisti=[];
@@ -11273,13 +11138,7 @@ function renderKO(){
     }
 
     if(usaF){
-        /*
-         * Se abbiamo finalisti reali già salvati, non li perdiamo
-         * quando renderKO() viene richiamata dopo un refresh/load.
-         */
-        if(savedFinalTopIsConcrete){
-            finalisti = savedFinalTop.slice();
-        }else if(finalisti.length!==2){
+        if(finalisti.length!==2){
             if(usaS){
                 finalisti=[
                     "Vincente Semifinale 1",
@@ -11329,15 +11188,6 @@ function renderKO(){
                     else if(g2>g1) campione=finalisti[1];
                 }
             }
-        }
-
-        /*
-         * Fallback per i tornei già conclusi e correttamente salvati:
-         * se il risultato/finalisti non possono essere ricostruiti dal
-         * girone corrente, manteniamo il campione persistito.
-         */
-        if(!campione && savedChampion){
-            campione=savedChampion;
         }
 
         let winnerCard=document.getElementById("winnerCardKO");
