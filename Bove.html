@@ -11116,44 +11116,65 @@ oninput="updateRes('${tag}',${i},1,this.value)">
 
    
 function getFinalQualified(){
-
     ensureRules();
 
-    const qualificati = [];
-    const lettereGironi = ["A","B","C","D","E","F","G"];
+    const qualificati=[];
+    const lettereGironi=["A","B","C","D","E","F","G"];
 
-    lettereGironi.forEach(tag=>{
+    const gruppiAttivi=lettereGironi.filter(tag=>{
+        return Array.isArray(state[tag]) && state[tag].length>0;
+    });
 
-        const squadre = state[tag];
+    const totaleSquadre=gruppiAttivi.reduce((n,tag)=>{
+        return n + state[tag].length;
+    },0);
 
-        if(!Array.isArray(squadre) || squadre.length === 0)
-            return;
+    const usaQuarti=state.rules.usaQuarti===true;
+    const numeroGironi=Math.max(1,gruppiAttivi.length);
 
-        const risultati =
+    /*
+     * Se sono attivi i QUARTI, il tabellone deve avere 8
+     * squadre reali.
+     *
+     * - 8 squadre totali: entrano tutte e 8
+     * - piu' di 8 squadre: vengono prese almeno 8 squadre
+     *   dalle classifiche dei gironi e poi ordinate globalmente
+     *   secondo i criteri gia' previsti dal motore.
+     *
+     * In questo modo usaQuarti=true non puo' piu' convivere
+     * con una lista di soli 4 qualificati e 4 segnaposto.
+     */
+    const targetQualificate=usaQuarti ? 8 : 0;
+    const quotaPerGirone=usaQuarti
+        ? Math.max(1,Math.ceil(targetQualificate/numeroGironi))
+        : Math.max(1,Number(state.rules.qualificatePerGirone)||1);
+
+    gruppiAttivi.forEach(tag=>{
+        const squadre=state[tag];
+
+        const risultati=
             Array.isArray(state[tag+"res"])
                 ? state[tag+"res"]
                 : [];
 
-        const numeroPartite =
-            squadre.length * (squadre.length - 1) / 2;
+        const numeroPartite=squadre.length*(squadre.length-1)/2;
 
         if(
-            risultati.length < numeroPartite ||
+            risultati.length<numeroPartite ||
             risultati.slice(0,numeroPartite).some(
-                r => r === "-" || r === "" || r == null
+                r=>r==="-" || r==="" || r==null
             )
         )
             return;
 
-        const classifica = calc(squadre,risultati);
+        const classifica=calc(squadre,risultati);
 
-        if(!Array.isArray(classifica) || !classifica.length)
+        if(!Array.isArray(classifica)||!classifica.length)
             return;
 
-        let q = Number(state.rules.qualificatePerGirone);
-
-        if(!Number.isFinite(q) || q < 1)
-            q = 1;
+        const q=usaQuarti
+            ? Math.min(quotaPerGirone,classifica.length)
+            : quotaPerGirone;
 
         classifica.slice(0,q).forEach((x,i)=>{
             qualificati.push({
@@ -11169,7 +11190,7 @@ function getFinalQualified(){
     });
 
     if(
-        qualificati.length === 0 &&
+        qualificati.length===0 &&
         Array.isArray(state.coppie) &&
         state.coppie.length
     ){
@@ -11189,58 +11210,41 @@ function getFinalQualified(){
     if(!qualificati.length)
         return [];
 
-    /*
-     * Il numero dei qualificati deve dipendere dalla fase realmente
-     * possibile per il numero di squadre, non dall'ordine dei gironi.
-     *
-     * 4 qualificati -> semifinali
-     * 8 qualificati -> quarti
-     * 2 qualificati -> finale
-     */
-    let richiesti = 0;
+    let richiesti=0;
 
-    if(
-        state.rules.usaQuarti === true &&
-        qualificati.length >= 8
-    ){
-        richiesti = 8;
-
+    if(usaQuarti && qualificati.length>=8){
+        richiesti=8;
     }else if(
-        state.rules.usaSemifinali === true &&
-        qualificati.length >= 4
+        state.rules.usaSemifinali===true &&
+        qualificati.length>=4
     ){
-        richiesti = 4;
-
+        richiesti=4;
     }else if(
-        state.rules.usaFinale === true &&
-        qualificati.length >= 2
+        state.rules.usaFinale===true &&
+        qualificati.length>=2
     ){
-        richiesti = 2;
+        richiesti=2;
     }
+
+    /*
+     * Con 8 squadre totali e quarti attivi, richiesti=8:
+     * tutti gli 8 partecipanti entrano nel tabellone.
+     */
+    if(usaQuarti && totaleSquadre===8 && qualificati.length===8)
+        richiesti=8;
 
     if(!richiesti)
         return [];
 
-    /*
-     * Con più di 8 qualificati non si devono prendere solo i primi
-     * gironi. Si costruisce invece una graduatoria globale sui dati
-     * già calcolati dal motore.
-     */
-    const ordinati = [...qualificati].sort((a,b)=>{
-
-        if(b.pt !== a.pt) return b.pt - a.pt;
-        if(b.df !== a.df) return b.df - a.df;
-        if(b.gf !== a.gf) return b.gf - a.gf;
-
-        if(a.posizione !== b.posizione)
-            return a.posizione - b.posizione;
-
+    const ordinati=[...qualificati].sort((a,b)=>{
+        if(b.pt!==a.pt) return b.pt-a.pt;
+        if(b.df!==a.df) return b.df-a.df;
+        if(b.gf!==a.gf) return b.gf-a.gf;
+        if(a.posizione!==b.posizione) return a.posizione-b.posizione;
         return String(a.girone).localeCompare(String(b.girone));
     });
 
-    return ordinati
-        .slice(0,richiesti)
-        .map(x=>x.nome);
+    return ordinati.slice(0,richiesti).map(x=>x.nome);
 }
 
 function sincronizzaFaseFinale(){
