@@ -4812,7 +4812,7 @@ function ensureRules(){
     if(!Array.isArray(state.quarti)) state.quarti=[];
     if(!Array.isArray(state.semiTop)) state.semiTop=[];
     if(!Array.isArray(state.finalTop)) state.finalTop=[];
-    if(state.campioneTop===undefined)state.campioneTop=null;if(!Array.isArray(state.finalGroupRes))state.finalGroupRes=[];if(!Array.isArray(state.ripescati))state.ripescati=[];
+    if(state.campioneTop===undefined)state.campioneTop=null;if(!Array.isArray(state.finalGroupRes))state.finalGroupRes=[];if(!Array.isArray(state.ripescati))state.ripescati=[];if(!Array.isArray(state.qExtra))state.qExtra=Array(4).fill("");if(!Array.isArray(state.sTopExtra))state.sTopExtra=Array(2).fill("");if(!Array.isArray(state.fTopExtra))state.fTopExtra=[""];
 
     if(state.rules.locked===undefined)
 
@@ -8430,57 +8430,14 @@ return true;
     updateAndSync();
 }
 // Funzione di esempio da inserire nel tuo script JS principale
+function getKOExtra(type,index){const key={Q:"qExtra",S:"sTopExtra",F:"fTopExtra"}[type];if(!key)return "";if(!Array.isArray(state[key]))state[key]=[];return String(state[key][index]||"").trim();}
+function getKOResult(type,index){const key={Q:"qRes",S:"sTopRes",F:"fTopRes"}[type];if(!key)return "-";const base=String(type==="F"?state[key]||"-":(Array.isArray(state[key])?state[key][index]:"-")||"-"),extra=getKOExtra(type,index);return extra&&base!=="-"?base+"|"+extra:base;}
+function updateKOExtra(type,index,valore){ensureRules();const key={Q:"qExtra",S:"sTopExtra",F:"fTopExtra"}[type];if(!key)return;if(!Array.isArray(state[key]))state[key]=[];state[key][index]=String(valore??"").trim();sincronizzaFaseFinale();renderKO();updateAndSync();}
 function updateKOResult(type,index,valore,pos){
-    ensureRules();
-
-    valore = String(valore ?? "").trim();
-
-    const aggiorna = (arr, i) => {
-        let res = String(arr[i] || "-").split("-");
-        if(res.length !== 2) res = ["",""];
-        res[pos] = valore;
-        arr[i] = res.join("-");
-    };
-
-    if(type === "Q"){
-        if(!Array.isArray(state.qRes)) state.qRes = Array(4).fill("-");
-        aggiorna(state.qRes,index);
-    }else if(type === "S"){
-        if(!Array.isArray(state.sTopRes)) state.sTopRes = Array(2).fill("-");
-        aggiorna(state.sTopRes,index);
-    }else if(type === "F"){
-        let res = String(state.fTopRes || "-").split("-");
-        if(res.length !== 2) res = ["",""];
-        res[pos] = valore;
-        state.fTopRes = res.join("-");
-    }else{
-        return;
-    }
-
-    /*
-     * Il campo risultato NON deve ricostruire il DOM mentre l'utente
-     * sta compilando il punteggio: altrimenti il focus viene perso e
-     * il secondo valore non può essere inserito normalmente.
-     * La fase finale viene invece ridisegnata quando il risultato è
-     * completo oppure quando si usa il normale salvataggio.
-     */
-    const risultatoCompleto =
-        type === "F"
-            ? /^\d+\-\d+$/.test(String(state.fTopRes || ""))
-            : /^\d+\-\d+$/.test(
-                String(
-                    type === "Q"
-                        ? state.qRes[index]
-                        : state.sTopRes[index]
-                )
-              );
-
-    if(risultatoCompleto){
-        sincronizzaFaseFinale();
-        renderKO();
-    }
-
-    updateAndSync();
+    ensureRules();const key={Q:"qRes",S:"sTopRes",F:"fTopRes"}[type];if(!key)return;valore=String(valore??"").trim();
+    if(type==="F"){let res=String(state[key]||"-").split("-");if(res.length!==2)res=["",""];res[pos===1?1:0]=valore;state[key]=res.join("-");}
+    else{if(!Array.isArray(state[key]))state[key]=type==="Q"?Array(4).fill("-"):Array(2).fill("-");let res=String(state[key][index]||"-").split("-");if(res.length!==2)res=["",""];res[pos===1?1:0]=valore;state[key][index]=res.join("-");}
+    sincronizzaFaseFinale();renderKO();updateAndSync();
 }
                     
 function getWinner(match,res){
@@ -10025,30 +9982,32 @@ function renderGironiFinale(){
 
 function renderTables(){
     ensureRules();const lettere=["A","B","C","D","E","F"];
-    function generaRoundRobin(n){let arr=Array.from({length:n},(_,i)=>i);if(arr.length%2)arr.push(null);const rounds=[];for(let r=0;r<arr.length-1;r++){const round=[];for(let i=0;i<arr.length/2;i++){const a=arr[i],b=arr[arr.length-1-i];if(a!==null&&b!==null)round.push([a,b]);}rounds.push(round);const fisso=arr[0],resto=arr.slice(1);resto.unshift(resto.pop());arr=[fisso,...resto];}if(state.rules.garaAndataRitorno===true)rounds.push(...rounds.map(round=>round.map(m=>[m[1],m[0]])));return rounds;}
+    function generaRoundRobin(n){
+        if(n===4){const base=[[0,1],[2,3],[0,3],[1,2],[0,2],[1,3]];return state.rules.garaAndataRitorno===true?base.concat(base.map(m=>[m[1],m[0]])):[base];}
+        let arr=Array.from({length:n},(_,i)=>i);if(arr.length%2)arr.push(null);const rounds=[];
+        for(let r=0;r<arr.length-1;r++){const round=[];for(let i=0;i<arr.length/2;i++){const a=arr[i],b=arr[arr.length-1-i];if(a!==null&&b!==null)round.push([a,b]);}rounds.push(round);const fisso=arr[0],resto=arr.slice(1);resto.unshift(resto.pop());arr=[fisso,...resto];}
+        if(state.rules.garaAndataRitorno===true)rounds.push(...rounds.map(round=>round.map(m=>[m[1],m[0]])));return rounds;
+    }
     const durata=Math.max(1,Number(state.rules.duration)||30),start=String(state.rules.start||"20:00").split(":"),oraBase=Number(start[0])||20,minutiBase=Number(start[1])||0,campiPerGirone={A:[2,3],B:[4,5],C:[6,7],D:[8,9],E:[10,11],F:[12,13]};
     lettere.forEach(tag=>{
         const box=document.getElementById(tag+"rows"),squadre=Array.isArray(state[tag])?state[tag]:[];if(!box)return;
-        const partite=[];generaRoundRobin(squadre.length).forEach(round=>round.forEach(m=>partite.push(m)));
+        const partite=[];generaRoundRobin(squadre.length).forEach(round=>{if(Array.isArray(round))round.forEach(m=>partite.push(m));});
         if(!Array.isArray(state[tag+"res"]))state[tag+"res"]=[];if(!Array.isArray(state[tag+"time"]))state[tag+"time"]=[];if(!Array.isArray(state[tag+"camp"]))state[tag+"camp"]=[];
         while(state[tag+"res"].length<partite.length)state[tag+"res"].push("-");while(state[tag+"time"].length<partite.length)state[tag+"time"].push("");while(state[tag+"camp"].length<partite.length)state[tag+"camp"].push("");
         state[tag+"res"]=state[tag+"res"].slice(0,partite.length);state[tag+"time"]=state[tag+"time"].slice(0,partite.length);state[tag+"camp"]=state[tag+"camp"].slice(0,partite.length);
         const campi=campiPerGirone[tag]||[2,3],occupazioni=[],assegnazioni=[];
         partite.forEach(m=>{let slot=0,campo=null;while(campo===null){for(const cc of campi){const conflitto=occupazioni.some(o=>o.slot===slot&&(o.campo===cc||o.squadre.includes(m[0])||o.squadre.includes(m[1])));if(!conflitto){campo=cc;break;}}if(campo===null)slot++;}occupazioni.push({slot,campo,squadre:[m[0],m[1]]});assegnazioni.push({m,slot,campo});});
-        let rows="";
-        assegnazioni.forEach((a,i)=>{const minuti=minutiBase+a.slot*durata,ora=oraBase+Math.floor(minuti/60),min=minuti%60,tempo=String(ora%24).padStart(2,"0")+":"+String(min).padStart(2,"0");if(!state[tag+"time"][i]||state[tag+"time"][i]==="-")state[tag+"time"][i]=tempo;if(!state[tag+"camp"][i])state[tag+"camp"][i]=a.campo;const risultato=String(state[tag+"res"][i]||"-").split("-"),casa=formatCoppiaDisplay(squadre[a.m[0]])||"",ospite=formatCoppiaDisplay(squadre[a.m[1]])||"";rows+=`<tr><td><input value="${a.campo}" oninput="updateCamp('${tag}',${i},this.value)" style="width:45px"></td><td><input value="${state[tag+"time"][i]||tempo}" oninput="updateTime('${tag}',${i},0,this.value)"></td><td class="match-cell"><div class="team-line">${casa}</div><div class="vs-line"><b>VS</b></div><div class="team-line">${ospite}</div></td><td class="db-cell"><input value="${risultato[0]==="-"?"":(risultato[0]||"")}" oninput="updateRes('${tag}',${i},0,this.value)"><input value="${risultato[1]||""}" oninput="updateRes('${tag}',${i},1,this.value)"></td></tr>`;});
+        let rows="";assegnazioni.forEach((a,i)=>{const minuti=minutiBase+a.slot*durata,ora=oraBase+Math.floor(minuti/60),min=minuti%60,tempo=String(ora%24).padStart(2,"0")+":"+String(min).padStart(2,"0");if(!state[tag+"time"][i]||state[tag+"time"][i]==="-")state[tag+"time"][i]=tempo;if(!state[tag+"camp"][i])state[tag+"camp"][i]=a.campo;const risultato=String(state[tag+"res"][i]||"-").split("-"),casa=formatCoppiaDisplay(squadre[a.m[0]])||"",ospite=formatCoppiaDisplay(squadre[a.m[1]])||"";rows+=`<tr><td><input value="${a.campo}" oninput="updateCamp('${tag}',${i},this.value)" style="width:45px"></td><td><input value="${state[tag+"time"][i]||tempo}" oninput="updateTime('${tag}',${i},0,this.value)"></td><td class="match-cell"><div class="team-line">${casa}</div><div class="vs-line"><b>VS</b></div><div class="team-line">${ospite}</div></td><td class="db-cell"><input value="${risultato[0]==="-"?"":(risultato[0]||"")}" oninput="updateRes('${tag}',${i},0,this.value)"><input value="${risultato[1]||""}" oninput="updateRes('${tag}',${i},1,this.value)"></td></tr>`;});
         box.innerHTML=rows;const card=document.getElementById("card"+tag);if(card){const attivi=Number(state.rules.numeroGironi)||0;card.style.display=(squadre.length>0&&lettere.indexOf(tag)<attivi)?"block":"none";}
     });updateAndSync();
 }
-
-   
 function getFinalQualified(){
     ensureRules();const lettere=["A","B","C","D","E","F"],gruppi=lettere.filter(g=>Array.isArray(state[g])&&state[g].length>0),candidati=[];
-    gruppi.forEach(g=>{const classifica=calc(state[g],Array.isArray(state[g+"res"])?state[g+"res"]:[]);if(!classifica.length)return;const q=Math.min(Math.max(0,Number(state.rules.qualificatePerGirone)||0),classifica.length);classifica.slice(0,q).forEach((x,i)=>candidati.push({nome:x.n,posizione:i+1,girone:g,pt:x.pt,gf:x.gf,gs:x.gs,df:x.df,qualificato:true}));classifica.slice(q).forEach((x,i)=>candidati.push({nome:x.n,posizione:q+i+1,girone:g,pt:x.pt,gf:x.gf,gs:x.gs,df:x.df,qualificato:false}));});
+    gruppi.forEach(g=>{const classifica=calc(state[g],Array.isArray(state[g+"res"])?state[g+"res"]:[]);if(!classifica.length)return;const q=Math.min(Math.max(0,Number(state.rules.qualificatePerGirone)||0),classifica.length);classifica.forEach((x,i)=>candidati.push({nome:x.n,posizione:i+1,girone:g,pt:x.pt,gf:x.gf,gs:x.gs,df:x.df,qualificato:i<q}));});
     const target=state.rules.formulaFinale==="gironeFinale"?Math.max(2,Number(state.rules.numeroQualificateFinali)||4):state.rules.usaQuarti?8:state.rules.usaSemifinali?4:state.rules.usaFinale?2:Math.max(0,Number(state.rules.numeroQualificateFinali)||0);if(!target)return [];
     const ordine=(a,b)=>{if(b.pt!==a.pt)return b.pt-a.pt;if(b.df!==a.df)return b.df-a.df;if(b.gf!==a.gf)return b.gf-a.gf;if(a.gs!==b.gs)return a.gs-b.gs;if(a.posizione!==b.posizione)return a.posizione-b.posizione;return String(a.girone).localeCompare(String(b.girone));};
-    let selezionati=candidati.filter(x=>x.qualificato).sort(ordine).slice(0,target);
-    if(state.rules.ripescaggio===true&&selezionati.length<target){const escluse=candidati.filter(x=>!x.qualificato).sort(ordine),n=Math.min(Number(state.rules.numeroRipescate)||0,target-selezionati.length,escluse.length);selezionati=unici(selezionati.concat(escluse.slice(0,n)));state.ripescati=escluse.slice(0,n).map(x=>x.nome);}else state.ripescati=[];
+    let selezionati=state.rules.usaQuarti===true?candidati.slice().sort(ordine).slice(0,target):candidati.filter(x=>x.qualificato).sort(ordine).slice(0,target);
+    if(state.rules.usaQuarti!==true&&state.rules.ripescaggio===true&&selezionati.length<target){const escluse=candidati.filter(x=>!x.qualificato).sort(ordine),n=Math.min(Number(state.rules.numeroRipescate)||0,target-selezionati.length,escluse.length);selezionati=unici(selezionati.concat(escluse.slice(0,n)));state.ripescati=escluse.slice(0,n).map(x=>x.nome);}else if(state.rules.usaQuarti!==true)state.ripescati=[];
     return unici(selezionati).slice(0,target).map(x=>x.nome);
     function unici(lista){const out=[],seen=new Set();lista.forEach(x=>{const k=String(x.nome);if(!seen.has(k)){seen.add(k);out.push(x);}});return out;}
 }
@@ -10088,7 +10047,7 @@ function sincronizzaFaseFinale(){ensureRules();if(state.rules.formulaFinale==="g
         }
 
         const v=state.quarti.map((match,index)=>{
-            return getWinner(match,state.qRes[index]||"-") || null;
+            return getWinner(match,getKOResult("Q",index)) || null;
         });
 
         if(usaS){
@@ -10144,8 +10103,8 @@ function sincronizzaFaseFinale(){ensureRules();if(state.rules.formulaFinale==="g
     }
 
     if(usaS && Array.isArray(state.semiTop) && state.semiTop.length===2){
-        const s1=getWinner(state.semiTop[0],state.sTopRes[0]||"-");
-        const s2=getWinner(state.semiTop[1],state.sTopRes[1]||"-");
+        const s1=getWinner(state.semiTop[0],getKOResult("S",0));
+        const s2=getWinner(state.semiTop[1],getKOResult("S",1));
 
         if(usaF){
             state.finalTop=[
@@ -10166,7 +10125,7 @@ function sincronizzaFaseFinale(){ensureRules();if(state.rules.formulaFinale==="g
         state.campioneTop=
             placeholder
                 ? null
-                : (getWinner(state.finalTop,state.fTopRes||"-")||null);
+                : (getWinner(state.finalTop,getKOResult("F",0))||null);
     }else{
         state.campioneTop=null;
     }
@@ -10179,9 +10138,9 @@ function renderKO(){
     q.style.display=(usaQ&&state.mostraQuarti!==false)?"table-row-group":"none";s.style.display=usaS?"table-row-group":"none";f.style.display=usaF?"table-row-group":"none";document.getElementById("finalGroupBox")?.remove();
     if(state.rules.formulaFinale==="gironeFinale"){q.style.display="none";s.style.display="none";f.style.display="none";renderFinaleGirone();return;}
     if(usaQ||usaS||usaF)sincronizzaFaseFinale();
-    if(usaQ){const quarti=Array.isArray(state.quarti)&&state.quarti.length===4?state.quarti:[["1ª qualificata","8ª qualificata"],["4ª qualificata","5ª qualificata"],["2ª qualificata","7ª qualificata"],["3ª qualificata","6ª qualificata"]];quarti.forEach((m,i)=>q.innerHTML+=renderMatchCard("QUARTO "+(i+1),m,"Q",i,state.qRes[i]));}
-    if(usaS){const semi=Array.isArray(state.semiTop)&&state.semiTop.length===2?state.semiTop:[["Vincente Quarto 1","Vincente Quarto 2"],["Vincente Quarto 3","Vincente Quarto 4"]];semi.forEach((m,i)=>s.innerHTML+=renderMatchCard("SEMIFINALE "+(i+1),m,"S",i,state.sTopRes[i]));}
-    if(usaF){const finalisti=Array.isArray(state.finalTop)&&state.finalTop.length===2?state.finalTop:(usaS?["Vincente Semifinale 1","Vincente Semifinale 2"]:usaQ?["Vincente Quarto 1","Vincente Quarto 2"]:["1ª qualificata","2ª qualificata"]);state.finalTop=[...finalisti];f.innerHTML=renderMatchCard("🏆 FINALE",finalisti,"F",0,state.fTopRes);document.getElementById("winnerCardKO")?.remove();const host=f.closest("table")?.parentElement||f.parentElement,card=document.createElement("div");card.id="winnerCardKO";card.style.cssText="display:none;margin-top:15px";const ph=/qualificat|vincente|da determinare/i,camp=!ph.test(String(finalisti[0]))&&!ph.test(String(finalisti[1]))?getWinner(finalisti,state.fTopRes):null;if(camp){state.campioneTop=camp;card.style.display="block";card.innerHTML='<div class="winner-box top-win" style="background:rgba(251,191,36,.2);color:#fbbf24;padding:15px;border-radius:8px;text-align:center;font-weight:bold;font-size:1.3em;">🏆 CAMPIONE TORNEO:<br><span style="font-size:1.1em;font-weight:normal;color:#e2e8f0;">'+formatCoppiaDisplay(camp)+'</span></div>';}else state.campioneTop=null;if(host)host.appendChild(card);}else{state.campioneTop=null;document.getElementById("winnerCardKO")?.remove();}
+    if(usaQ){const quarti=Array.isArray(state.quarti)&&state.quarti.length===4?state.quarti:[["1ª qualificata","8ª qualificata"],["4ª qualificata","5ª qualificata"],["2ª qualificata","7ª qualificata"],["3ª qualificata","6ª qualificata"]];quarti.forEach((m,i)=>q.innerHTML+=renderMatchCard("QUARTO "+(i+1),m,"Q",i,getKOResult("Q",i)));}
+    if(usaS){const semi=Array.isArray(state.semiTop)&&state.semiTop.length===2?state.semiTop:[["Vincente Quarto 1","Vincente Quarto 2"],["Vincente Quarto 3","Vincente Quarto 4"]];semi.forEach((m,i)=>s.innerHTML+=renderMatchCard("SEMIFINALE "+(i+1),m,"S",i,getKOResult("S",i)));}
+    if(usaF){const finalisti=Array.isArray(state.finalTop)&&state.finalTop.length===2?state.finalTop:(usaS?["Vincente Semifinale 1","Vincente Semifinale 2"]:usaQ?["Vincente Quarto 1","Vincente Quarto 2"]:["1ª qualificata","2ª qualificata"]);state.finalTop=[...finalisti];f.innerHTML=renderMatchCard("🏆 FINALE",finalisti,"F",0,getKOResult("F",0));document.getElementById("winnerCardKO")?.remove();const host=f.closest("table")?.parentElement||f.parentElement,card=document.createElement("div");card.id="winnerCardKO";card.style.cssText="display:none;margin-top:15px";const ph=/qualificat|vincente|da determinare/i,camp=!ph.test(String(finalisti[0]))&&!ph.test(String(finalisti[1]))?getWinner(finalisti,getKOResult("F",0)):null;if(camp){state.campioneTop=camp;card.style.display="block";card.innerHTML='<div class="winner-box top-win" style="background:rgba(251,191,36,.2);color:#fbbf24;padding:15px;border-radius:8px;text-align:center;font-weight:bold;font-size:1.3em;">🏆 CAMPIONE TORNEO:<br><span style="font-size:1.1em;font-weight:normal;color:#e2e8f0;">'+formatCoppiaDisplay(camp)+'</span></div>';}else state.campioneTop=null;if(host)host.appendChild(card);}else{state.campioneTop=null;document.getElementById("winnerCardKO")?.remove();}
 }
 function renderFinaleGirone(){
     ensureRules();let box=document.getElementById("finalGroupBox");if(!box){const host=document.querySelector(".finalContainer");if(!host)return;box=document.createElement("div");box.id="finalGroupBox";box.className="card";host.appendChild(box);}
@@ -10189,78 +10148,19 @@ function renderFinaleGirone(){
     const total=teams.length*(teams.length-1)/2;if(!Array.isArray(state.finalGroupRes)||state.finalGroupRes.length!==total)state.finalGroupRes=Array(total).fill("-");
     let rows="",idx=0;for(let i=0;i<teams.length;i++)for(let j=i+1;j<teams.length;j++){const r=String(state.finalGroupRes[idx]||"-").split("-");rows+=`<tr><td>${formatCoppiaDisplay(teams[i])}</td><td>VS</td><td>${formatCoppiaDisplay(teams[j])}</td><td><input value="${r[0]==="-"?"":(r[0]||"")}" oninput="updateFinalGroupResult(${idx},0,this.value)"></td><td><input value="${r[1]||""}" oninput="updateFinalGroupResult(${idx},1,this.value)"></td></tr>`;idx++;}
     box.innerHTML=`<h3 style="text-align:center">🏆 Girone Finale</h3><table style="width:100%;border-collapse:collapse"><thead><tr><th>Squadra</th><th></th><th>Avversario</th><th>Ris</th><th></th></tr></thead><tbody>${rows}</tbody></table>`;
-    const rank=calc(teams,state.finalGroupRes),vincente=rank.length&&rank[0].pt>0?rank[0].n:null;let winner=document.getElementById("winnerCardFinalGroup");
+    const rank=calc(teams,state.finalGroupRes),completo=state.finalGroupRes.every(x=>/^\d+-\d+$/.test(String(x||""))),vincente=completo&&rank.length?rank[0].n:null;let winner=document.getElementById("winnerCardFinalGroup");
     if(vincente){state.campioneTop=vincente;if(!winner){winner=document.createElement("div");winner.id="winnerCardFinalGroup";box.appendChild(winner);}winner.innerHTML='<div class="winner-box top-win" style="margin-top:15px;text-align:center">🏆 CAMPIONE TORNEO:<br><span>'+formatCoppiaDisplay(vincente)+'</span></div>';}else{state.campioneTop=null;if(winner)winner.remove();}
 }
 function updateFinalGroupResult(index,pos,val){ensureRules();const i=Number(index);if(!Array.isArray(state.finalGroupRes)||!Number.isInteger(i)||i<0||i>=state.finalGroupRes.length)return;let r=String(state.finalGroupRes[i]||"-").split("-");if(r.length!==2)r=["",""];r[pos===1?1:0]=String(val??"").trim();state.finalGroupRes[i]=r.join("-");renderFinaleGirone();updateAndSync();}
-function renderMatchCard(titolo, match, type, index, risultato) {
-    const res = String(risultato || "-").split("-");
-    const risultato1 = res[0] === "-" ? "" : (res[0] || "");
-    const risultato2 = res[1] || "";
-
-    const campKey = { Q:"qCamp", S:"sTopCamp", F:"fTopCamp" }[type];
-    const timeKey = { Q:"qTime", S:"sTopTime", F:"fTopTime" }[type];
-
-    const camp = Array.isArray(state[campKey]) ? (state[campKey][index] || "") : "";
-    const time = Array.isArray(state[timeKey]) ? (state[timeKey][index] || "") : "";
-
-    const rawTeam1 = match && match[0] != null ? match[0] : "Da determinare";
-    const rawTeam2 = match && match[1] != null ? match[1] : "Da determinare";
-
-    const displayTeam1 = formatCoppiaDisplay(rawTeam1) || "Da determinare";
-    const displayTeam2 = formatCoppiaDisplay(rawTeam2) || "Da determinare";
-
-    const placeholder =
-        /^(da determinare|vincente |qualificat[ao] |[0-9]+[ªa°]? qualificat[ao])/i;
-
-    const isPlaceholder =
-        placeholder.test(displayTeam1.trim()) ||
-        placeholder.test(displayTeam2.trim());
-
-    return `
-<tr>
-    <td class="campo-cell">
-        <input
-            value="${camp}"
-            oninput="updateKOField('${type}', ${index}, 'camp', this.value)"
-            style="width:45px"
-        >
-    </td>
-
-    <td class="orario-cell">
-        <input
-            type="time"
-            value="${time}"
-            oninput="updateKOField('${type}', ${index}, 'time', this.value)"
-        >
-    </td>
-
-    <td class="match-cell">
-        <div class="team-line">${displayTeam1}</div>
-        <div class="vs-line"><b>VS</b></div>
-        <div class="team-line">${displayTeam2}</div>
-    </td>
-
-    <td class="score-cell">
-        <input
-            inputmode="numeric"
-            pattern="[0-9]*"
-            value="${risultato1}"
-            oninput="updateKOResult('${type}', ${index}, this.value, 0)"
-        >
-    </td>
-
-    <td class="score-cell">
-        <input
-            inputmode="numeric"
-            pattern="[0-9]*"
-            value="${risultato2}"
-            oninput="updateKOResult('${type}', ${index}, this.value, 1)"
-        >
-    </td>
-</tr>`;
+function renderMatchCard(titolo,match,type,index,risultato){
+    ensureRules();
+    const res=String(risultato||"-").split("-"),risultato1=res[0]==="-"?"":(res[0]||""),risultato2=res[1]||"";
+    const campKey={Q:"qCamp",S:"sTopCamp",F:"fTopCamp"}[type],timeKey={Q:"qTime",S:"sTopTime",F:"fTopTime"}[type];
+    const camp=Array.isArray(state[campKey])?(state[campKey][index]||""):"",time=Array.isArray(state[timeKey])?(state[timeKey][index]||""):"";
+    const displayTeam1=formatCoppiaDisplay(match&&match[0]!=null?match[0]:"Da determinare")||"Da determinare",displayTeam2=formatCoppiaDisplay(match&&match[1]!=null?match[1]:"Da determinare")||"Da determinare";
+    const extra=getKOExtra(type,index),showExtra=state.rules.killerPoint===true||state.rules.rigori===true||state.rules.tempoSupplementare===true;
+    return `<tr><td class="campo-cell"><input value="${camp}" oninput="updateKOField('${type}',${index},'camp',this.value)" style="width:45px"></td><td class="orario-cell"><input type="time" value="${time}" oninput="updateKOField('${type}',${index},'time',this.value)"></td><td class="match-cell"><div class="team-line">${displayTeam1}</div><div class="vs-line"><b>VS</b></div><div class="team-line">${displayTeam2}</div></td><td class="score-cell"><input inputmode="numeric" pattern="[0-9]*" value="${risultato1}" oninput="updateKOResult('${type}',${index},this.value,0)"></td><td class="score-cell"><input inputmode="numeric" pattern="[0-9]*" value="${risultato2}" oninput="updateKOResult('${type}',${index},this.value,1)"></td></tr>`+(showExtra?`<tr class="ko-extra-row"><td colspan="5"><input value="${extra}" placeholder="Extra: KP-A / KP-B / R-5-4 / 3-2" oninput="updateKOExtra('${type}',${index},this.value)" style="max-width:260px;font-size:11px"></td></tr>`:"");
 }
-
 function applicaModelloTorneo(){
 
     ensureRules();
