@@ -51,6 +51,18 @@ footer{max-width:1180px;margin:0 auto;padding:30px 18px 60px;color:var(--muted);
 </table>
 <div class="note danger"><b>Protezione DB:</b> il controllo non è soltanto grafico. RLS, policy e trigger Supabase impediscono a un Admin di eliminare tornei/iscrizioni, archiviare o riaprire un torneo archiviato, oppure modificare il proprio ruolo in <code>superadmin</code>. I backup automatici e il registro delle modifiche sono gestiti dal database.</div>
 <p>Nel pannello Admin il ruolo viene mostrato nel footer. La voce <code>👑 Superadmin</code> è visibile esclusivamente all'account Superadmin.</p>
+<h3>Backup e ripristino completo dei dati amministrativi</h3>
+<p>Dal 22 settembre 2026 il sistema non limita più il backup al solo torneo. Sono presenti snapshot automatici anche per <code>iscrizioni</code>, <code>profili</code>, <code>news</code>, <code>sponsor</code> e <code>mercatino</code>.</p>
+<table><tr><th>Area</th><th>Backup automatico</th><th>Ripristino Superadmin</th></tr>
+<tr><td>Torneo + configurazione/regole</td><td>✓</td><td>✓</td></tr>
+<tr><td>Iscrizioni</td><td>✓</td><td>✓</td></tr>
+<tr><td>Profili/ruoli</td><td>✓</td><td>✓</td></tr>
+<tr><td>News</td><td>✓</td><td>✓</td></tr>
+<tr><td>Sponsor</td><td>✓</td><td>✓</td></tr>
+<tr><td>Mercatino</td><td>✓</td><td>✓</td></tr>
+</table>
+<p>Per i dati amministrativi il backup è <b>per singola riga</b>: quando una riga viene inserita, modificata o cancellata, viene conservato lo snapshot. Il Superadmin può selezionare il backup dalla sezione <code>👑 Superadmin</code> e ripristinare quella riga. Il ripristino sostituisce la riga corrente con lo snapshot salvato, oppure elimina una riga se il backup rappresenta un inserimento successivamente da annullare.</p>
+<div class="note"><b>Importante:</b> questa è una protezione completa delle entità amministrative gestite dal pannello, ma non equivale a un'immagine unica dell'intero database. Il ripristino dipende dalla presenza del relativo snapshot.</div>
 </section>
 
 <section id="admin"><h2>2. Area amministrativa</h2>
@@ -174,6 +186,7 @@ footer{max-width:1180px;margin:0 auto;padding:30px 18px 60px;color:var(--muted);
 <tr><td><code>news</code></td><td>Comunicazioni globali e collegate ai tornei.</td></tr>
 <tr><td><code>sponsor</code></td><td>Contenuti sponsor.</td></tr>
 <tr><td><code>mercatino</code></td><td>Annunci del mercatino.</td></tr></table>
+<h3>Backup Superadmin</h3><p>La tabella <code>public.admin_data_backup</code> conserva gli snapshot delle righe di <code>iscrizioni</code>, <code>profili</code>, <code>news</code>, <code>sponsor</code> e <code>mercatino</code>. La funzione <code>superadmin_restore_data_backup</code> è riservata al Superadmin e registra il ripristino nell'<code>admin_audit_log</code>.</p>
 <h3>Regola</h3><p>Una modifica alla struttura dati va fatta tramite migrazione tracciata. Non usare SQL manuale non documentato come soluzione definitiva a un problema applicativo.</p>
 <h3>Sicurezza</h3><p>RLS è attivo sulle tabelle applicative. Gli avvisi del Security Advisor sulle funzioni con search_path modificabile e sulla protezione password devono essere trattati come attività di sicurezza separate dalla normale manutenzione funzionale.</p>
 </section>
