@@ -40,7 +40,7 @@ async function wireDashboard(){
   caricaAdminState();
   try{
     let session=null;
-    for(let i=0;i<5;i++){
+    for(let i=0;i<15;i++){
       const{data,error}=await sb.auth.getSession();
       if(error)throw error;
       session=data?.session||null;
