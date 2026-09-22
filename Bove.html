@@ -8974,27 +8974,46 @@ document.querySelectorAll('#finaleBox input').forEach(input => {
         if(res.length !== 2) res = ["",""];
         res[pos] = valore;
         state.fTopRes = res.join("-");
+
+        /*
+         * LA FINALE NON DEVE ESSERE RICOSTRUITA.
+         * I finalisti già presenti restano invariati e, quando il
+         * risultato è completo, viene aggiornato direttamente il
+         * campione.
+         */
+        if(/^\d+\-\d+$/.test(String(state.fTopRes || "")) &&
+           Array.isArray(state.finalTop) &&
+           state.finalTop.length === 2){
+
+            const vincitore=getWinner(
+                state.finalTop,
+                state.fTopRes
+            );
+
+            if(vincitore){
+                state.campioneTop=vincitore;
+            }
+        }
+
+        renderKO();
+        updateAndSync();
+        return;
     }else{
         return;
     }
 
     /*
-     * Il campo risultato NON deve ricostruire il DOM mentre l'utente
-     * sta compilando il punteggio: altrimenti il focus viene perso e
-     * il secondo valore non può essere inserito normalmente.
-     * La fase finale viene invece ridisegnata quando il risultato è
-     * completo oppure quando si usa il normale salvataggio.
+     * Q e S: solo dopo un risultato completo si ricostruisce
+     * la fase successiva.
      */
     const risultatoCompleto =
-        type === "F"
-            ? /^\d+\-\d+$/.test(String(state.fTopRes || ""))
-            : /^\d+\-\d+$/.test(
-                String(
-                    type === "Q"
-                        ? state.qRes[index]
-                        : state.sTopRes[index]
-                )
-              );
+        /^\d+\-\d+$/.test(
+            String(
+                type === "Q"
+                    ? state.qRes[index]
+                    : state.sTopRes[index]
+            )
+        );
 
     if(risultatoCompleto){
         sincronizzaFaseFinale();
