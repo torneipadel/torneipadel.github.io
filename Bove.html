@@ -9676,7 +9676,32 @@ function render(){
 
     const titolo=document.getElementById("titoloTorneo");
     if(titolo){
-        titolo.innerHTML="🏆 "+(state.nomeTorneo||"Torneo Amatoriale Padel");
+        const nomePulito=String(state.nomeTorneo||"Torneo Amatoriale Padel")
+            .replace(/\*+/g,"")
+            .replace(/\s+/g," ")
+            .trim();
+        titolo.textContent="🏆 "+nomePulito;
+    }
+
+    const idTorneoDisplay=document.getElementById("idTorneoDisplay");
+    if(idTorneoDisplay && state.idTorneo){
+        idTorneoDisplay.textContent="ID torneo: "+String(state.idTorneo).replace(/\*+/g,"").trim();
+    }
+
+    const nomeFormula=document.getElementById("nomeFormulaTorneo");
+    if(nomeFormula){
+        const tipo=String(state.rules?.tipoTorneo||"").trim();
+        const formule={
+            italiana:"Torneo all'italiana",
+            gironiFinale:"Gironi + Fase Finale",
+            eliminazione:"Eliminazione diretta",
+            personalizzato:"Torneo personalizzato",
+            manuale:"Torneo manuale"
+        };
+        nomeFormula.textContent=String(formule[tipo]||"")
+            .replace(/\*+/g,"")
+            .replace(/<[^>]*>/g,"")
+            .trim();
     }
 
     const inputNome=document.getElementById("nomeTorneoInput");
@@ -11358,7 +11383,7 @@ window.addEventListener("load", async()=>{
 
 
         idBox.textContent =
-            "ID torneo: " + idTorneo;
+            "ID torneo: " + String(idTorneo).replace(/\*+/g,"").trim();
     }
 
 
