@@ -43,6 +43,16 @@ footer{max-width:1180px;margin:0 auto;padding:30px 18px 60px;color:var(--muted);
 <div class="note"><b>Regola fondamentale:</b> Bove è la macchina a stati del torneo. L'area Admin deve alimentarla senza sostituirne la logica centrale.</div>
 </section>
 
+<section id="ruoli-admin"><h2>2.1 Ruoli Admin e Superadmin — protezioni definitive</h2>
+<p>Dal 22 settembre 2026 il sistema distingue due livelli amministrativi.</p>
+<table><tr><th>Ruolo</th><th>Account autorizzati</th><th>Operazioni</th></tr>
+<tr><td><b>Superadmin</b></td><td><code>giose.rizzi@gmail.com</code></td><td>Tutte le funzioni Admin + eliminazione definitiva dei tornei e delle iscrizioni, archiviazione/riapertura dei tornei archiviati, ripristino dai backup e consultazione del registro audit.</td></tr>
+<tr><td><b>Admin</b></td><td><code>boverob@libero.it</code><br><code>cfalba@libero.it</code></td><td>Gestione ordinaria di tornei, iscrizioni, risultati, comunicazioni e configurazioni. Le operazioni distruttive e il ripristino sono riservati al Superadmin.</td></tr>
+</table>
+<div class="note danger"><b>Protezione DB:</b> il controllo non è soltanto grafico. RLS, policy e trigger Supabase impediscono a un Admin di eliminare tornei/iscrizioni, archiviare o riaprire un torneo archiviato, oppure modificare il proprio ruolo in <code>superadmin</code>. I backup automatici e il registro delle modifiche sono gestiti dal database.</div>
+<p>Nel pannello Admin il ruolo viene mostrato nel footer. La voce <code>👑 Superadmin</code> è visibile esclusivamente all'account Superadmin.</p>
+</section>
+
 <section id="admin"><h2>2. Area amministrativa</h2>
 <h3>Accesso</h3><p>L'area amministrativa è il punto di ingresso per la gestione operativa. Le funzioni devono essere utilizzate rispettando il flusso previsto dal progetto e senza creare dati duplicati.</p>
 <h3>Sezioni principali</h3>
