@@ -27,7 +27,7 @@ Mantenere il progetto attuale come laboratorio di sviluppo e collaudo e costruir
 5. Separazione LAB/MASTER: da completare.
 6. Configurazione centrale: in corso — configurazione identità e dati legali già centralizzata su Supabase.
 7. Migrazione dei riferimenti hardcoded a configurazione: in corso.
-8. Pulizia Master: in corso solo sui contenuti già classificati e verificati.
+8. Pulizia Master: SOSPESA come attività distruttiva; da ora si lavora per duplicazione/migrazione e la cancellazione non è il metodo di lavoro.
 9. Collaudo completo: da eseguire.
 10. Master replicabile: da dichiarare pronto solo dopo collaudo.
 
@@ -52,3 +52,11 @@ Prossimo blocco: vecchia architettura Admin, sempre con classificazione prima de
 
 ### Stato WhatsApp
 - Vecchi moduli broadcast/final classificati e rimossi da TEMP_AUDIT; restano attivi router, override, anteprima poster e guida WhatsApp correnti.
+
+
+## Nuovo metodo LAB → MASTER — 24/09/2026
+- Il prodotto Master viene costruito come copia separata del LAB prima delle migrazioni.
+- Creata branch `MASTER-BASE-LAB-20260924` partendo direttamente da `main`, così la base Master conserva integralmente il progetto LAB al momento della separazione.
+- Creata anche la cartella `MASTER/` nella nuova branch come area documentale iniziale.
+- Da questo punto le funzioni vengono duplicate/migrate e verificate prima di qualsiasi eventuale rimozione.
+- `main` resta il LAB e non viene modificato.
