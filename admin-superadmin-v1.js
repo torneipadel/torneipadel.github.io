@@ -19,18 +19,44 @@
   function addSuperadminNav(){
     const duplicates=[...document.querySelectorAll('#sideSuperadmin')];
     if(duplicates.length>1)duplicates.slice(1).forEach(x=>x.remove());
+    const mobileDuplicates=[...document.querySelectorAll('#mobileSuperadmin')];
+    if(mobileDuplicates.length>1)mobileDuplicates.slice(1).forEach(x=>x.remove());
+
     const groups=[...document.querySelectorAll('#areaAdmin .sidebar .nav-group')];
     const system=groups.find(g=>g.querySelector('.nav-label')?.textContent?.trim()==='Sistema');
-    if(!system||$('sideSuperadmin'))return;
-    const nav=system.querySelector('.nav');
-    if(!nav)return;
-    const b=document.createElement('button');
-    b.type='button';
-    b.id='sideSuperadmin';
-    b.textContent='👑 Superadmin';
-    b.style.display=isSuper()?'block':'none';
-    b.onclick=()=>openPanel();
-    nav.insertBefore(b,nav.firstChild);
+    if(system&&!$('sideSuperadmin')){
+      const nav=system.querySelector('.nav');
+      if(nav){
+        const b=document.createElement('button');
+        b.type='button';
+        b.id='sideSuperadmin';
+        b.textContent='👑 Superadmin';
+        b.style.display=isSuper()?'block':'none';
+        b.onclick=()=>openPanel();
+        nav.insertBefore(b,nav.firstChild);
+      }
+    }
+
+    const mobileNav=document.querySelector('.mobile-nav');
+    if(!mobileNav)return;
+    let mobile=$('mobileSuperadmin');
+    if(!isSuper()){
+      mobile?.remove();
+      return;
+    }
+    if(!mobile){
+      mobile=document.createElement('button');
+      mobile.type='button';
+      mobile.id='mobileSuperadmin';
+      mobile.textContent='👑 Superadmin';
+      mobile.onclick=()=>{
+        $('mobileOverlay')?.classList.remove('open');
+        openPanel();
+      };
+      const first=mobileNav.querySelector('[data-page]');
+      if(first)mobileNav.insertBefore(mobile,first);
+      else mobileNav.prepend(mobile);
+    }
   }
 
   function roleReady(){
