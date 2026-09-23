@@ -216,11 +216,7 @@
       '</div>'+
       '<div id="completeProjectBackupStatus" style="margin-top:10px"></div>'+
       '<div id="completeProjectBackupHistory" style="margin-top:10px"></div>'+
-      '<div style="margin-top:8px"><b>Branch:</b> <code>'+esc(COMPLETE_PROJECT_BACKUP_BRANCH)+'</code> · <b>Commit:</b> <code>'+esc(COMPLETE_PROJECT_BACKUP_COMMIT.slice(0,10))+'</code></div>'+
-      '<div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap">'+
-      '<a class="btn small" href="https://github.com/'+GITHUB_REPO+'/tree/'+COMPLETE_PROJECT_BACKUP_BRANCH+'" target="_blank" rel="noopener">Apri backup completo</a>'+
-      '<a class="btn small" href="https://github.com/'+GITHUB_REPO+'/commit/'+COMPLETE_PROJECT_BACKUP_COMMIT+'" target="_blank" rel="noopener">Apri commit</a>'+
-      '</div></div>'+
+      '</div>'+
       '<div style="display:grid;gap:16px">';
     results.forEach(group=>{
       html+='<div style="border:1px solid #ddd;border-radius:10px;padding:12px"><h3 style="margin:0 0 10px">'+esc(group.file)+'</h3>';
