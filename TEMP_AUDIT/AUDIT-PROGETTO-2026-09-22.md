@@ -190,14 +190,14 @@ Sono pagine che possono essere raggiunte direttamente tramite URL, bookmark o al
 - `admin-delete-fix.js` → OBSOLETO: implementava una eliminazione torneo separata; il flusso corrente usa gli export di `admin-functions.js`.
 - `admin-torneo-management-v1.js` → OBSOLETO: vecchia UI di gestione torneo e vecchio ponte approvazione; sostituito dall'insieme modulare corrente.
 - `admin-random-pairs.js` → OBSOLETO: vecchia architettura Admin che includeva archivio, comunicazioni e generazione coppie; la generazione automatica delle coppie è già presente in `admin-layout-v2.js` e le comunicazioni sono gestite dai moduli correnti.
-- `tabellone-fix.js` → CONSERVATO IN TEMP_AUDIT: non caricato, ma contiene correzioni visuali storiche del tabellone e sponsor. Non viene eliminato finché non viene confrontato con le correzioni attualmente incorporate in `tabellone.html`.
+- `tabellone-fix.js` → OBSOLETO: non caricato; il rendering classifica è già implementato nel motore attuale con criteri e indicatori aggiornati, le regole CSS `.match-cell/.team-line/.vs-line` sono già incorporate in `tabellone.html`, e la parte sponsor è separata nel modulo attivo `sponsor-public-v2.js`.
 
 ### Operazione eseguita
 Sono stati eliminati dalla branch `productizzazione-configurazione` esclusivamente i quattro moduli classificati OBSOLETI sopra indicati.
 `main` non è stato modificato.
 
 ### Stato
-La famiglia Torneo/Coppie è classificata salvo il confronto finale di `tabellone-fix.js`, mantenuto come fallback tecnico.
+La famiglia Torneo/Coppie è classificata e il vecchio `tabellone-fix.js` è stato rimosso dopo confronto con il motore attuale.
 
 ## DECISIONE
 La root è stata ripulita dai file chiaramente temporanei/legacy individuati nel primo audit.
