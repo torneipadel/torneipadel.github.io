@@ -280,7 +280,16 @@
       if(status)status.innerHTML='<span class="notice">✅ Backup completo creato: <code>'+esc(b.branch_name||'-')+'</code> · commit <code>'+esc(String(b.commit_sha||'').slice(0,10))+'</code></span>';
       await loadCompleteProjectBackups();
     }catch(e){
-      if(status)status.innerHTML='<span class="notice" style="color:#b42318">❌ Backup non creato: '+esc(e.message||e)+'</span>';
+      let detail='';
+      try{
+        if(e?.context?.json){
+          const body=await e.context.json();
+          detail=body?.error||body?.message||'';
+        }
+      }catch(_){}
+      const msg=detail||e?.message||String(e);
+      if(status)status.innerHTML='<span class="notice" style="color:#b42318">❌ Backup non creato: '+esc(msg)+'</span>';
+      console.error('Backup completo progetto:',e,detail);
     }finally{
       if(button)button.disabled=false;
     }
