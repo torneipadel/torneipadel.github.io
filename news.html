@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>News | Next Point Padel</title>
+<title>News | Organizzazione sportiva</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -17,7 +17,7 @@
 <script src="system-config-v1.js?v=1"></script></head>
 <body>
 <div class="page">
-<div class="top"><div class="brand"><img class="brand-logo" src="/loghi/icona_app1.jpg" alt="NEXT POINT PADEL"><div class="brand-copy"><div class="brand-name">NEXT POINT PADEL</div><div class="brand-sub">gestione tornei ed eventi padel</div></div></div><a class="back" href="dashboard.html?v=20260924" onclick="window.location.replace('dashboard.html?v=20260924');return false;">← Torna al sito</a></div>
+<div class="top"><div class="brand"><img class="brand-logo" src="/loghi/icona_app1.jpg" alt="ORGANIZZAZIONE SPORTIVA"><div class="brand-copy"><div class="brand-name">ORGANIZZAZIONE SPORTIVA</div><div class="brand-sub">gestione tornei ed eventi padel</div></div></div><a class="back" href="dashboard.html?v=20260924" onclick="window.location.replace('dashboard.html?v=20260924');return false;">← Torna al sito</a></div>
 <section class="heroTitle"><div class="eyebrow">Comunicazioni & contenuti</div><h1>News</h1><p>Tornei, promozioni, eventi, ricordi e novità del club.</p></section>
 <main id="app"><div class="loading">Caricamento delle News…</div></main>
 </div>
@@ -43,14 +43,14 @@ async function load(){const [torneiRes,globalRes,marketRes]=await Promise.all([s
 </script>
 <script id="NP_PRODUCT_BRANDING_V1">
 (function(){
-const c=window.NP_SYSTEM_CONFIG||{},brand=c.nomeAttivita||"Next Point Padel";
-document.title=document.title.replace(/Next Point Padel/gi,brand);
+const c=window.NP_SYSTEM_CONFIG||{},brand=c.nomeAttivita||"Organizzazione sportiva";
+document.title=document.title.replace(/Organizzazione sportiva/gi,brand);
 document.querySelectorAll("body *").forEach(el=>{
- if(el.children.length===0&&el.textContent.includes("Next Point Padel"))el.textContent=el.textContent.replace(/Next Point Padel/gi,brand);
+ if(el.children.length===0&&el.textContent.includes("Organizzazione sportiva"))el.textContent=el.textContent.replace(/Organizzazione sportiva/gi,brand);
 });
 document.querySelectorAll('a[href^="mailto:"]').forEach(a=>{if(c.email)a.href="mailto:"+c.email});
 document.querySelectorAll('a[href^="tel:"]').forEach(a=>{if(c.telefono)a.href="tel:"+c.telefono.replace(/[^+0-9]/g,"")});
-const logos=document.querySelectorAll("img[src*='icona_app1.jpg'],img[alt*='Next Point Padel']");
+const logos=document.querySelectorAll("img[src*='icona_app1.jpg'],img[alt*='Organizzazione sportiva']");
 logos.forEach(x=>{if(c.logo)x.src=c.logo;if(x.alt)x.alt=brand});
 if(c.sfondo)document.body.style.backgroundImage="linear-gradient(rgba(3,12,24,.35),rgba(3,12,24,.78)),url('"+c.sfondo+"')";
 })();
