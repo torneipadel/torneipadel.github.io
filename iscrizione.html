@@ -30,7 +30,7 @@ button:hover{background:#fff;transform:translateY(-1px);box-shadow:0 9px 22px rg
 <script src="system-config-v1.js?v=1"></script></head>
 <body>
 <div class="card">
-<img src="/loghi/icona_app1.jpg" class="logo" alt="NEXT POINT PADEL">
+<img src="/loghi/icona_app1.jpg" class="logo" alt="ORGANIZZAZIONE SPORTIVA">
 <h2>🏆 Iscrizione torneo</h2>
 <div id="datiTorneo">Caricamento torneo...</div>
 <div id="datiUtente"></div>
@@ -57,14 +57,14 @@ window.addEventListener("load",avviaIscrizione);
 <script src="sponsor-public-v2.js?v=3"></script>
 <script id="NP_PRODUCT_BRANDING_V1">
 (function(){
-const c=window.NP_SYSTEM_CONFIG||{},brand=c.nomeAttivita||"Next Point Padel";
-document.title=document.title.replace(/Next Point Padel/gi,brand);
+const c=window.NP_SYSTEM_CONFIG||{},brand=c.nomeAttivita||"Organizzazione sportiva";
+document.title=document.title.replace(/Organizzazione sportiva/gi,brand);
 document.querySelectorAll("body *").forEach(el=>{
- if(el.children.length===0&&el.textContent.includes("Next Point Padel"))el.textContent=el.textContent.replace(/Next Point Padel/gi,brand);
+ if(el.children.length===0&&el.textContent.includes("Organizzazione sportiva"))el.textContent=el.textContent.replace(/Organizzazione sportiva/gi,brand);
 });
 document.querySelectorAll('a[href^="mailto:"]').forEach(a=>{if(c.email)a.href="mailto:"+c.email});
 document.querySelectorAll('a[href^="tel:"]').forEach(a=>{if(c.telefono)a.href="tel:"+c.telefono.replace(/[^+0-9]/g,"")});
-const logos=document.querySelectorAll("img[src*='icona_app1.jpg'],img[alt*='Next Point Padel']");
+const logos=document.querySelectorAll("img[src*='icona_app1.jpg'],img[alt*='Organizzazione sportiva']");
 logos.forEach(x=>{if(c.logo)x.src=c.logo;if(x.alt)x.alt=brand});
 if(c.sfondo)document.body.style.backgroundImage="linear-gradient(rgba(3,12,24,.35),rgba(3,12,24,.78)),url('"+c.sfondo+"')";
 })();
