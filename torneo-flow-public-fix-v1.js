@@ -75,6 +75,6 @@ async function run(){
  box.innerHTML=aperti.length?aperti.map(t=>card(t,false)).join(''):'<div class="torneo-item">Nessun torneo aperto al momento.</div>';
  installMenu(aperti); installArchivio(chiusi);
 }
-window.apriTorneoPubblico=function(id){if(!id){alert('Torneo non valido');return;}window.location.href='Bove.html?idTorneo='+encodeURIComponent(id);};
+window.apriTorneoPubblico=function(id){if(!id){alert('Torneo non valido');return;}window.location.href='tabellone.html?idTorneo='+encodeURIComponent(id);};
 window.addEventListener('load',function(){setTimeout(run,0);});
 })();
