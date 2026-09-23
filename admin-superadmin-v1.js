@@ -189,6 +189,8 @@
 
   const CODE_FILES=['Bove.html','admin.html','admin-superadmin-v1.js','manuale.html','admin-system-monitor-v1.js','admin-torneo-rotazione-v1.js'];
   const GITHUB_REPO='torneirobertobove/torneirobertobove.github.io';
+  const COMPLETE_PROJECT_BACKUP_BRANCH='backup-completo-2026-09-23-2114';
+  const COMPLETE_PROJECT_BACKUP_COMMIT='d1bc780c4890177310d5a12f49f7fa79e77c9ede';
 
   async function loadCodeBackups(){
     const box=$('codeBackupList'); if(!box)return;
@@ -205,7 +207,16 @@
         return {file,commits:data};
       }catch(e){return {file,commits:[],error:e.message}}
     }));
-    let html='<div style="display:grid;gap:16px">';
+    let html=
+      '<div style="margin-bottom:16px;padding:14px;border:1px solid #198754;border-radius:10px;background:#eefaf2">'+
+      '<div style="font-weight:800;font-size:16px">💾 Backup completo progetto</div>'+
+      '<div style="margin-top:6px">Snapshot completo del repository residente in GitHub come branch di backup.</div>'+
+      '<div style="margin-top:8px"><b>Branch:</b> <code>'+esc(COMPLETE_PROJECT_BACKUP_BRANCH)+'</code> · <b>Commit:</b> <code>'+esc(COMPLETE_PROJECT_BACKUP_COMMIT.slice(0,10))+'</code></div>'+
+      '<div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap">'+
+      '<a class="btn small" href="https://github.com/'+GITHUB_REPO+'/tree/'+COMPLETE_PROJECT_BACKUP_BRANCH+'" target="_blank" rel="noopener">Apri backup completo</a>'+
+      '<a class="btn small" href="https://github.com/'+GITHUB_REPO+'/commit/'+COMPLETE_PROJECT_BACKUP_COMMIT+'" target="_blank" rel="noopener">Apri commit</a>'+
+      '</div></div>'+
+      '<div style="display:grid;gap:16px">';
     results.forEach(group=>{
       html+='<div style="border:1px solid #ddd;border-radius:10px;padding:12px"><h3 style="margin:0 0 10px">'+esc(group.file)+'</h3>';
       if(group.error){html+='<div class="empty">Errore: '+esc(group.error)+'</div></div>';return}
