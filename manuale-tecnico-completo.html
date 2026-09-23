@@ -45,7 +45,7 @@ table{width:100%;border-collapse:collapse;margin:12px 0;font-size:12px}th,td{bor
 <h2>2. Architettura generale</h2>
 <div class="flow"><span>VISITATORE</span><b class="arrow">→</b><span>visitatore.html</span><b class="arrow">→</b><span>moduli pubblici</span><b class="arrow">→</b><span>Supabase</span></div>
 <div class="flow"><span>ADMIN</span><b class="arrow">→</b><span>admin.html</span><b class="arrow">→</b><span>gestione tornei / contenuti</span><b class="arrow">→</b><span>Supabase</span></div>
-<div class="flow"><span>ADMIN</span><b class="arrow">→</b><span>Bove.html</span><b class="arrow">→</b><span>motore torneo</span><b class="arrow">→</b><span>salvataggio</span></div>
+<div class="flow"><span>ADMIN</span><b class="arrow">→</b><span>tabellone.html</span><b class="arrow">→</b><span>motore torneo</span><b class="arrow">→</b><span>salvataggio</span></div>
 <div class="flow"><span>ADMIN</span><b class="arrow">→</b><span>King</span><b class="arrow">→</b><span>coppie variabili / classifica individuale</span></div>
 <p>Il progetto usa HTML5, CSS3, JavaScript browser/ES6+, Supabase JS v2, Supabase Auth, PostgreSQL/Supabase, GitHub Pages e componenti PWA/service worker. Bove utilizza inoltre SheetJS/XLSX.</p>
 <h3>Flusso amministrativo</h3><p><strong>Nuovo torneo → dati torneo → numero squadre → giocatori calcolati → scelta formula → configurazione formula → creazione.</strong></p>
@@ -118,7 +118,7 @@ table{width:100%;border-collapse:collapse;margin:12px 0;font-size:12px}th,td{bor
 
 <section class="card" id="5">
 <h2>5. Bove — motore centrale dei tornei</h2>
-<p><code>Bove.html</code> è la macchina a stati del torneo. Il principio di manutenzione è che l'Admin alimenta Bove e non lo sostituisce.</p>
+<p><code>tabellone.html</code> è la macchina a stati del torneo. Il principio di manutenzione è che l'Admin alimenta Bove e non lo sostituisce.</p>
 <table><tr><th>Funzione</th><th>Funzione operativa</th></tr>
 <tr><td class="function">verifyAccess / bloccaGestionale</td><td>Controllo accesso e protezione del gestionale.</td></tr>
 <tr><td class="function">closeRules / openRules</td><td>Gestione dell'apertura/chiusura della configurazione delle regole.</td></tr>
