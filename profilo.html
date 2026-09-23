@@ -39,7 +39,7 @@ input:focus,textarea:focus{border-color:rgba(255,255,255,.65);box-shadow:0 0 0 2
 <input id="alias" placeholder="Alias torneo">
 <textarea id="note" placeholder="Note"></textarea>
 <button class="btn" onclick="salvaProfilo()">SALVA PROFILO</button>
-<button class="btn-back" onclick="location.href='2Page.html'">⬅ Torna Dashboard</button>
+<button class="btn-back" onclick="location.href='dashboard.html'">⬅ Torna Dashboard</button>
 <div id="status"></div>
 </div>
 <script>
@@ -105,7 +105,7 @@ document.getElementById("status").innerHTML="Errore salvataggio";
 return;
 }
 document.getElementById("status").innerHTML="✅ Profilo salvato";
-setTimeout(()=>{window.location.href="2Page.html";},1000);
+setTimeout(()=>{window.location.href="dashboard.html";},1000);
 }
 document.addEventListener("DOMContentLoaded",async()=>{await caricaProfilo();});
 </script>
