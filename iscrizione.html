@@ -27,7 +27,7 @@ button:hover{background:#fff;transform:translateY(-1px);box-shadow:0 9px 22px rg
 @media(max-width:767px){body{padding:18px 12px;align-items:center;background-attachment:scroll}.card{width:min(570px,100%);min-height:calc(100dvh - 36px);padding:30px 22px 25px;border-radius:18px}.logo{max-width:250px;max-height:130px}h2{font-size:18px;margin-bottom:19px}.info{font-size:13px;padding:14px 14px;margin-bottom:16px;line-height:1.5}button{height:46px;font-size:13px}}
 @media(max-width:380px){body{padding:14px 10px;align-items:center}.card{min-height:calc(100dvh - 28px);padding:25px 18px 22px;border-radius:16px}.logo{max-width:215px;max-height:112px;margin-bottom:10px}h2{font-size:17px;margin-bottom:19px}.info{font-size:12px;padding:13px 13px;margin-bottom:16px;line-height:1.5}}
  .privacy-note{font-size:11px;line-height:1.55;color:rgba(255,255,255,.68);margin:0 0 14px}.privacy-note a{color:#fff;font-weight:700} </style>
-</head>
+<script src="system-config-v1.js?v=1"></script></head>
 <body>
 <div class="card">
 <img src="/loghi/icona_app1.jpg" class="logo" alt="NEXT POINT PADEL">
@@ -55,5 +55,18 @@ window.addEventListener("load",avviaIscrizione);
 </script>
 <script src="torneo-flow-public-fix-v1.js?v=2"></script>
 <script src="sponsor-public-v2.js?v=3"></script>
-</body>
+<script id="NP_PRODUCT_BRANDING_V1">
+(function(){
+const c=window.NP_SYSTEM_CONFIG||{},brand=c.nomeAttivita||"Next Point Padel";
+document.title=document.title.replace(/Next Point Padel/gi,brand);
+document.querySelectorAll("body *").forEach(el=>{
+ if(el.children.length===0&&el.textContent.includes("Next Point Padel"))el.textContent=el.textContent.replace(/Next Point Padel/gi,brand);
+});
+document.querySelectorAll('a[href^="mailto:"]').forEach(a=>{if(c.email)a.href="mailto:"+c.email});
+document.querySelectorAll('a[href^="tel:"]').forEach(a=>{if(c.telefono)a.href="tel:"+c.telefono.replace(/[^+0-9]/g,"")});
+const logos=document.querySelectorAll("img[src*='icona_app1.jpg'],img[alt*='Next Point Padel']");
+logos.forEach(x=>{if(c.logo)x.src=c.logo;if(x.alt)x.alt=brand});
+if(c.sfondo)document.body.style.backgroundImage="linear-gradient(rgba(3,12,24,.35),rgba(3,12,24,.78)),url('"+c.sfondo+"')";
+})();
+</script></body>
 </html>
