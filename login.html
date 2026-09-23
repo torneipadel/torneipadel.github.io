@@ -9,7 +9,7 @@
 <meta name="theme-color" content="#071219">
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" id="npAppleIcon" href="/loghi/icona_app1.jpg">
-<title>NEXT POINT PADEL</title>
+<title>ORGANIZZAZIONE SPORTIVA</title>
 <script src="system-config-v1.js?v=1"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="lingue.js?v=2"></script>
@@ -60,7 +60,7 @@ button:hover{background:#fff;transform:translateY(-1px);box-shadow:0 11px 25px r
 </div>
 </div>
 <main class="glass">
-<div class="brand"><img src="/loghi/icona_app1.jpg" alt="NEXT POINT PADEL"><h1>NEXT POINT PADEL</h1><p data-i18n="brandSub">Tornei • Eventi • Competizioni di padel</p></div>
+<div class="brand"><img src="/loghi/icona_app1.jpg" alt="ORGANIZZAZIONE SPORTIVA"><h1>ORGANIZZAZIONE SPORTIVA</h1><p data-i18n="brandSub">Tornei • Eventi • Competizioni di padel</p></div>
 <h2 class="section-title" data-i18n="access">Accesso utenti</h2>
 <form id="loginForm" onsubmit="return false">
 <div class="field"><label for="email" data-i18n="emailLabel">Email</label><input id="email" type="email" autocomplete="email" placeholder="Inserisci la tua email" data-i18n-placeholder="emailPlaceholder"></div>
@@ -76,11 +76,11 @@ button:hover{background:#fff;transform:translateY(-1px);box-shadow:0 11px 25px r
 <script>
 (function(){
 const c=window.NP_SYSTEM_CONFIG||{};
-document.title=(c.nomeAttivita||"NEXT POINT PADEL").toUpperCase();
+document.title=(c.nomeAttivita||"ORGANIZZAZIONE SPORTIVA").toUpperCase();
 document.body.style.backgroundImage='linear-gradient(135deg,rgba(4,14,21,.50),rgba(7,18,25,.30) 45%,rgba(3,12,18,.58)),url("'+(c.sfondo||"2pages.jpg")+'")';
 const img=document.querySelector(".brand img"); if(img&&c.logo) img.src=c.logo;
 const icon=document.getElementById("npAppleIcon"); if(icon&&c.logo) icon.href=c.logo;
-const h=document.querySelector(".brand h1"); if(h) h.textContent=(c.nomeAttivita||"NEXT POINT PADEL").toUpperCase();
+const h=document.querySelector(".brand h1"); if(h) h.textContent=(c.nomeAttivita||"ORGANIZZAZIONE SPORTIVA").toUpperCase();
 const p=document.querySelector(".brand p"); if(p&&c.sottotitolo) p.textContent=c.sottotitolo;
 })();
 </script>
