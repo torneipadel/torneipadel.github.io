@@ -7,6 +7,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <title>Next Point Padel</title>
+<script src="system-config-v1.js?v=1"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -112,6 +113,20 @@ h1{position:relative;z-index:1;font-size:29px;line-height:1.12;margin:0;font-wei
 <div id="status"></div>
 </main>
 
+<script>
+(function(){
+const c=window.NP_SYSTEM_CONFIG||{};
+document.title=c.nomeAttivita||document.title;
+const root=document.documentElement;
+document.body.style.backgroundImage="linear-gradient(rgba(3,12,24,.30),rgba(3,12,24,.62)),url('"+(c.sfondo||"2pages.jpg")+"')";
+const logo=document.querySelector(".logo");
+if(logo&&c.logo) logo.src=c.logo;
+const eyebrow=document.querySelector(".eyebrow");
+if(eyebrow) eyebrow.textContent=(c.nomeAttivita||"").toUpperCase();
+const subtitle=document.querySelector(".subtitle");
+if(subtitle&&c.sottotitolo) subtitle.textContent=c.sottotitolo;
+})();
+</script>
 <script>
 const sb=window.sb=supabase.createClient("https://iybjvtmfaupgthqqsngd.supabase.co","sb_publishable_oLLML3_ne0I1dWKIinSRNA_K1Ao5SOl",{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});
 function toggleMenu(){document.getElementById("menuPanel").classList.toggle("open")}
