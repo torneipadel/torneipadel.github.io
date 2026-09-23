@@ -175,6 +175,30 @@ La v2 stable del poster contiene un editor completo e va confrontata con la vers
 
 Sono pagine che possono essere raggiunte direttamente tramite URL, bookmark o altri flussi e quindi non vengono considerate inutili solo perché non risultano referenziate da admin.html.
 
+## INTEGRAZIONE AUDIT — 24/09/2026 — FAMIGLIA TORNEO / COPPIE
+
+### Verifiche eseguite
+- Il flusso corrente di gestione torneo è affidato ai moduli caricati da `admin.html`, in particolare `admin-functions.js`, `admin-layout-v2.js`, `admin-wizard-calculation-fix-v1.js`, `admin-approval-sync-v1.js`, `admin-close-tournament-v1.js`.
+- `admin-layout-v2.js` contiene già la gestione completa delle coppie, inclusa generazione automatica, modifica manuale, validazione dei giocatori duplicati e salvataggio su Supabase.
+- `admin-approval-sync-v1.js` contiene il flusso corrente di approvazione centralizzata delle iscrizioni.
+- `admin-functions.js` contiene il flusso corrente di eliminazione/archiviazione e gli export usati dall'Admin.
+- `bove-admin-flow-fix.js` resta il bridge attivo tra Admin e tabellone.
+- I vecchi moduli in TEMP non risultano caricati da `admin.html`.
+
+### Classificazione
+- `admin-creation-repair-v1.js` → OBSOLETO: modulo passivo di compatibilità che rimuove vecchi elementi wizard; il wizard corrente è già gestito dal flusso attivo.
+- `admin-delete-fix.js` → OBSOLETO: implementava una eliminazione torneo separata; il flusso corrente usa gli export di `admin-functions.js`.
+- `admin-torneo-management-v1.js` → OBSOLETO: vecchia UI di gestione torneo e vecchio ponte approvazione; sostituito dall'insieme modulare corrente.
+- `admin-random-pairs.js` → OBSOLETO: vecchia architettura Admin che includeva archivio, comunicazioni e generazione coppie; la generazione automatica delle coppie è già presente in `admin-layout-v2.js` e le comunicazioni sono gestite dai moduli correnti.
+- `tabellone-fix.js` → CONSERVATO IN TEMP_AUDIT: non caricato, ma contiene correzioni visuali storiche del tabellone e sponsor. Non viene eliminato finché non viene confrontato con le correzioni attualmente incorporate in `tabellone.html`.
+
+### Operazione eseguita
+Sono stati eliminati dalla branch `productizzazione-configurazione` esclusivamente i quattro moduli classificati OBSOLETI sopra indicati.
+`main` non è stato modificato.
+
+### Stato
+La famiglia Torneo/Coppie è classificata salvo il confronto finale di `tabellone-fix.js`, mantenuto come fallback tecnico.
+
 ## DECISIONE
 La root è stata ripulita dai file chiaramente temporanei/legacy individuati nel primo audit.
 I file sospetti sono in TEMP_AUDIT e sono recuperabili.
