@@ -17,7 +17,7 @@
 </head>
 <body>
 <div class="page">
-<div class="top"><div class="brand"><img class="brand-logo" src="/loghi/icona_app1.jpg" alt="NEXT POINT PADEL"><div class="brand-copy"><div class="brand-name">NEXT POINT PADEL</div><div class="brand-sub">gestione tornei ed eventi padel</div></div></div><a class="back" href="2Page.html">← Torna al sito</a></div>
+<div class="top"><div class="brand"><img class="brand-logo" src="/loghi/icona_app1.jpg" alt="NEXT POINT PADEL"><div class="brand-copy"><div class="brand-name">NEXT POINT PADEL</div><div class="brand-sub">gestione tornei ed eventi padel</div></div></div><a class="back" href="dashboard.html">← Torna al sito</a></div>
 <section class="heroTitle"><div class="eyebrow">Comunicazioni & contenuti</div><h1>News</h1><p>Tornei, promozioni, eventi, ricordi e novità del club.</p></section>
 <main id="app"><div class="loading">Caricamento delle News…</div></main>
 </div>
@@ -28,7 +28,7 @@ const sb=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);let allNews=[];let isA
 const esc=v=>String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
 function normalizeNews(row){const cfg=row?.configurazione||{};const arr=Array.isArray(cfg.news)?cfg.news:[];return arr.map((n,i)=>({...n,__torneo:row.nome||'',__torneoId:row.id,__index:i,__global:false,__ordine:Number(n.ordine)||999999,__data:n.data||row.updated_at||row.data_torneo||row.data||''}))}
 function normalizeGlobalNews(row){return {...row,tipo:row.tipo||'Comunicazione',titolo:row.titolo||'Senza titolo',testo:row.testo||'',immagine:row.immagine||'',inEvidenza:false,link:'',__torneo:'',__torneoId:null,__index:-1,__global:true,__ordine:999999,__data:row.created_at||''}}
-function normalizeTournamentNews(row){const cfg=row?.configurazione||{};const poster=Array.isArray(cfg.news)?cfg.news.find(n=>n?.immagine)?.immagine||'':'';const d=row?.data_torneo||row?.data||'';return {tipo:'Torneo',titolo:row?.nome||'Torneo',testo:row?.descrizione||'Scopri il torneo, i dettagli e le iscrizioni.',immagine:poster,inEvidenza:false,link:'Bove.html?idTorneo='+encodeURIComponent(row.id),__torneo:row?.nome||'',__torneoId:row?.id,__index:-1,__global:true,__ordine:500000,__data:d||row?.updated_at||''}}
+function normalizeTournamentNews(row){const cfg=row?.configurazione||{};const poster=Array.isArray(cfg.news)?cfg.news.find(n=>n?.immagine)?.immagine||'':'';const d=row?.data_torneo||row?.data||'';return {tipo:'Torneo',titolo:row?.nome||'Torneo',testo:row?.descrizione||'Scopri il torneo, i dettagli e le iscrizioni.',immagine:poster,inEvidenza:false,link:'tabellone.html?idTorneo='+encodeURIComponent(row.id),__torneo:row?.nome||'',__torneoId:row?.id,__index:-1,__global:true,__ordine:500000,__data:d||row?.updated_at||''}}
 function normalizeMarketNews(row){return {tipo:'Offerta',titolo:row?.titolo||'Articolo del Mercatino',testo:row?.anteprima||row?.descrizione||'Articolo disponibile nel Mercatino.',immagine:row?.immagine||'',inEvidenza:false,link:'mercatino.html',__torneo:'Mercatino',__torneoId:null,__index:-1,__global:true,__ordine:750000,__data:row?.created_at||''}}
 function formatDate(v){if(!v)return '';const d=new Date(v);return Number.isNaN(d.getTime())?String(v):d.toLocaleDateString('it-IT',{day:'2-digit',month:'long',year:'numeric'})}
 function sortNews(a,b){if(Boolean(b.inEvidenza)!==Boolean(a.inEvidenza))return b.inEvidenza?1:-1;if(a.__ordine!==b.__ordine)return a.__ordine-b.__ordine;return String(b.__data).localeCompare(String(a.__data))}
