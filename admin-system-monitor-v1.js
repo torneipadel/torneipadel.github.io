@@ -2,7 +2,7 @@
 (function () {
   'use strict';
 
-  const REPO = 'torneirobertobove/torneirobertobove.github.io';
+  const REPO = 'torneipadel/torneipadel.github.io';
   const DB_LIMIT = 500 * 1024 * 1024;
   const STORAGE_LIMIT = 1024 * 1024 * 1024;
   const GIT_TARGET = 1024 * 1024 * 1024;
@@ -156,7 +156,7 @@
   const GITHUB_CACHE_KEY = '__NP_ADMIN_GITHUB_MONITOR__';
   const GITHUB_CACHE_TTL = 10 * 60 * 1000;
   const GITHUB_FALLBACK = {
-    name: 'torneirobertobove.github.io',
+    name: 'torneipadel.github.io',
     full_name: REPO,
     size: 65605,
     default_branch: 'main',
