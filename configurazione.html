@@ -37,6 +37,140 @@ body{margin:0}.config-page{max-width:900px;margin:0 auto;padding:28px 18px 50px}
 <div class="field"><label>Instagram</label><input id="instagram"></div>
 <div class="field"><label>Descrizione</label><textarea id="descrizione"></textarea></div>
 </div>
+<div class="card"><h2>🔐 Privacy e dati legali</h2>
+<p style="font-size:13px;line-height:1.6;opacity:.75">Questi dati alimentano direttamente la pagina Privacy pubblica e vengono salvati nella configurazione legale del prodotto.</p>
+<div class="field"><label>Titolare / Ragione sociale</label><input id="privacyTitolare" placeholder="Es. ASD Nome Attività"></div>
+<div class="field"><label>Sede</label><input id="privacySede" placeholder="Indirizzo completo"></div>
+<div class="field"><label>Codice fiscale / P.IVA</label><input id="privacyCfPiva"></div>
+<div class="field"><label>E-mail Privacy</label><input id="privacyEmail" type="email" placeholder="privacy@..."></div>
+<div class="field"><label>PEC (se disponibile)</label><input id="privacyPec"></div>
+<div class="field"><label>DPO / RPD (solo se nominato)</label><input id="privacyDpo"></div>
+</div>
+<div class="card"><h2>Stato configurazione</h2>
+<p style="font-size:13px;line-height:1.6;opacity:.75">Questa pagina gestisce la configurazione centrale del prodotto. I dati vengono salvati su Supabase e mantenuti anche in cache locale per garantire un caricamento rapido.</p>
+<div class="actions"><button class="btnx primary" id="save">Salva configurazione</button><button class="btnx" id="reset">Ripristina base</button><span class="status" id="status"></span></div>
+</div>
+</section>
+</main>
+<script src="system-config-v1.js?v=1"></script>
+<script>
+(function(){
+const ids=['nomeAttivita','sottotitolo','logo','sfondo','email','telefono','sede','cfPiva','whatsapp','facebook','instagram','descrizione'];
+const status=document.getElementById('status');
+function load(){const c=window.NP_SYSTEM_CONFIG||{};ids.forEach(id=>{document.getElementById(id).value=c[id]||''});}
+document.getElementById('save').onclick=async()=>{
+const c={};ids.forEach(id=>c[id]=document.getElementById(id).value.trim());
+status.textContent='Salvataggio...';
+try{
+const sb=window.supabase.createClient('https://iybjvtmfaupgthqqsngd.supabase.co','sb_publishable_oLLML3_ne0I1dWKIinSRNA_K1Ao5SOl',{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});
+const {data:{user}}=await sb.auth.getUser();
+if(!user)throw new Error('Sessione amministratore non disponibile');
+const {error}=await sb.from('system_config').upsert({id:1,config:c,updated_by:user.id,updated_at:new Date().toISOString()});
+if(error)throw error;
+localStorage.setItem('np_system_config',JSON.stringify(c));
+window.NP_SYSTEM_CONFIG=Object.assign({},c);
+status.textContent='Configurazione salvata e sincronizzata';
+}catch(e){
+status.textContent='Errore salvataggio: '+(e.message||e);
+}
+};
+document.getElementById('reset').onclick=()=>{localStorage.removeItem('np_system_config');location.reload()};
+load();
+})();
+</script>
+</body>
+</html<script>
+(function(){
+const ids=['nomeAttivita','sottotitolo','logo','sfondo','email','telefono','sede','cfPiva','whatsapp','facebook','instagram','descrizione'];
+const privacyIds=['privacyTitolare','privacySede','privacyCfPiva','privacyEmail','privacyPec','privacyDpo'];
+const status=document.getElementById('status');
+const sb=window.supabase.createClient('https://iybjvtmfaupgthqqsngd.supabase.co','sb_publishable_oLLML3_ne0I1dWKIinSRNA_K1Ao5SOl',{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});
+function setValue(id,value){const el=document.getElementById(id);if(el)el.value=value||''}
+async function load(){
+ const c=window.NP_SYSTEM_CONFIG||{};
+ ids.forEach(id=>setValue(id,c[id]));
+ try{
+  const{data,error}=await sb.from('privacy_settings').select('titolare,sede,cf_piva,email_privacy,pec,dpo').eq('id',1).maybeSingle();
+  if(error)throw error;
+  setValue('privacyTitolare',data?.titolare);
+  setValue('privacySede',data?.sede);
+  setValue('privacyCfPiva',data?.cf_piva);
+  setValue('privacyEmail',data?.email_privacy);
+  setValue('privacyPec',data?.pec);
+  setValue('privacyDpo',data?.dpo);
+ }catch(e){console.error('Caricamento Privacy:',e)}
+}
+document.getElementById('save').onclick=async()=>{
+ const c={};ids.forEach(id=>c[id]=document.getElementById(id).value.trim());
+ const privacy={
+  titolare:document.getElementById('privacyTitolare').value.trim(),
+  sede:document.getElementById('privacySede').value.trim(),
+  cf_piva:document.getElementById('privacyCfPiva').value.trim(),
+  email_privacy:document.getElementById('privacyEmail').value.trim(),
+  pec:document.getElementById('privacyPec').value.trim(),
+  dpo:document.getElementById('privacyDpo').value.trim(),
+  updated_at:new Date().toISOString()
+ };
+ status.textContent='Salvataggio...';
+ try{
+  const{data:{user}}=await sb.auth.getUser();
+  if(!user)throw new Error('Sessione amministratore non disponibile');
+  const{error:configError}=await sb.from('system_config').upsert({id:1,config:c,updated_by:user.id,updated_at:new Date().toISOString()});
+  if(configError)throw configError;
+  const{error:privacyError}=await sb.from('privacy_settings').update(privacy).eq('id',1);
+  if(privacyError)throw privacyError;
+  localStorage.setItem('np_system_config',JSON.stringify(c));
+  window.NP_SYSTEM_CONFIG=Object.assign({},c);
+  status.textContent='Configurazione generale e Privacy salvate e sincronizzate';
+ }catch(e){
+  status.textContent='Errore salvataggio: '+(e.message||e);
+  console.error(e);
+ }
+};
+document.getElementById('reset').onclick=()=>{localStorage.removeItem('np_system_config');location.reload()};
+load();
+})();
+</script>
+<link rel="stylesheet" href="admin-layout-v1.css?v=3">
+<link rel="stylesheet" href="admin-glass-bg-v2.css?v=1">
+<style>
+body{margin:0}.config-page{max-width:900px;margin:0 auto;padding:28px 18px 50px}.config-head{margin-bottom:20px}.config-head h1{margin:0 0 7px}.config-head p{margin:0;opacity:.72}.config-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}.card{padding:20px;border:1px solid rgba(255,255,255,.16);border-radius:18px;background:rgba(255,255,255,.07);backdrop-filter:blur(14px)}.card h2{font-size:17px;margin:0 0 15px}.field{display:flex;flex-direction:column;gap:6px;margin-bottom:13px}.field label{font-size:12px;font-weight:700;opacity:.8}.field input,.field textarea{width:100%;box-sizing:border-box;border:1px solid rgba(255,255,255,.18);border-radius:10px;padding:10px 11px;background:rgba(0,0,0,.18);color:#fff;font:14px Arial}.field textarea{min-height:90px;resize:vertical}.actions{display:flex;gap:10px;align-items:center;margin-top:18px}.btnx{border:1px solid rgba(255,255,255,.2);border-radius:10px;padding:10px 15px;background:rgba(255,255,255,.1);color:#fff;font-weight:700;cursor:pointer}.btnx.primary{background:#1261a0}.status{font-size:12px;opacity:.75}@media(max-width:700px){.config-grid{grid-template-columns:1fr}.config-page{padding:20px 12px 35px}}
+</style>
+</head>
+<body>
+<main class="config-page">
+<header class="config-head">
+<h1>⚙️ Configurazione Sistema</h1>
+<p>Prima base del nuovo prodotto: identità, contatti e branding sono separati dalla logica del torneo.</p>
+</header>
+<section class="config-grid">
+<div class="card"><h2>Identità</h2>
+<div class="field"><label>Nome attività</label><input id="nomeAttivita"></div>
+<div class="field"><label>Sottotitolo</label><input id="sottotitolo"></div>
+<div class="field"><label>Logo</label><input id="logo" placeholder="es. loghi/logo.png"></div>
+<div class="field"><label>Sfondo principale</label><input id="sfondo" placeholder="es. sfondo2.jpg"></div>
+</div>
+<div class="card"><h2>Contatti</h2>
+<div class="field"><label>E-mail</label><input id="email"></div>
+<div class="field"><label>Telefono</label><input id="telefono"></div>
+<div class="field"><label>Indirizzo / sede</label><input id="sede"></div>
+<div class="field"><label>Codice fiscale / P.IVA</label><input id="cfPiva"></div>
+</div>
+<div class="card"><h2>Comunicazione</h2>
+<div class="field"><label>WhatsApp</label><input id="whatsapp"></div>
+<div class="field"><label>Facebook</label><input id="facebook"></div>
+<div class="field"><label>Instagram</label><input id="instagram"></div>
+<div class="field"><label>Descrizione</label><textarea id="descrizione"></textarea></div>
+</div>
+<div class="card"><h2>🔐 Privacy e dati legali</h2>
+<p style="font-size:13px;line-height:1.6;opacity:.75">Questi dati alimentano direttamente la pagina Privacy pubblica e vengono salvati nella configurazione legale del prodotto.</p>
+<div class="field"><label>Titolare / Ragione sociale</label><input id="privacyTitolare" placeholder="Es. ASD Nome Attività"></div>
+<div class="field"><label>Sede</label><input id="privacySede" placeholder="Indirizzo completo"></div>
+<div class="field"><label>Codice fiscale / P.IVA</label><input id="privacyCfPiva"></div>
+<div class="field"><label>E-mail Privacy</label><input id="privacyEmail" type="email" placeholder="privacy@..."></div>
+<div class="field"><label>PEC (se disponibile)</label><input id="privacyPec"></div>
+<div class="field"><label>DPO / RPD (solo se nominato)</label><input id="privacyDpo"></div>
+</div>
 <div class="card"><h2>Stato configurazione</h2>
 <p style="font-size:13px;line-height:1.6;opacity:.75">Questa pagina gestisce la configurazione centrale del prodotto. I dati vengono salvati su Supabase e mantenuti anche in cache locale per garantire un caricamento rapido.</p>
 <div class="actions"><button class="btnx primary" id="save">Salva configurazione</button><button class="btnx" id="reset">Ripristina base</button><span class="status" id="status"></span></div>
