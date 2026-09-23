@@ -239,3 +239,9 @@ Sono stati eliminati dalla branch `productizzazione-configurazione` esclusivamen
 
 ## Stato
 La famiglia Archivio è ora parzialmente classificata. Resta da verificare solo la necessità della persistenza storica prima di eliminarla.
+
+
+### Famiglia Sponsor — classificazione
+- `TEMP_AUDIT/admin-sponsor-help-v1.js` → OBSOLETO: sostituito da `admin-sponsor-help-v2.js`, già caricato da `admin.html`.
+- `TEMP_AUDIT/sponsor-global-fix.js` → OBSOLETO: implementava una vecchia gestione sponsor dentro `tornei.configurazione.sponsor`; il flusso attuale usa la tabella globale `sponsor` tramite `admin-comunicazioni-v1.js`, con `admin-sponsor-route-fix-v1.js` per l'accesso e `sponsor-public-v2.js` per la pubblicazione.
+- Nessun modulo legacy Sponsor viene mantenuto in TEMP_AUDIT dopo il confronto.
