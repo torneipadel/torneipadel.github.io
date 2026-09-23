@@ -7,7 +7,19 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="system-config-v1.js?v=1"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+(function(){
+const c=window.NP_SYSTEM_CONFIG||{};
+document.title=(c.nomeAttivita||"Next Point Padel")+" — Tornei";
+document.body.style.backgroundImage="url('"+(c.sfondo||"sfondo2.jpg")+"')";
+const logo=document.querySelector(".np-brandline-logo");if(logo&&c.logo)logo.src=c.logo;
+const name=document.querySelector(".np-brandline-name");if(name)name.textContent=(c.nomeAttivita||"Next Point Padel").toUpperCase();
+const strong=document.querySelector(".np-menu strong");if(strong)strong.textContent=(c.nomeAttivita||"Next Point Padel").toUpperCase();
+const ey=document.querySelector(".np-eyebrow");if(ey)ey.textContent=(c.nomeAttivita||"Next Point Padel").toUpperCase()+" · TORNEI";
+})();
+</script>
 <style>
 :root{--line:rgba(255,255,255,.22);--blue:#073b72;--gold:#ffe76b}
 *{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;min-height:100vh;font-family:'Open Sans',Arial,sans-serif;color:#fff;background:#06111f url('sfondo2.jpg') center/cover fixed no-repeat;overflow-x:hidden}body:before{content:'';position:fixed;inset:0;background:linear-gradient(180deg,rgba(3,12,24,.30),rgba(3,12,24,.68));pointer-events:none;z-index:-1}
