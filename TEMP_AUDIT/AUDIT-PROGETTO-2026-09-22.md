@@ -245,3 +245,9 @@ La famiglia Archivio è ora parzialmente classificata. Resta da verificare solo 
 - `TEMP_AUDIT/admin-sponsor-help-v1.js` → OBSOLETO: sostituito da `admin-sponsor-help-v2.js`, già caricato da `admin.html`.
 - `TEMP_AUDIT/sponsor-global-fix.js` → OBSOLETO: implementava una vecchia gestione sponsor dentro `tornei.configurazione.sponsor`; il flusso attuale usa la tabella globale `sponsor` tramite `admin-comunicazioni-v1.js`, con `admin-sponsor-route-fix-v1.js` per l'accesso e `sponsor-public-v2.js` per la pubblicazione.
 - Nessun modulo legacy Sponsor viene mantenuto in TEMP_AUDIT dopo il confronto.
+
+
+### Famiglia WhatsApp — classificazione
+- `TEMP_AUDIT/admin-whatsapp-broadcast-v1.js` → OBSOLETO: vecchia UI broadcast con selezione destinatari e apertura WhatsApp Business; il flusso corrente è gestito da `admin-comunicazioni-v1.js` più `admin-comunicazioni-whatsapp-override-v1.js`, che aggiunge destinatari, apertura WhatsApp, copia e poster.
+- `TEMP_AUDIT/admin-whatsapp-final-v1.js` → OBSOLETO: vecchio router/UI WhatsApp sostituito dall'override corrente; le funzioni `renderWhatsApp`, `bindCanonicalButtons` e relativi marker sono già superate da `whatsappOverride` e dal router canonico attivo.
+- `admin-whatsapp-poster-preview-v1.js` e `admin-whatsapp-help-v1.js` restano attivi e non sono stati modificati.
