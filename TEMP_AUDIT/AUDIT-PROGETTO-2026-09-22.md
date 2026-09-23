@@ -191,3 +191,27 @@ Analizzare TEMP_AUDIT per famiglie:
 6. vecchia architettura Admin.
 
 Solo dopo il confronto funzione-per-funzione si decide cosa eliminare definitivamente o recuperare.
+
+---
+
+# INTEGRAZIONE AUDIT — 24/09/2026 — FAMIGLIA ARCHIVIO
+
+## Verifiche eseguite
+- `admin.html` carica `admin-archivio-button-v1.js` e `admin-close-tournament-v1.js`.
+- `admin.html` NON carica i vecchi moduli `admin-archive-persistence-v1.js`, `admin-archive-restore-v1.js`, `admin-archived-lock-v1.js`, `admin-dashboard-archive.js`.
+- La gestione corrente dell'archivio è già presente nel modulo attivo `admin-archivio-button-v1.js`: caricamento dei tornei con `stato='archiviato'`, esclusione dal selettore principale, pannello Archivio e apertura del torneo.
+- `admin-functions.js` contiene ancora funzioni storiche di archivio, ma il controllo UI corrente dichiara esplicitamente che il pulsante Archivio è gestito da `admin-archivio-button-v1.js`.
+- `admin-close-tournament-v1.js` gestisce la chiusura/archiviazione e contiene una correzione specifica sul salvataggio dello stato archiviato.
+
+## Classificazione
+- `admin-archive-restore-v1.js` → OBSOLETO: non caricato, duplicava pulsanti/pannello Archivio già gestiti dal modulo corrente.
+- `admin-archived-lock-v1.js` → OBSOLETO: non caricato, duplicava caricamento/pannello/filtro dell'Archivio.
+- `admin-dashboard-archive.js` → OBSOLETO: non caricato e costruiva una seconda UI di archivio sul contenitore lista tornei.
+- `admin-archive-persistence-v1.js` → CONSERVATO IN TEMP_AUDIT: non caricato e contiene una logica specifica di persistenza dello stato archiviato tramite localStorage. Non è stato eliminato finché non viene verificato se quella protezione è ancora necessaria nel comportamento corrente.
+
+## Operazione eseguita
+Sono stati eliminati dalla branch `productizzazione-configurazione` esclusivamente i tre moduli classificati OBSOLETI sopra indicati.
+`main` non è stato modificato.
+
+## Stato
+La famiglia Archivio è ora parzialmente classificata. Resta da verificare solo la necessità della persistenza storica prima di eliminarla.
