@@ -3226,6 +3226,10 @@ short:{
 
     Dres:[],
 
+    Eres:[],
+
+    Fres:[],
+
 
 
 
@@ -3245,6 +3249,10 @@ short:{
 
     Dtime:[],
 
+    Etime:[],
+
+    Ftime:[],
+
 
 
 
@@ -3263,6 +3271,10 @@ short:{
     Ccamp:[],
 
     Dcamp:[],
+
+    Ecamp:[],
+
+    Fcamp:[],
 
 
 
@@ -3284,6 +3296,10 @@ short:{
     rankC:[],
 
     rankD:[],
+
+    rankE:[],
+
+    rankF:[],
 
 
 
@@ -5205,6 +5221,24 @@ function ensureRules(){
     if(state.rules.note===undefined)
 
         state.rules.note="";
+
+    if(!Array.isArray(state.Eres))
+        state.Eres=[];
+
+    if(!Array.isArray(state.Fres))
+        state.Fres=[];
+
+    if(!Array.isArray(state.Etime))
+        state.Etime=[];
+
+    if(!Array.isArray(state.Ftime))
+        state.Ftime=[];
+
+    if(!Array.isArray(state.Ecamp))
+        state.Ecamp=[];
+
+    if(!Array.isArray(state.Fcamp))
+        state.Fcamp=[];
 
 
 
