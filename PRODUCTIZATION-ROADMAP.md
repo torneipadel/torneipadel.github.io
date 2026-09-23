@@ -7,7 +7,7 @@ Mantenere il progetto attuale come laboratorio di sviluppo e collaudo e costruir
 ## Regole
 1. main resta l'ambiente operativo/laboratorio e non viene trasformato nel prodotto.
 2. productizzazione-configurazione è il ramo di lavoro del prodotto Master.
-3. Nessuna cancellazione viene fatta solo perché un file sembra vecchio.
+3. Nessuna cancellazione viene fatta solo perché un file semble vecchio.
 4. Prima di eliminare: ricerca riferimenti, verifica uso reale, classificazione.
 5. Il motore torneo non viene riscritto per rendere il prodotto generico: si separano invece motore e configurazione.
 6. TEMP_AUDIT resta disponibile come archivio tecnico finché la classificazione non è conclusa.
@@ -23,11 +23,11 @@ Mantenere il progetto attuale come laboratorio di sviluppo e collaudo e costruir
 1. Protezione laboratorio: completata. main invariato come base operativa.
 2. Backup: completato. Backup branch 4184d14f7c disponibile.
 3. Mappatura: in corso. Prima mappa esistente in TEMP_AUDIT/AUDIT-PROGETTO-2026-09-22.md.
-4. Classificazione funzione-per-funzione: da completare.
+4. Classificazione funzione-per-funzione: in corso — famiglia Archivio parzialmente classificata.
 5. Separazione LAB/MASTER: da completare.
-6. Configurazione centrale: da progettare e implementare.
-7. Migrazione dei riferimenti hardcoded a configurazione: da completare.
-8. Pulizia Master: solo dopo classificazione e verifica.
+6. Configurazione centrale: in corso — configurazione identità e dati legali già centralizzata su Supabase.
+7. Migrazione dei riferimenti hardcoded a configurazione: in corso.
+8. Pulizia Master: in corso solo sui contenuti già classificati e verificati.
 9. Collaudo completo: da eseguire.
 10. Master replicabile: da dichiarare pronto solo dopo collaudo.
 
@@ -35,7 +35,8 @@ Mantenere il progetto attuale come laboratorio di sviluppo e collaudo e costruir
 - Branch Master di lavoro: productizzazione-configurazione.
 - main non modificato dalla fase di productizzazione.
 - Non è ancora corretto dichiarare il Master "pulito": la mappatura completa delle dipendenze è ancora da terminare.
-- Non vengono eliminati ora i contenuti di TEMP_AUDIT: appartengono al patrimonio di laboratorio finché non viene completata la classificazione.
+- Non vengono eliminati ora i contenuti di TEMP_AUDIT non ancora classificati.
+- La famiglia Archivio è stata analizzata: tre moduli duplicati e non caricati sono stati rimossi dal branch Master; la persistenza storica è mantenuta per ulteriore verifica.
 
-## Primo obiettivo operativo
-Completare la mappa reale delle dipendenze partendo dalle pagine operative e dai moduli caricati direttamente, quindi classificare i file per CORE / CONFIGURAZIONE / LAB-TEST / OBSOLETO prima di qualsiasi ulteriore pulizia.
+## Prossimo obiettivo operativo
+Continuare la mappa reale delle dipendenze con la famiglia Torneo/Coppie, poi News/Poster, Sponsor, WhatsApp e vecchia architettura Admin, sempre con classificazione prima della rimozione.
