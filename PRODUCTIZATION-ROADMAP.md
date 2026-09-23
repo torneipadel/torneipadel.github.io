@@ -23,7 +23,7 @@ Mantenere il progetto attuale come laboratorio di sviluppo e collaudo e costruir
 1. Protezione laboratorio: completata. main invariato come base operativa.
 2. Backup: completato. Backup branch 4184d14f7c disponibile.
 3. Mappatura: in corso. Prima mappa esistente in TEMP_AUDIT/AUDIT-PROGETTO-2026-09-22.md.
-4. Classificazione funzione-per-funzione: in corso — famiglia Archivio parzialmente classificata.
+4. Classificazione funzione-per-funzione: in corso — Archivio classificato salvo persistenza storica; Torneo/Coppie classificato salvo confronto finale del fallback tabellone.
 5. Separazione LAB/MASTER: da completare.
 6. Configurazione centrale: in corso — configurazione identità e dati legali già centralizzata su Supabase.
 7. Migrazione dei riferimenti hardcoded a configurazione: in corso.
@@ -36,7 +36,7 @@ Mantenere il progetto attuale come laboratorio di sviluppo e collaudo e costruir
 - main non modificato dalla fase di productizzazione.
 - Non è ancora corretto dichiarare il Master "pulito": la mappatura completa delle dipendenze è ancora da terminare.
 - Non vengono eliminati ora i contenuti di TEMP_AUDIT non ancora classificati.
-- La famiglia Archivio è stata analizzata: tre moduli duplicati e non caricati sono stati rimossi dal branch Master; la persistenza storica è mantenuta per ulteriore verifica.
+- La famiglia Archivio è stata analizzata: tre moduli duplicati e non caricati sono stati rimossi dal branch Master; la persistenza storica è mantenuta per ulteriore verifica. La famiglia Torneo/Coppie è stata analizzata: quattro moduli legacy non caricati sono stati rimossi; il vecchio tabellone-fix resta temporaneamente in TEMP_AUDIT come fallback tecnico.
 
 ## Prossimo obiettivo operativo
-Continuare la mappa reale delle dipendenze con la famiglia Torneo/Coppie, poi News/Poster, Sponsor, WhatsApp e vecchia architettura Admin, sempre con classificazione prima della rimozione.
+Prossimo blocco: confrontare il fallback tabellone-fix con il tabellone attuale; poi passare a News/Poster, Sponsor, WhatsApp e vecchia architettura Admin, sempre con classificazione prima della rimozione.
