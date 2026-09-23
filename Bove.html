@@ -1750,11 +1750,6 @@ Seleziona formato torneo
 
     </div>
 
-    <div style="margin-top:10px;">
-      <label>Punti Sconfitta</label>
-      <input id="lP" type="number" value="0">
-    </div>
-
 
 
     <hr style="margin:15px 0;">
@@ -2991,9 +2986,9 @@ let state = {
             FORMULE
         */
 
-        formulaGironi:"tuttiControTutti",
+        formulaGironi:"italiana",
 
-        formulaFinale:"eliminazioneDiretta",
+        formulaFinale:"eliminazione_diretta",
 
 
 
@@ -4824,7 +4819,7 @@ function ensureRules(){
 
     if(state.rules.tipoTorneo===undefined)
 
-        state.rules.tipoTorneo="italiana";
+        state.rules.tipoTorneo="gironi";
 
 
     const formatoSalvato =
@@ -4959,14 +4954,14 @@ function ensureRules(){
 
     if(state.rules.formulaGironi===undefined)
 
-        state.rules.formulaGironi="tuttiControTutti";
+        state.rules.formulaGironi="italiana";
 
 
 
     if(state.rules.formulaFinale===undefined)
 
         state.rules.formulaFinale=
-            "eliminazioneDiretta";
+            "eliminazione_diretta";
 
 
 
@@ -5029,17 +5024,17 @@ function ensureRules(){
 
     if(state.rules.crit1===undefined)
 
-        state.rules.crit1="scontroDiretto";
+        state.rules.crit1="df";
 
 
     if(state.rules.crit2===undefined)
 
-        state.rules.crit2="df";
+        state.rules.crit2="gf";
 
 
     if(state.rules.crit3===undefined)
 
-        state.rules.crit3="gf";
+        state.rules.crit3="gs";
 
 
 
@@ -8169,86 +8164,247 @@ function formatCoppiaDisplay(coppia){
 }
 
 function calc(squadre, risultati){
-    if(!Array.isArray(squadre) || !Array.isArray(risultati)) return [];
-    const classifica=squadre.map(nome=>({n:nome,pt:0,gf:0,gs:0,df:0,qual:false}));
-    const scontri=[]; let indice=0;
 
-    for(let i=0;i<squadre.length;i++){
-        for(let j=i+1;j<squadre.length;j++){
-            const risultato=risultati[indice++];
-            if(!risultato || risultato==="-" || typeof risultato!=="string") continue;
-            const parti=risultato.split("-");
-            if(parti.length!==2) continue;
-            const a=Number(parti[0]), b=Number(parti[1]);
-            if(Number.isNaN(a)||Number.isNaN(b)) continue;
+    if(
+        !Array.isArray(squadre)
+        ||
+        !Array.isArray(risultati)
+    ){
 
-            classifica[i].gf+=a; classifica[i].gs+=b;
-            classifica[j].gf+=b; classifica[j].gs+=a;
+        return [];
 
-            if(a>b){
-                classifica[i].pt+=Number(state.rules?.w ?? 3);
-                classifica[j].pt+=Number(state.rules?.l ?? 0);
-            }else if(b>a){
-                classifica[j].pt+=Number(state.rules?.w ?? 3);
-                classifica[i].pt+=Number(state.rules?.l ?? 0);
-            }else{
-                classifica[i].pt+=Number(state.rules?.d ?? 1);
-                classifica[j].pt+=Number(state.rules?.d ?? 1);
-            }
-            scontri.push({i,j,a,b});
-        }
     }
 
-    classifica.forEach(x=>x.df=x.gf-x.gs);
-    const criteri=[state.rules?.crit1,state.rules?.crit2,state.rules?.crit3].filter(Boolean);
 
-    function h2h(teamIndex,tiedIndexes){
-        const peers=new Set(tiedIndexes.filter(x=>x!==teamIndex));
-        const out={pt:0,df:0,gf:0,gs:0};
-        scontri.forEach(m=>{
-            let gf,gs;
-            if(m.i===teamIndex && peers.has(m.j)){gf=m.a;gs=m.b;}
-            else if(m.j===teamIndex && peers.has(m.i)){gf=m.b;gs=m.a;}
-            else return;
-            out.gf+=gf; out.gs+=gs; out.df+=gf-gs;
-            if(gf>gs) out.pt+=Number(state.rules?.w ?? 3);
-            else if(gf<gs) out.pt+=Number(state.rules?.l ?? 0);
-            else out.pt+=Number(state.rules?.d ?? 1);
+
+    let classifica=[];
+
+
+
+    squadre.forEach(nome=>{
+
+
+        classifica.push({
+
+            n:nome,
+
+            pt:0,
+
+            gf:0,
+
+            gs:0,
+
+            df:0
+
         });
-        return out;
-    }
 
-    const indexed=classifica.map((x,index)=>({x,index}));
-    indexed.sort((A,B)=>{
-        if(B.x.pt!==A.x.pt) return B.x.pt-A.x.pt;
-        const tied=indexed.filter(z=>z.x.pt===A.x.pt && z.x.pt===B.x.pt).map(z=>z.index);
 
-        for(const criterio of criteri){
-            if(criterio==="scontroDiretto"){
-                const ah=h2h(A.index,tied), bh=h2h(B.index,tied);
-                if(bh.pt!==ah.pt) return bh.pt-ah.pt;
-                if(bh.df!==ah.df) return bh.df-ah.df;
-                if(bh.gf!==ah.gf) return bh.gf-ah.gf;
-            }else if(criterio==="df"){
-                if(B.x.df!==A.x.df) return B.x.df-A.x.df;
-            }else if(criterio==="gf"){
-                if(B.x.gf!==A.x.gf) return B.x.gf-A.x.gf;
-            }else if(criterio==="gs"){
-                if(A.x.gs!==B.x.gs) return A.x.gs-B.x.gs;
-            }
-        }
-
-        if(B.x.df!==A.x.df) return B.x.df-A.x.df;
-        if(B.x.gf!==A.x.gf) return B.x.gf-A.x.gf;
-        if(A.x.gs!==B.x.gs) return A.x.gs-B.x.gs;
-        return A.index-B.index;
     });
 
-    const qualificate=Number(state.rules?.qualificatePerGirone ?? 2);
-    indexed.forEach((item,i)=>item.x.qual=i<qualificate);
-    return indexed.map(item=>item.x);
-}
 
+
+    let indice=0;
+
+
+
+    for(
+        let i=0;
+        i<squadre.length;
+        i++
+    ){
+
+        for(
+            let j=i+1;
+            j<squadre.length;
+            j++
+        ){
+
+
+            let risultato =
+                risultati[indice];
+
+
+            indice++;
+
+
+
+            if(
+                !risultato
+                ||
+                risultato==="-"
+            ){
+
+                continue;
+
+            }
+
+
+
+            let parti =
+                risultato
+                .split("-");
+
+
+
+            if(parti.length!==2){
+
+                continue;
+
+            }
+
+
+
+            let a =
+                Number(
+                    parti[0]
+                );
+
+
+            let b =
+                Number(
+                    parti[1]
+                );
+
+
+
+            if(
+                Number.isNaN(a)
+                ||
+                Number.isNaN(b)
+            ){
+
+                continue;
+
+            }
+
+
+
+            classifica[i].gf += a;
+
+            classifica[i].gs += b;
+
+
+
+            classifica[j].gf += b;
+
+            classifica[j].gs += a;
+
+
+
+            if(a>b){
+
+
+                classifica[i].pt +=
+                    Number(
+                        state.rules?.w || 3
+                    );
+
+
+            }
+            else
+            if(b>a){
+
+
+                classifica[j].pt +=
+                    Number(
+                        state.rules?.w || 3
+                    );
+
+
+            }
+            else{
+
+
+                classifica[i].pt +=
+                    Number(
+                        state.rules?.d || 1
+                    );
+
+
+                classifica[j].pt +=
+                    Number(
+                        state.rules?.d || 1
+                    );
+
+
+            }
+
+
+        }
+
+    }
+
+
+
+    classifica.forEach(x=>{
+
+
+        x.df =
+            x.gf -
+            x.gs;
+
+
+    });
+
+
+
+    classifica.sort((a,b)=>{
+
+
+        if(
+            b.pt!==a.pt
+        )
+
+            return b.pt-a.pt;
+
+
+
+        if(
+            b.df!==a.df
+        )
+
+            return b.df-a.df;
+
+
+
+        if(
+            b.gf!==a.gf
+        )
+
+            return b.gf-a.gf;
+
+
+
+        return a.gs-b.gs;
+
+
+    });
+
+
+
+    const qualificate =
+
+        Number(
+            state.rules?.qualificatePerGirone || 2
+        );
+
+
+
+    classifica.forEach((x,i)=>{
+
+
+        x.qual =
+            i < qualificate;
+
+
+    });
+
+
+
+    return classifica;
+
+
+}
 function renderClass(){
 
     ensureRules();
@@ -8402,45 +8558,76 @@ ${formatCoppiaDisplay(x.n)}
 
 
 }
-function updateCamp(g,i,val){
-    if(!["A","B","C","D","E","F"].includes(g)) return;
-    const key=g+"camp";
-    if(!Array.isArray(state[key])) state[key]=[];
-    state[key][i]=String(val ?? "").trim();
-    updateAndSync();
-}
-
-function updateTime(g,i,pos,val){
-    if(!["A","B","C","D","E","F"].includes(g)) return;
-    const key=g+"time";
-    if(!Array.isArray(state[key])) state[key]=[];
-    state[key][i]=String(val ?? "").trim();
-    updateAndSync();
-}
-
 function updateRes(g,i,pos,val){
+
     let s;
-    if(g==="A") s=state.Ares;
-    else if(g==="B") s=state.Bres;
-    else if(g==="C") s=state.Cres;
-    else if(g==="D") s=state.Dres;
-    else if(g==="E") s=state.Eres;
-    else if(g==="F") s=state.Fres;
-    else return;
 
-    if(!Array.isArray(s)) return;
-    if(!s[i]) s[i]="-";
 
-    let p=s[i].toString().split("-");
-    if(p.length<2) p=["",""];
+    if(g==="A")
+        s=state.Ares;
+
+    else if(g==="B")
+        s=state.Bres;
+
+    else if(g==="C")
+        s=state.Cres;
+
+    else if(g==="D")
+        s=state.Dres;
+
+    else
+        return;
+
+
+
+    if(!Array.isArray(s))
+        return;
+
+
+
+    if(!s[i])
+        s[i]="-";
+
+
+
+    let p =
+        s[i]
+        .toString()
+        .split("-");
+
+
+
+    if(p.length<2){
+
+        p=[
+            "",
+            ""
+        ];
+
+    }
+
+
+
     p[pos]=val;
-    s[i]=p.join("-");
+
+
+
+    s[i]=
+        p.join("-");
+
+
 
     renderClass();
-    if(typeof renderKO==="function") renderKO();
-    updateAndSync();
-}
 
+
+    if(typeof renderKO==="function")
+        renderKO();
+
+
+
+    updateAndSync();
+
+}
 async function salvaTorneoSupabase(){
 
     try{
@@ -9929,10 +10116,10 @@ function generaPartiteGironi(){
         const coppie = [
             [0,1],
             [2,3],
-            [0,3],
-            [1,2],
             [0,2],
-            [1,3]
+            [1,3],
+            [0,3],
+            [1,2]
         ];
 
         coppie.forEach(x=>{
@@ -10410,9 +10597,7 @@ function renderTables(){
         A:[2,3],
         B:[4,5],
         C:[6,7],
-        D:[8,9],
-        E:[10,11],
-        F:[12,13]
+        D:[8,9]
     };
 
     let durata=Number(state.rules.duration||30);
@@ -10431,7 +10616,7 @@ function renderTables(){
 
     let calendario=[];
 
-    ["A","B","C","D","E","F"].forEach(tag=>{
+    ["A","B","C","D"].forEach(tag=>{
 
         let squadre=state[tag];
 
@@ -10570,7 +10755,7 @@ function renderTables(){
 
     });
 
-    ["A","B","C","D","E","F"].forEach(tag=>{
+    ["A","B","C","D"].forEach(tag=>{
 
         let box=
             document.getElementById(
@@ -10652,17 +10837,9 @@ function renderTables(){
                 ":"+
                 String(min).padStart(2,"0");
 
-            if(!state[tag+"time"][i] || state[tag+"time"][i]==="-")
+            state[tag+"time"][i]=tempo;
 
-
-                state[tag+"time"][i]=tempo;
-
-
-
-            if(!state[tag+"camp"][i])
-
-
-                state[tag+"camp"][i]=m.campo;
+            state[tag+"camp"][i]=m.campo;
 
             if(!state[tag+"res"][i]){
                 state[tag+"res"][i]="-";
