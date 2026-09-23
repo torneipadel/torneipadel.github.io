@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>La nostra storia - Next Point Padel</title>
 <meta name="description" content="La storia, l'amicizia e la passione da cui nasce Next Point Padel.">
+<script src="system-config-v1.js?v=1"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -23,6 +24,17 @@ body:before{content:"";position:fixed;inset:0;pointer-events:none;background:rad
 @media(max-width:600px){body{padding:14px 11px 28px}.menu-button{top:12px;right:12px}.hero{padding:29px 17px 23px;border-radius:21px}.logo{max-width:235px;max-height:112px}.hero:before{width:370px;height:220px}.section{padding:18px;border-radius:19px}.values{grid-template-columns:1fr 1fr}.actions{flex-direction:column}.button{text-align:center}.menu-panel{width:min(280px,86vw)}}
 @media(max-width:390px){h1{font-size:26px}.hero-text{font-size:12px}.values{grid-template-columns:1fr}}
 </style>
+<script>
+(function(){
+const c=window.NP_SYSTEM_CONFIG||{};
+document.title="La nostra storia - "+(c.nomeAttivita||"Next Point Padel");
+document.body.style.backgroundImage="linear-gradient(rgba(3,12,24,.30),rgba(3,12,24,.72)),url('"+(c.sfondo||"2pages.jpg")+"')";
+const logo=document.querySelector(".logo");if(logo&&c.logo)logo.src=c.logo;
+const brand=document.querySelector(".brand-name");if(brand)brand.textContent=(c.nomeAttivita||"Next Point Padel").toUpperCase();
+const ey=document.querySelector(".eyebrow");if(ey)ey.textContent=(c.nomeAttivita||"Next Point Padel").toUpperCase();
+document.querySelectorAll(".footer").forEach(x=>x.textContent=(c.nomeAttivita||"Next Point Padel")+" · Una passione nata tra amici");
+})();
+</script>
 </head>
 <body>
 <div class="menu-button" onclick="toggleMenu()" aria-label="Apri menu">☰</div>
