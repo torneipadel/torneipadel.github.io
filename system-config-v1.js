@@ -1,12 +1,12 @@
 (function(){
 'use strict';
 const defaults={
-nomeAttivita:'Next Point Padel',
+nomeAttivita:'Organizzazione sportiva',
 sottotitolo:'Tornei, sport e comunità',
 logo:'loghi/icona_app1.jpg',
 sfondo:'2pages.jpg',
-email:'info@nextpointpadel.it',
-telefono:'+39 333444556',
+email:'info@example.com',
+telefono:'',
 sede:'',
 cfPiva:'',
 whatsapp:'',
