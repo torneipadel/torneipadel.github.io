@@ -49,14 +49,15 @@
       mobile.type='button';
       mobile.id='mobileSuperadmin';
       mobile.textContent='👑 Superadmin';
-      mobile.onclick=()=>{
-        $('mobileOverlay')?.classList.remove('open');
-        openPanel();
-      };
       const first=mobileNav.querySelector('[data-page]');
       if(first)mobileNav.insertBefore(mobile,first);
       else mobileNav.prepend(mobile);
     }
+    mobile.style.display=isSuper()?'block':'none';
+    mobile.onclick=()=>{
+      $('mobileOverlay')?.classList.remove('open');
+      openPanel();
+    };
   }
 
   function roleReady(){
