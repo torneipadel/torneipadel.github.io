@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>Mercatino · Next Point Padel</title>
+<title>Mercatino · Organizzazione sportiva</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -15,8 +15,8 @@
 <script src="system-config-v1.js?v=1"></script></head>
 <body>
 <main class="page">
-<header class="topbar"><button class="icon" onclick="history.back()" aria-label="Torna indietro">←</button><img class="logo" src="/loghi/icona_app1.jpg" alt="Next Point Padel"><div class="brand-copy"><div class="brand-name">NEXT POINT PADEL</div><div class="brand-sub">gestione tornei ed eventi padel</div></div></header>
-<section class="title"><div class="eyebrow">NEXT POINT PADEL · BACHECA INTERNA</div><h1>Mercatino</h1><p class="subtitle">Articoli sportivi, racchette e accessori messi in vendita all'interno del circolo.</p></section>
+<header class="topbar"><button class="icon" onclick="history.back()" aria-label="Torna indietro">←</button><img class="logo" src="/loghi/icona_app1.jpg" alt="Organizzazione sportiva"><div class="brand-copy"><div class="brand-name">ORGANIZZAZIONE SPORTIVA</div><div class="brand-sub">gestione tornei ed eventi padel</div></div></header>
+<section class="title"><div class="eyebrow">ORGANIZZAZIONE SPORTIVA · BACHECA INTERNA</div><h1>Mercatino</h1><p class="subtitle">Articoli sportivi, racchette e accessori messi in vendita all'interno del circolo.</p></section>
 <div class="toolbar"><div class="filters"><button class="filter active" data-filter="all">Tutti</button><button class="filter" data-filter="racchette">Racchette</button><button class="filter" data-filter="abbigliamento">Abbigliamento</button><button class="filter" data-filter="accessori">Accessori</button><button class="filter" data-filter="altro">Altro</button></div><button id="editorToggle" class="main-action" type="button" onclick="apriEditor()">＋ INSERISCI IL TUO ARTICOLO</button></div>
 <div id="editor" class="editor" hidden>
 <h2 id="editorTitle">Inserisci il tuo articolo</h2><p class="editor-note">Puoi gestire solo gli articoli inseriti dal tuo account. Pubblicare significa renderli visibili nella bacheca quando sono disponibili.</p>
@@ -35,20 +35,20 @@
 </div>
 <section id="list" class="list" aria-live="polite"><div class="empty">Caricamento Mercatino...</div></section>
 <section class="mine"><h2>I MIEI ARTICOLI</h2><div id="mineList" class="mine-list"><div class="empty">Accedi per gestire i tuoi articoli.</div></div></section>
-<footer class="footer">NEXT POINT PADEL · MERCATINO INTERNO</footer>
+<footer class="footer">ORGANIZZAZIONE SPORTIVA · MERCATINO INTERNO</footer>
 </main>
 <div id="detail" class="detail" role="dialog" aria-modal="true" aria-label="Dettaglio articolo"><div class="detail-box"><div class="detail-head"><button class="close" onclick="closeDetail()" aria-label="Chiudi">×</button></div><div id="detailContent"></div></div></div>
 <script src="mercatino-public-v1.js?v=6"></script>
 <script id="NP_PRODUCT_BRANDING_V1">
 (function(){
-const c=window.NP_SYSTEM_CONFIG||{},brand=c.nomeAttivita||"Next Point Padel";
-document.title=document.title.replace(/Next Point Padel/gi,brand);
+const c=window.NP_SYSTEM_CONFIG||{},brand=c.nomeAttivita||"Organizzazione sportiva";
+document.title=document.title.replace(/Organizzazione sportiva/gi,brand);
 document.querySelectorAll("body *").forEach(el=>{
- if(el.children.length===0&&el.textContent.includes("Next Point Padel"))el.textContent=el.textContent.replace(/Next Point Padel/gi,brand);
+ if(el.children.length===0&&el.textContent.includes("Organizzazione sportiva"))el.textContent=el.textContent.replace(/Organizzazione sportiva/gi,brand);
 });
 document.querySelectorAll('a[href^="mailto:"]').forEach(a=>{if(c.email)a.href="mailto:"+c.email});
 document.querySelectorAll('a[href^="tel:"]').forEach(a=>{if(c.telefono)a.href="tel:"+c.telefono.replace(/[^+0-9]/g,"")});
-const logos=document.querySelectorAll("img[src*='icona_app1.jpg'],img[alt*='Next Point Padel']");
+const logos=document.querySelectorAll("img[src*='icona_app1.jpg'],img[alt*='Organizzazione sportiva']");
 logos.forEach(x=>{if(c.logo)x.src=c.logo;if(x.alt)x.alt=brand});
 if(c.sfondo)document.body.style.backgroundImage="linear-gradient(rgba(3,12,24,.35),rgba(3,12,24,.78)),url('"+c.sfondo+"')";
 })();
