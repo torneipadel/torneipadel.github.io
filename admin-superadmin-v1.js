@@ -39,6 +39,7 @@
 
     const mobileNav=document.querySelector('.mobile-nav');
     if(!mobileNav)return;
+    mobileNav.querySelectorAll('#mobileSuperadmin').forEach((x,i)=>{if(i>0)x.remove()});
     let mobile=$('mobileSuperadmin');
     if(!isSuper()){
       mobile?.remove();
