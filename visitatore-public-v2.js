@@ -15,7 +15,7 @@ function openT(t){return (t.pubblicato===true||String(t.stato||'').toLowerCase()
 function closedT(t){return t.iscrizioni_chiuse===true||['chiuso','concluso','archiviato'].includes(String(t.stato||'').toLowerCase())}
 function capacity(t){const current=counts[t.id]||0;const max=(Number(t.posti)||Number(t.configurazione?.rules?.numeroSquadre)||8)*2;return{current,max,remaining:Math.max(0,max-current)}}
 function vaiIscrizione(v){if(!v){alert('Torneo non valido');return}location.href='iscrizione.html?torneo='+encodeURIComponent(v)}
-function apriTorneoPubblico(v){if(!v){alert('Torneo non valido');return}location.href='Bove.html?idTorneo='+encodeURIComponent(v)}
+function apriTorneoPubblico(v){if(!v){alert('Torneo non valido');return}location.href='tabellone.html?idTorneo='+encodeURIComponent(v)}
 window.vaiIscrizione=vaiIscrizione;window.apriTorneoPubblico=apriTorneoPubblico;
 function menu(open){document.getElementById('npMenu')?.classList.toggle('open',open)}
 window.apriMenu=()=>menu(true);window.chiudiMenu=()=>menu(false);window.apriMercatino=()=>location.href='mercatino.html';window.apriContatti=()=>location.href='contatti.html';window.esciVisitatore=async()=>{try{await client?.auth.signOut()}finally{location.href='index.html'}};
