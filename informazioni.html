@@ -117,5 +117,16 @@ const button=document.querySelector('.menu-button');
 if(panel.classList.contains('open')&&!panel.contains(e.target)&&!button.contains(e.target))panel.classList.remove('open')
 });
 </script>
-</body>
+<script>
+(function(){
+const c=window.NP_SYSTEM_CONFIG||{},brand=c.nomeAttivita||"Next Point Padel";
+document.title="Informazioni · "+brand;
+document.querySelectorAll("body *").forEach(el=>{
+ if(el.children.length===0&&el.textContent.includes("Next Point Padel"))el.textContent=el.textContent.replace(/Next Point Padel/g,brand);
+});
+const logo=document.querySelector(".logo");if(logo&&c.logo)logo.src=c.logo;
+if(c.sfondo)document.body.style.backgroundImage="linear-gradient(rgba(3,12,24,.35),rgba(3,12,24,.78)),url('"+c.sfondo+"')";
+const footer=document.querySelector(".footer");if(footer)footer.textContent=brand+" · Una passione condivisa";
+})();
+</script></body>
 </html>
