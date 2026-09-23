@@ -189,8 +189,7 @@
 
   const CODE_FILES=['Bove.html','admin.html','admin-superadmin-v1.js','manuale.html','admin-system-monitor-v1.js','admin-torneo-rotazione-v1.js'];
   const GITHUB_REPO='torneirobertobove/torneirobertobove.github.io';
-  const COMPLETE_PROJECT_BACKUP_BRANCH='backup-completo-2026-09-23-2114';
-  const COMPLETE_PROJECT_BACKUP_COMMIT='d1bc780c4890177310d5a12f49f7fa79e77c9ede';
+  const COMPLETE_PROJECT_BACKUP_FUNCTION='project-complete-backup';
 
   async function loadCodeBackups(){
     const box=$('codeBackupList'); if(!box)return;
@@ -260,32 +259,34 @@
     if(!box)return;
     box.innerHTML='<div class="empty">Lettura backup completi...</div>';
     try{
-      const r=await fetch('https://api.github.com/repos/'+GITHUB_REPO+'/branches?per_page=100',{headers:{Accept:'application/vnd.github+json'}});
-      if(!r.ok)throw new Error('GitHub HTTP '+r.status);
-      const branches=await r.json();
-      const rows=(branches||[]).filter(b=>String(b.name||'').startsWith('backup-completo-')).sort((a,b)=>String(b.name).localeCompare(String(a.name)));
-      box.innerHTML=rows.length?'<div style="display:grid;gap:6px">'+rows.map(b=>'<div style="padding:8px;border:1px solid #eee;border-radius:8px"><b>'+esc(b.name)+'</b> · <a href="https://github.com/'+GITHUB_REPO+'/tree/'+encodeURIComponent(b.name)+'" target="_blank" rel="noopener">Apri</a></div>').join('')+'</div>':'<div class="empty">Nessun backup completo trovato.</div>';
-    }catch(e){box.innerHTML='<div class="empty">Impossibile leggere i backup completi: '+esc(e.message)+'</div>'}
+      const c=client();
+      if(!c?.functions?.invoke)throw new Error('Servizio backup non disponibile');
+      const r=await c.functions.invoke(COMPLETE_PROJECT_BACKUP_FUNCTION,{method:'GET'});
+      if(r.error)throw r.error;
+      const rows=(r.data?.backups||[]).sort((a,b)=>new Date(b.created_at)-new Date(a.created_at));
+      box.innerHTML=rows.length?'<div style="display:grid;gap:6px">'+rows.map(b=>'<div style="padding:9px;border:1px solid #eee;border-radius:8px"><div><b>'+esc(b.branch_name)+'</b> · '+esc(dt(b.created_at))+'</div><small>Commit: <code>'+esc(String(b.commit_sha||'').slice(0,10))+'</code> · '+esc(b.created_by_email||'-')+'</small><div style="margin-top:5px"><a href="https://github.com/'+GITHUB_REPO+'/tree/'+encodeURIComponent(b.branch_name)+'" target="_blank" rel="noopener">Apri backup</a> · <a href="https://github.com/'+GITHUB_REPO+'/commit/'+encodeURIComponent(b.commit_sha)+'" target="_blank" rel="noopener">Apri commit</a></div></div>').join('')+'</div>':'<div class="empty">Nessun backup completo trovato.</div>';
+    }catch(e){box.innerHTML='<div class="empty">Impossibile leggere i backup completi: '+esc(e.message||e)+'</div>'}
   }
 
   async function createCompleteProjectBackup(){
     if(!isSuper())return;
-    const stamp=new Date().toISOString().replace(/[-:]/g,'').replace(/\.\d{3}Z$/,'Z').replace('T','-').replace('Z','');
-    const branch='backup-completo-'+stamp;
     const status=$('completeProjectBackupStatus');
+    const button=$('createCompleteProjectBackup');
+    if(button)button.disabled=true;
     if(status)status.innerHTML='<span class="notice">Creazione backup completo in corso...</span>';
     try{
-      const r=await fetch('https://api.github.com/repos/'+GITHUB_REPO+'/git/ref/heads/main',{headers:{Accept:'application/vnd.github+json'}});
-      if(!r.ok)throw new Error('Impossibile leggere main (HTTP '+r.status+')');
-      const ref=await r.json();
-      const sha=ref.object?.sha;
-      if(!sha)throw new Error('Commit main non disponibile');
-      const cr=await fetch('https://api.github.com/repos/'+GITHUB_REPO+'/git/refs',{method:'POST',headers:{Accept:'application/vnd.github+json','Content-Type':'application/json'},body:JSON.stringify({ref:'refs/heads/'+branch,sha})});
-      if(!cr.ok)throw new Error('Creazione branch non riuscita (HTTP '+cr.status+')');
-      if(status)status.innerHTML='<span class="notice">✅ Backup completo creato: <code>'+esc(branch)+'</code></span>';
+      const c=client();
+      if(!c?.functions?.invoke)throw new Error('Servizio backup non disponibile');
+      const r=await c.functions.invoke(COMPLETE_PROJECT_BACKUP_FUNCTION,{method:'POST',body:{}});
+      if(r.error)throw r.error;
+      if(!r.data?.ok)throw new Error(r.data?.error||'Backup non creato');
+      const b=r.data.backup||{};
+      if(status)status.innerHTML='<span class="notice">✅ Backup completo creato: <code>'+esc(b.branch_name||'-')+'</code> · commit <code>'+esc(String(b.commit_sha||'').slice(0,10))+'</code></span>';
       await loadCompleteProjectBackups();
     }catch(e){
-      if(status)status.innerHTML='<span class="notice" style="color:#b42318">❌ Backup non creato: '+esc(e.message)+'</span>';
+      if(status)status.innerHTML='<span class="notice" style="color:#b42318">❌ Backup non creato: '+esc(e.message||e)+'</span>';
+    }finally{
+      if(button)button.disabled=false;
     }
   }
 
