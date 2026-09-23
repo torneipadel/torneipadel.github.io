@@ -210,7 +210,13 @@
     let html=
       '<div style="margin-bottom:16px;padding:14px;border:1px solid #198754;border-radius:10px;background:#eefaf2">'+
       '<div style="font-weight:800;font-size:16px">💾 Backup completo progetto</div>'+
-      '<div style="margin-top:6px">Snapshot completo del repository residente in GitHub come branch di backup.</div>'+
+      '<div style="margin-top:6px">Crea in qualsiasi momento un nuovo snapshot completo dell’intero repository, senza modificare <code>main</code>.</div>'+
+      '<div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap">'+
+      '<button type="button" class="btn small" id="createCompleteProjectBackup">💾 Esegui backup completo adesso</button>'+
+      '<button type="button" class="btn small" id="refreshCompleteProjectBackups">↻ Aggiorna backup</button>'+
+      '</div>'+
+      '<div id="completeProjectBackupStatus" style="margin-top:10px"></div>'+
+      '<div id="completeProjectBackupHistory" style="margin-top:10px"></div>'+
       '<div style="margin-top:8px"><b>Branch:</b> <code>'+esc(COMPLETE_PROJECT_BACKUP_BRANCH)+'</code> · <b>Commit:</b> <code>'+esc(COMPLETE_PROJECT_BACKUP_COMMIT.slice(0,10))+'</code></div>'+
       '<div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap">'+
       '<a class="btn small" href="https://github.com/'+GITHUB_REPO+'/tree/'+COMPLETE_PROJECT_BACKUP_BRANCH+'" target="_blank" rel="noopener">Apri backup completo</a>'+
@@ -242,8 +248,45 @@
     });
     html+='</div><div style="margin-top:12px;padding:10px 12px;border-left:4px solid #9a6700;background:#fff8e6"><b>Ripristino:</b> il Superadmin seleziona una versione completa del file; la richiesta viene presa automaticamente da GitHub Actions e genera un nuovo commit, senza cancellare la cronologia precedente. Il controllo viene eseguito ogni 5 minuti.</div>';
     box.innerHTML=html;
+    $('createCompleteProjectBackup')?.addEventListener('click',createCompleteProjectBackup);
+    $('refreshCompleteProjectBackups')?.addEventListener('click',loadCompleteProjectBackups);
+    await loadCompleteProjectBackups();
     box.querySelectorAll('[data-code-status]').forEach(b=>b.onclick=()=>setCodeStatus(b.dataset.codeFile,b.dataset.codeSha,b.dataset.codeStatus));
     box.querySelectorAll('[data-code-restore]').forEach(b=>b.onclick=()=>requestCodeRestore(b.dataset.codeFile,b.dataset.codeRestore));
+  }
+
+  async function loadCompleteProjectBackups(){
+    const box=$('completeProjectBackupHistory');
+    if(!box)return;
+    box.innerHTML='<div class="empty">Lettura backup completi...</div>';
+    try{
+      const r=await fetch('https://api.github.com/repos/'+GITHUB_REPO+'/branches?per_page=100',{headers:{Accept:'application/vnd.github+json'}});
+      if(!r.ok)throw new Error('GitHub HTTP '+r.status);
+      const branches=await r.json();
+      const rows=(branches||[]).filter(b=>String(b.name||'').startsWith('backup-completo-')).sort((a,b)=>String(b.name).localeCompare(String(a.name)));
+      box.innerHTML=rows.length?'<div style="display:grid;gap:6px">'+rows.map(b=>'<div style="padding:8px;border:1px solid #eee;border-radius:8px"><b>'+esc(b.name)+'</b> · <a href="https://github.com/'+GITHUB_REPO+'/tree/'+encodeURIComponent(b.name)+'" target="_blank" rel="noopener">Apri</a></div>').join('')+'</div>':'<div class="empty">Nessun backup completo trovato.</div>';
+    }catch(e){box.innerHTML='<div class="empty">Impossibile leggere i backup completi: '+esc(e.message)+'</div>'}
+  }
+
+  async function createCompleteProjectBackup(){
+    if(!isSuper())return;
+    const stamp=new Date().toISOString().replace(/[-:]/g,'').replace(/\.\d{3}Z$/,'Z').replace('T','-').replace('Z','');
+    const branch='backup-completo-'+stamp;
+    const status=$('completeProjectBackupStatus');
+    if(status)status.innerHTML='<span class="notice">Creazione backup completo in corso...</span>';
+    try{
+      const r=await fetch('https://api.github.com/repos/'+GITHUB_REPO+'/git/ref/heads/main',{headers:{Accept:'application/vnd.github+json'}});
+      if(!r.ok)throw new Error('Impossibile leggere main (HTTP '+r.status+')');
+      const ref=await r.json();
+      const sha=ref.object?.sha;
+      if(!sha)throw new Error('Commit main non disponibile');
+      const cr=await fetch('https://api.github.com/repos/'+GITHUB_REPO+'/git/refs',{method:'POST',headers:{Accept:'application/vnd.github+json','Content-Type':'application/json'},body:JSON.stringify({ref:'refs/heads/'+branch,sha})});
+      if(!cr.ok)throw new Error('Creazione branch non riuscita (HTTP '+cr.status+')');
+      if(status)status.innerHTML='<span class="notice">✅ Backup completo creato: <code>'+esc(branch)+'</code></span>';
+      await loadCompleteProjectBackups();
+    }catch(e){
+      if(status)status.innerHTML='<span class="notice" style="color:#b42318">❌ Backup non creato: '+esc(e.message)+'</span>';
+    }
   }
 
   async function setCodeStatus(file,sha,status){
