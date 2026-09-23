@@ -17,6 +17,8 @@
   }
 
   function addSuperadminNav(){
+    const duplicates=[...document.querySelectorAll('#sideSuperadmin')];
+    if(duplicates.length>1)duplicates.slice(1).forEach(x=>x.remove());
     const groups=[...document.querySelectorAll('#areaAdmin .sidebar .nav-group')];
     const system=groups.find(g=>g.querySelector('.nav-label')?.textContent?.trim()==='Sistema');
     if(!system||$('sideSuperadmin'))return;
@@ -120,7 +122,7 @@
       '<div style="padding:10px 12px;border-left:4px solid #198754;background:#eefaf2"><b>Come funziona:</b> per i dati amministrativi il sistema conserva lo snapshot della singola riga quando viene inserita, modificata o cancellata. Il Superadmin può quindi riportare quella riga allo stato salvato. Non è un’immagine completa dell’intero database in un unico backup.</div>'+
       '<div style="padding:10px 12px;border-left:4px solid #9a6700;background:#fff8e6"><b>Importante:</b> il ripristino è possibile solo se esiste il relativo snapshot. Un dato creato e mai passato da un backup non può essere ricostruito.</div>'+
       '</div>';
-    await Promise.all([loadAudit(),loadBackups(),loadDataBackups()]);
+    await Promise.all([loadAudit(),loadBackups(),loadDataBackups(),loadCodeBackups()]);
     return true;
   }
 
