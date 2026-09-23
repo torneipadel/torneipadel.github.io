@@ -14,7 +14,7 @@
 @media(max-width:600px){body{background-attachment:scroll}.page{width:calc(100% - 20px);padding-top:10px}.top{top:7px}.brand-logo{width:94px}.brand-name{font-size:14px}.brand-sub{font-size:8px;white-space:normal}.back{padding:9px 13px;font-size:9px}.heroTitle{margin-top:25px}.heroTitle h1{font-size:40px}.featured{border-radius:19px}.featuredMedia{min-height:190px}.featuredBody{padding:20px}.featuredBody h2{font-size:26px}.card{border-radius:19px}.filters{gap:7px}.filter{padding:8px 11px}}
 @media(prefers-reduced-motion:reduce){.back,.cta,.filter{transition:none}}
 </style>
-</head>
+<script src="system-config-v1.js?v=1"></script></head>
 <body>
 <div class="page">
 <div class="top"><div class="brand"><img class="brand-logo" src="/loghi/icona_app1.jpg" alt="NEXT POINT PADEL"><div class="brand-copy"><div class="brand-name">NEXT POINT PADEL</div><div class="brand-sub">gestione tornei ed eventi padel</div></div></div><a class="back" href="dashboard.html?v=20260924" onclick="window.location.replace('dashboard.html?v=20260924');return false;">← Torna al sito</a></div>
@@ -41,5 +41,18 @@ async function deleteNews(torneoId,index){if(!isAdmin)return;if(!Number.isIntege
 async function load(){const [torneiRes,globalRes,marketRes]=await Promise.all([sb.from('tornei').select('id,nome,data,data_torneo,updated_at,descrizione,pubblicato,stato,configurazione').order('updated_at',{ascending:false}),sb.from('news').select('id,titolo,testo,immagine,pubblicata,created_at').eq('pubblicata',true).order('created_at',{ascending:false}),sb.from('mercatino').select('id,titolo,anteprima,descrizione,immagine,pubblicato,stato,created_at').eq('pubblicato',true).eq('stato','disponibile').order('created_at',{ascending:false})]);const torneiError=torneiRes.error,globalError=globalRes.error,marketError=marketRes.error;if(torneiError&&globalError&&marketError){document.getElementById('app').innerHTML='<div class="empty">Le News non sono momentaneamente disponibili.</div>';console.error(torneiError,globalError,marketError);return}const manualNews=globalError?[]:(globalRes.data||[]).map(normalizeGlobalNews);const torneoNews=torneiError?[]:(torneiRes.data||[]).filter(t=>t.pubblicato===true||String(t.stato||'').toLowerCase()==='attivo').map(normalizeTournamentNews);const marketNews=marketError?[]:(marketRes.data||[]).map(normalizeMarketNews);const torneoConfigNews=torneiError?[]:(torneiRes.data||[]).flatMap(normalizeNews);allNews=[...torneoConfigNews,...manualNews,...torneoNews,...marketNews].sort(sortNews);render()}
 (async()=>{isAdmin=await checkAdmin();await load()})();
 </script>
-</body>
+<script id="NP_PRODUCT_BRANDING_V1">
+(function(){
+const c=window.NP_SYSTEM_CONFIG||{},brand=c.nomeAttivita||"Next Point Padel";
+document.title=document.title.replace(/Next Point Padel/gi,brand);
+document.querySelectorAll("body *").forEach(el=>{
+ if(el.children.length===0&&el.textContent.includes("Next Point Padel"))el.textContent=el.textContent.replace(/Next Point Padel/gi,brand);
+});
+document.querySelectorAll('a[href^="mailto:"]').forEach(a=>{if(c.email)a.href="mailto:"+c.email});
+document.querySelectorAll('a[href^="tel:"]').forEach(a=>{if(c.telefono)a.href="tel:"+c.telefono.replace(/[^+0-9]/g,"")});
+const logos=document.querySelectorAll("img[src*='icona_app1.jpg'],img[alt*='Next Point Padel']");
+logos.forEach(x=>{if(c.logo)x.src=c.logo;if(x.alt)x.alt=brand});
+if(c.sfondo)document.body.style.backgroundImage="linear-gradient(rgba(3,12,24,.35),rgba(3,12,24,.78)),url('"+c.sfondo+"')";
+})();
+</script></body>
 </html>
