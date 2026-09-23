@@ -39,8 +39,12 @@ Mantenere il progetto attuale come laboratorio di sviluppo e collaudo e costruir
 - La famiglia Archivio è stata analizzata: tre moduli duplicati e non caricati sono stati rimossi dal branch Master; la persistenza storica è mantenuta per ulteriore verifica. La famiglia Torneo/Coppie è stata analizzata: quattro moduli legacy non caricati sono stati rimossi e il vecchio tabellone-fix è stato eliminato dopo confronto con il motore attuale.
 
 ## Prossimo obiettivo operativo
-Prossimo blocco: Sponsor, poi WhatsApp e vecchia architettura Admin, sempre con classificazione prima della rimozione.
+Prossimo blocco: WhatsApp e vecchia architettura Admin, sempre con classificazione prima della rimozione.
 
 
 ### Stato News/Poster
 - `admin-news-ai-hide-v1.js` e `admin-news-poster-premium-v2-stable.js` classificati come obsoleti e rimossi da TEMP_AUDIT dopo confronto con le versioni attive.
+
+
+### Stato Sponsor
+- Vecchi moduli Sponsor classificati e rimossi da TEMP_AUDIT dopo confronto con gestione attiva su tabella `sponsor`.
