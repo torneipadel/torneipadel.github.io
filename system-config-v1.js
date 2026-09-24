@@ -2,7 +2,7 @@
 'use strict';
 const defaults={
 nomeAttivita:'Organizzazione sportiva',
-sottotitolo:'Tornei, sport e comunit√†',
+sottotitolo:'Tornei, sport e comunit‡',
 logo:'loghi/icona_app1.jpg',
 sfondo:'2pages.jpg',
 email:'info@example.com',
