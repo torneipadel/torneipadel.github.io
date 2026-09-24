@@ -2,7 +2,7 @@
 (function(){
 'use strict';
 const SPEED=22,GAP=14;
-const SUPABASE_URL='https://iybjvtmfaupgthqqsngd.supabase.co';
+const SUPABASE_URL='https://dkeqicstprvvfebiaooc.supabase.co';
 const SUPABASE_KEY='sb_publishable_oLLML3_ne0I1dWKIinSRNA_K1Ao5SOl';
 let frame=0,running=false,paused=false,last=0,positions=[];
 function client(){
