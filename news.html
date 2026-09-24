@@ -22,8 +22,8 @@
 <main id="app"><div class="loading">Caricamento delle News…</div></main>
 </div>
 <script>
-const SUPABASE_URL='https://iybjvtmfaupgthqqsngd.supabase.co';
-const SUPABASE_KEY='sb_publishable_oLLML3_ne0I1dWKIinSRNA_K1Ao5SOl';
+const SUPABASE_URL='https://dkeqicstprvvfebiaooc.supabase.co';
+const SUPABASE_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRrZXFpY3N0cHJ2dmZiaWFvY29pIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjExNjQ2NjksImV4cCI6MjA3Njc0MDY2OX0.MPlE8CZ2B8pEhSJzTWBJ-FfFLQpwRAxlAlno-SCylWg';
 const sb=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);let allNews=[];let isAdmin=false;
 const esc=v=>String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
 function normalizeNews(row){const cfg=row?.configurazione||{};const arr=Array.isArray(cfg.news)?cfg.news:[];return arr.map((n,i)=>({...n,__torneo:row.nome||'',__torneoId:row.id,__index:i,__global:false,__ordine:Number(n.ordine)||999999,__data:n.data||row.updated_at||row.data_torneo||row.data||''}))}
