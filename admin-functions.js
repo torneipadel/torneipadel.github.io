@@ -1,5 +1,5 @@
 const sb = window.supabase.createClient(
-  "https://iybjvtmfaupgthqqsngd.supabase.co",
+  "https://dkeqicstprvvfebiaooc.supabase.co",
   "sb_publishable_oLLML3_ne0I1dWKIinSRNA_K1Ao5SOl",
   { auth:{ persistSession:true, autoRefreshToken:true, detectSessionInUrl:true } }
 );
