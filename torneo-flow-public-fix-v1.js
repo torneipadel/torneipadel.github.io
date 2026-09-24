@@ -1,7 +1,7 @@
 /* TORNEI PUBLICI V4 - TORNEI + SPONSOR PUBBLICI */
 (function(){
 'use strict';
-const URL_SUPABASE='https://iybjvtmfaupgthqqsngd.supabase.co';
+const URL_SUPABASE='https://dkeqicstprvvfebiaooc.supabase.co';
 const KEY='sb_publishable_oLLML3_ne0I1dWKIinSRNA_K1Ao5SOl';
 function esc(v){return String(v==null?'':v).replace(/[&<>'\"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','\"':'&quot;'}[c]));}
 function idVal(v){return Number(v);}
