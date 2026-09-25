@@ -1,5 +1,5 @@
 (function(){'use strict';
-const URL_SUPABASE='https://dkeqicstprvvfebiaooc.supabase.co';
+const URL_SUPABASE='https://iybjvtmfaupgthqqsngd.supabase.co';
 const KEY='sb_publishable_oLLML3_ne0I1dWKIinSRNA_K1Ao5SOl';
 const client=window.supabase.createClient(URL_SUPABASE,KEY);
 const BUCKET='mercatino-images';
