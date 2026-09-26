@@ -7109,6 +7109,123 @@ try{
                     Array.isArray(iscritti)
                         ? iscritti
                         : [];
+                /* Risoluzione iscrizioni approvate: mai mostrare l'email nel tabellone. */
+                if(Array.isArray(state.iscritti) && state.iscritti.length){
+
+                    const iscrittiByEmail = new Map();
+
+                    state.iscritti.forEach(function(iscritto){
+
+                        const email =
+                            String(iscritto?.email || "")
+                                .trim()
+                                .toLowerCase();
+
+                        if(!email)
+                            return;
+
+                        const nome =
+                            String(iscritto?.nome || "").trim();
+
+                        const cognome =
+                            String(iscritto?.cognome || "").trim();
+
+                        const nomeGiocatore =
+                            String(iscritto?.nome_giocatore || "").trim();
+
+                        const display =
+                            [nome,cognome]
+                                .filter(Boolean)
+                                .join(" ")
+                                .trim() ||
+                            nomeGiocatore ||
+                            email;
+
+                        iscrittiByEmail.set(email,display);
+                    });
+
+                    function risolviEmailIscritto(valore){
+
+                        if(valore===null || valore===undefined)
+                            return valore;
+
+                        if(typeof valore!=="string")
+                            return valore;
+
+                        const testo = valore.trim();
+
+                        if(!testo)
+                            return valore;
+
+                        const diretto =
+                            iscrittiByEmail.get(
+                                testo.toLowerCase()
+                            );
+
+                        if(diretto)
+                            return diretto;
+
+                        if(testo.includes(" / ")){
+
+                            return testo
+                                .split(" / ")
+                                .map(function(parte){
+                                    const p=parte.trim();
+                                    return iscrittiByEmail.get(p.toLowerCase()) || p;
+                                })
+                                .join(" / ");
+                        }
+
+                        return testo;
+                    }
+
+                    function risolviPartecipante(valore){
+
+                        if(typeof valore==="string")
+                            return risolviEmailIscritto(valore);
+
+                        if(!valore || typeof valore!=="object")
+                            return valore;
+
+                        const copia = {...valore};
+
+                        [
+                            "nome",
+                            "name",
+                            "email",
+                            "g1",
+                            "g2",
+                            "giocatore1",
+                            "giocatore2",
+                            "player1",
+                            "player2"
+                        ].forEach(function(key){
+
+                            if(
+                                Object.prototype.hasOwnProperty.call(copia,key)
+                            ){
+                                copia[key]=risolviEmailIscritto(copia[key]);
+                            }
+                        });
+
+                        return copia;
+                    }
+
+                    if(Array.isArray(state.coppie)){
+                        state.coppie =
+                            state.coppie.map(risolviPartecipante);
+                    }
+
+                    if(Array.isArray(state.partecipanti)){
+                        state.partecipanti =
+                            state.partecipanti.map(risolviPartecipante);
+                    }
+
+                    console.log(
+                        "ISCRITTI APPROVATI RISOLTI NEL TABELLONE:",
+                        state.iscritti.length
+                    );
+                }
 
             }
 
