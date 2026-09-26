@@ -1,8 +1,8 @@
 /* TORNEI PUBLICI V4 - TORNEI + SPONSOR PUBBLICI */
 (function(){
 'use strict';
-const URL_SUPABASE='https://iybjvtmfaupgthqqsngd.supabase.co';
-const KEY='sb_publishable_oLLML3_ne0I1dWKIinSRNA_K1Ao5SOl';
+const URL_SUPABASE='https://dkeqicstprvvfebiaooc.supabase.co';
+const KEY='sb_publishable_EBgrU25BpXMp9x6a2n7_Pg_FTFa5JLu';
 function esc(v){return String(v==null?'':v).replace(/[&<>'\"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','\"':'&quot;'}[c]));}
 function idVal(v){return Number(v);}
 function aperto(t){return (t.pubblicato===true||t.stato==='attivo') && t.iscrizioni_chiuse!==true && t.stato!=='chiuso';}
