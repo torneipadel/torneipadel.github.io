@@ -3,8 +3,8 @@
 */
 (function(){
 'use strict';
-const URL_SUPABASE='https://iybjvtmfaupgthqqsngd.supabase.co';
-const KEY='sb_publishable_oLLML3_ne0I1dWKIinSRNA_K1Ao5SOl';
+const URL_SUPABASE='https://dkeqicstprvvfebiaooc.supabase.co';
+const KEY='sb_publishable_EBgrU25BpXMp9x6a2n7_Pg_FTFa5JLu';
 let client=null, tournaments=[], counts={};
 const esc=v=>String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
 const id=v=>Number(v)||0;
